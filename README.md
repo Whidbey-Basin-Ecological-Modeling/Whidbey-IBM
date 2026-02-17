@@ -1,7 +1,8 @@
 
-# Individual-based Model of Juvenile Chinook Salmon in the Skagit River Estuary
+# Individual-based Model of Juvenile Chinook Salmon in the Whidbey Basin
 
-This repository is a C++ implementation of an individual-based model of the behavior of juvenile Chinook salmon in estuarine waters. The project currently focuses on the Skagit River estuary channel network, although the model itself can be used to simulate other environments.
+This repository is a C++ implementation of an individual-based model of the behavior of juvenile Chinook salmon in estuarine waters. The project currently focuses on the 
+Whidbey Basin, although the model itself can be used to simulate other environments. 
 
 ## Authors
 
@@ -30,7 +31,8 @@ Compiling the model and its dependencies requires the following libraries and to
 - `curl`
 - `clang`
 
-These dependencies are installable on Mac via [Homebrew](https://brew.sh); once you have installed Homebrew, run `brew install curl automake autoconf libtool zlib` to get the required packages. A version of `clang` is available as part of the XCode developer tools, which can be installed using the command `xcode-select --install`.
+These dependencies are installable on Mac via [Homebrew](https://brew.sh); once you have installed Homebrew, run `brew install curl automake autoconf libtool zlib` to get the 
+required packages. A version of `clang` is available as part of the XCode developer tools, which can be installed using the command `xcode-select --install`. 
 
 If you have any difficulty installing Homebrew, see [Troy's build notes](troys_build_notes.md). Alternatively, you could use a different package manager, such as [MacPorts](https://www.macports.org/), which tends to 
 be more flexible about allowing you to avoid restricted area on your filesystem and using your home directory instead for all installations.
@@ -39,14 +41,14 @@ Compilation of the GUI also requires a recent (>=3.0) version of [wxWidgets](htt
 
 1. Open a terminal. Clone this repository (as shown below, or with GitHub desktop, or using your other favorite method), then navigate to your local copy:
 
-        git clone git@github.com:noaa-nwfsc/Skagit-IBM.git 
-        cd Skagit-IBM
+        git clone git@github.com:Whidbey-Basin-Ecological-Modeling/Whidbey-IBM.git
+        cd Whidbey-IBM
 
 1. RapidJSON should be installed first. (For more details see [Troy's build notes](troys_build_notes.md).)
 
         cd ..
         git clone https://github.com/Tencent/rapidjson.git
-        cd Skagit-IBM
+        cd Whidbey-IBM
         ln -s ../rapidjson .
 
 1. Then, fetch and install additional dependencies (hdf5, netcdf-c, netcdf-cxx) and compile them. Again, see [Troy's build notes](troys_build_notes.md) if you have difficulty.
@@ -59,23 +61,23 @@ Compilation of the GUI also requires a recent (>=3.0) version of [wxWidgets](htt
         git clone https://github.com/catchorg/Catch2.git
         cd ..
 
-1. Configure the build. This assumes you are in the root of the repository (probably named `Skagit-IBM`. For a release build (the default):
+1. Configure the build. This assumes you are in the root of the repository (probably named `Whidbey-IBM`. For a release build (the default):
 
         mkdir build
-        cmake -S . -B ./build/release
+        cmake -S . -B ./build/cmake-release
 
     For a debug build:     
 
-        cmake -DCMAKE_BUILD_TYPE=Debug -S . -B ./build/debug
+        cmake -DCMAKE_BUILD_TYPE=Debug -S . -B ./build/cmake-debug
 
 1. Compile the model executables. Commands below assume you are in root of the repository.
 
-        cmake --build ./build/debug/
+        cmake --build ./build/cmake-debug/
 
    The above command builds the `headless`, `gui`, and `tests` executables. You can also build specific targets in a similar manner:
 
-        cmake --build ./build/release/ --target clean
-        cmake --build ./build/release/ --target gui
+        cmake --build ./build/cmake-release/ --target clean
+        cmake --build ./build/cmake-release/ --target gui
 
    More examples of build commands may be found at the top of the `CMakeLists.txt file`.
 

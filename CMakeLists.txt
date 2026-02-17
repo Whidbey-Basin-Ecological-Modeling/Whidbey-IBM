@@ -1,19 +1,19 @@
-# examples
-# configure: "cmake -DCMAKE_BUILD_TYPE=Debug -S ~/code/Skagit-IBM -B ~/code/Skagit-IBM/build/debug"
-# build    : "cmake --build ~/code/Skagit-IBM/build/debug"
-# build a target: "cmake --build ~/code/Skagit-IBM/build/debug --target headless --verbose"
-# clean    : "cmake --build ~/code/Skagit-IBM/build/debug --target clean"
+# examples. these assume the project root is ~/code/Whidbey-IBM
+# configure: "cmake -DCMAKE_BUILD_TYPE=Debug -S ~/code/Whidbey-IBM -B ~/code/Whidbey-IBM/build/cmake-debug"
+# build    : "cmake --build ~/code/Whidbey-IBM/build/cmake-debug"
+# build a target: "cmake --build ~/code/Whidbey-IBM/build/cmake-debug --target headless --verbose"
+# clean    : "cmake --build ~/code/Whidbey-IBM/build/cmake-debug --target clean"
 #
 # configure release build with ASAN and debugging info:
-#    "cmake -DCMAKE_BUILD_TYPE=RelWithDebugStack -DENABLE_ASAN=ON -S ~/code/Skagit-IBM -B ~/code/Skagit-IBM/build/releaseWithSyms"
-# and build it: "cmake --build ~/code/Skagit-IBM/build/releaseWithSyms --target headless"
+#    "cmake -DCMAKE_BUILD_TYPE=RelWithDebugStack -DENABLE_ASAN=ON -S ~/code/Whidbey-IBM -B ~/code/Whidbey-IBM/build/releaseWithSyms"
+# and build it: "cmake --build ~/code/~/code/Whidbey-IBM/build/releaseWithSyms --target headless"
 # a good set of ASAN options to run that build with (note the suppression of leak detection):
 # "export ASAN_OPTIONS=detect_odr_violation=0:alloc_dealloc_mismatch=0:halt_on_error=0:print_stacktrace=1:quarantine_size_mb=256:verbosity=0:sleep_before_dying=30:detect_leaks=0"
 #
 # configure debug build with QUICK_DEBUG_HACK defined. note: this puts the build in a different directory, "debug-hack"
-#    "cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} -DQUICK_DEBUG_HACK" -S ~/code/Skagit-IBM -B ~/code/Skagit-IBM/build/debug-hack"
+#    "cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} -DQUICK_DEBUG_HACK" -S ~/code/Whidbey-IBM -B ~/code/Whidbey-IBM/build/debug-hack"
 #
-# executables show up in {Skagit-IBM-ROOT}/bin under a subdirectory (e.g. /Debug or /Release)
+# executables show up in {Whidbey-IBM-ROOT}/bin under a subdirectory (e.g. /Debug or /Release)
 
 cmake_minimum_required(VERSION 3.10)
 project(headless_gui VERSION 1.0)
@@ -74,6 +74,19 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src
 )
 
+# Get absolute paths for rpath
+get_filename_component(ABSLIB_NCCPP "${CMAKE_SOURCE_DIR}/local/netcdf-cxx4/lib" ABSOLUTE)
+get_filename_component(ABSLIB_NCC "${CMAKE_SOURCE_DIR}/local/netcdf-c/lib" ABSOLUTE)
+
+# Determine dynamic library extension
+if(NOT DL_EXT)
+  if(APPLE)
+    set(DL_EXT "dylib" CACHE STRING "Dynamic library extension")
+  else()
+    set(DL_EXT "so" CACHE STRING "Dynamic library extension")
+  endif()
+endif()
+
 add_subdirectory(3rdParty/Catch2)
 add_subdirectory(tests)
 
@@ -101,18 +114,6 @@ set(COMMON_SOURCES
   src/fish_movement_high_awareness.cpp
 )
 
-# Get absolute paths for rpath
-get_filename_component(ABSLIB_NCCPP "${CMAKE_SOURCE_DIR}/local/netcdf-cxx4/lib" ABSOLUTE)
-get_filename_component(ABSLIB_NCC "${CMAKE_SOURCE_DIR}/local/netcdf-c/lib" ABSOLUTE)
-
-# Determine dynamic library extension
-if(NOT DL_EXT)
-  if(APPLE)
-    set(DL_EXT "dylib" CACHE STRING "Dynamic library extension")
-  else()
-    set(DL_EXT "so" CACHE STRING "Dynamic library extension")
-  endif()
-endif()
 # Create headless executable
 add_executable(headless ${COMMON_SOURCES} src/headless.cpp)
 set_target_properties(headless PROPERTIES

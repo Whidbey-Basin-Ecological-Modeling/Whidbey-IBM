@@ -3125,3 +3125,6 @@ build/*
 /.idea.old/editor.xml
 /.idea.old/misc.xml
 /.idea.old/vcs.xml
+rapidjson
+/.idea/workspace.xml
+Catch2
