@@ -30,6 +30,7 @@ set(TEST_SOURCES
         fish_movement_factory_test.cpp
         fish_move_test.cpp
         fish_movement_high_awareness_test.cpp
+        edge_consistency_test.cpp
 )
 
 # These tests can use the Catch2-provided main

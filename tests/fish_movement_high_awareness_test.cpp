@@ -113,7 +113,7 @@ TEST_CASE("FishMovementHighAwareness::getReachableNeighbors multi-hop reachabili
     }
 }
 
-TEST_CASE("FishMovementHighAwareness::getReachableNeighbors Dijkstra shortest path selection", "[fish_movement][high_awareness]") {
+TEST_CASE("FishMovementHighAwareness::getReachableNeighbors Dijkstra shortest path","[fish_movement][high_awareness]") {
     auto hydroModel = std::make_unique<MockHydroModel>();
     Model testModel(hydroModel.get());
 
