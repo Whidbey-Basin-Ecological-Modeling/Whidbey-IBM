@@ -32,8 +32,6 @@ public:
 
     virtual ~HydroModel() = default;
 
-    // Return the flow speed in m/s along the provided edge (from edge.source to edge.target)
-    float getFlowSpeedAlong(Edge &edge);
     // Return the flow speed in m/s at a given location
     float getUnsignedFlowSpeedAt(MapNode &node);
     float getUnsignedFlowSpeedAtHydroNode(DistribHydroNode &hydroNode);

@@ -1,5 +1,78 @@
 latest debug build
 % cmake --build ./build/debug-hack --target headless --verbose; cp troy_run_listings_template.csv troy_run_listings.csv; date; ./bin/Debug/headless "troy_run_listings.csv" "run32/map2000d2014" "run29_config/config_map_2000_data_2014_deterministic.json"; date
+  Change Dir: '/Users/troy.frever/code/Whidbey-IBM/build/debug-hack'
+
+  Run Build Command(s): /Users/troy.frever/homebrew/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile headless
+  /Users/troy.frever/homebrew/bin/cmake -S/Users/troy.frever/code/Whidbey-IBM -B/Users/troy.frever/code/Whidbey-IBM/build/debug-hack --check-build-system CMakeFiles/Makefile.cmake 0
+  /Library/Developer/CommandLineTools/usr/bin/make  -f CMakeFiles/Makefile2 headless
+  /Users/troy.frever/homebrew/bin/cmake -S/Users/troy.frever/code/Whidbey-IBM -B/Users/troy.frever/code/Whidbey-IBM/build/debug-hack --check-build-system CMakeFiles/Makefile.cmake 0
+  /Users/troy.frever/homebrew/bin/cmake -E cmake_progress_start /Users/troy.frever/code/Whidbey-IBM/build/debug-hack/CMakeFiles 9
+  /Library/Developer/CommandLineTools/usr/bin/make  -f CMakeFiles/Makefile2 CMakeFiles/headless.dir/all
+  /Library/Developer/CommandLineTools/usr/bin/make  -f CMakeFiles/headless.dir/build.make CMakeFiles/headless.dir/depend
+  cd /Users/troy.frever/code/Whidbey-IBM/build/debug-hack && /Users/troy.frever/homebrew/bin/cmake -E cmake_depends "Unix Makefiles" /Users/troy.frever/code/Whidbey-IBM /Users/troy.frever/code/Whidbey-IBM /Users/troy.frever/code/Whidbey-IBM/build/debug-hack /Users/troy.frever/code/Whidbey-IBM/build/debug-hack /Users/troy.frever/code/Whidbey-IBM/build/debug-hack/CMakeFiles/headless.dir/DependInfo.cmake "--color="
+  /Library/Developer/CommandLineTools/usr/bin/make  -f CMakeFiles/headless.dir/build.make CMakeFiles/headless.dir/build
+  make[3]: Nothing to be done for `CMakeFiles/headless.dir/build'.
+  [100%] Built target headless
+  /Users/troy.frever/homebrew/bin/cmake -E cmake_progress_start /Users/troy.frever/code/Whidbey-IBM/build/debug-hack/CMakeFiles 0
+
+  Wed Feb 18 14:05:58 PST 2026
+  Configuring model...
+  8 hardware threads available
+  Forcing max threads to 1 due to non-zero RNG seed (42)
+  1 thread(s) enabled
+
+  loading distributary hydrology data: 341/341
+  done loading hydro
+  directionless edges!
+  Found 0 duplicate input edges
+  Found 0 duplicate output edges
+  Removing disconnected node 22158
+  Removing disconnected node 22056
+  Removing disconnected node 21724
+  Nearshore connector nodes: 5 Distributary
+  Nearshore connector nodes: 1 Low tide terrace
+  Nearshore connector nodes: 5 Distributary edge
+  Nearshore connector nodes: 31 Blind channel
+  Nearshore connector nodes: 1 Impoundment
+  Nearshore connector nodes: 377 Nearshore
+  Created 420 new nearshore connector nodes
+  Made  0 disconnected 'distributary' nodes into blind channels
+  Found 0 disconnected nodes
+  Found 0 orphaned nodes
+  Found 0 orphaned protected nodes
+  Map nodes: 6 Boat harbor
+  Map nodes: 150 Low tide terrace
+  Map nodes: 1322 Distributary edge
+  Map nodes: 2126 Distributary
+  Map nodes: 688 Nearshore
+  Map nodes: 155 Impoundment
+  Map nodes: 27661 Blind channel
+  Selected run ID: 0
+  Sample data will be saved to run32/map2000d2014/output_0.nc
+  Step 25: 0.430417s elapsed; 14m42s remaining; 17115 living fish; 0 exited; 4380 dead
+  Step 50: 0.879845s elapsed; 28m26s remaining; 34258 living fish; 0 exited; 11860 dead
+  Step 75: 1.26546s elapsed; 41m31s remaining; 50691 living fish; 0 exited; 22533 dead
+  Step 100: 1.91345s elapsed; 56m15s remaining; 73163 living fish; 0 exited; 37487 dead
+  Step 125: 2.48197s elapsed; 1h12m56s remaining; 102171 living fish; 0 exited; 59312 dead
+  Step 150: 3.05941s elapsed; 1h30m55s remaining; 125229 living fish; 7 exited; 85596 dead
+  Step 175: 3.25948s elapsed; 1h47m0s remaining; 136350 living fish; 154 exited; 113659 dead
+  Step 200: 3.3455s elapsed; 1h59m28s remaining; 143167 living fish; 482 exited; 143106 dead
+  Step 225: 3.7718s elapsed; 2h10m15s remaining; 146890 living fish; 1059 exited; 173161 dead
+  Step 250: 3.22616s elapsed; 2h18m29s remaining; 143379 living fish; 1777 exited; 201406 dead
+  Step 275: 2.9372s elapsed; 2h22m35s remaining; 135895 living fish; 2746 exited; 227378 dead
+  Step 300: 2.9325s elapsed; 2h25m2s remaining; 131112 living fish; 3847 exited; 252340 dead
+  Step 325: 3.19467s elapsed; 2h27m14s remaining; 134805 living fish; 4854 exited; 278030 dead
+  Step 350: 3.31921s elapsed; 2h29m34s remaining; 143935 living fish; 5807 exited; 305051 dead
+  Step 375: 3.79861s elapsed; 2h32m36s remaining; 163656 living fish; 6821 exited; 335049 dead
+  Step 400: 4.37404s elapsed; 2h37m16s remaining; 184204 living fish; 7758 exited; 369368 dead
+^C
+Interrupted at step 416; 1129.67s elapsed since start
+Enter command: ["exit" to terminate, "save <filename>" to save model state, "resume" to continue]
+> exit
+Really exit? [y/N]: y
+Wed Feb 18 14:25:23 PST 2026
+-----------------------
+% cmake --build ./build/debug-hack --target headless --verbose; cp troy_run_listings_template.csv troy_run_listings.csv; date; ./bin/Debug/headless "troy_run_listings.csv" "run32/map2000d2014" "run29_config/config_map_2000_data_2014_deterministic.json"; date
 
 Mon Nov 17 11:49:38 PST 2025
 Configuring model...

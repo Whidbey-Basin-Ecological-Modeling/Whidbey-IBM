@@ -95,23 +95,6 @@ bool HydroModel::isHighTide() {
         && this->currCresTide > this->cresTideData[this->getTime() + 1];
 }
 
-// Calculate flow speed along the provided edge
-float HydroModel::getFlowSpeedAlong(Edge &edge) {
-    if (this->useSimData) {
-        return isDistributary(edge.source->type) ? this->simDistFlow : 0.0f;
-    }
-    // Get the current flow vector at the edge's source
-    float u = this->getCurrentU(this->hydroNodes[edge.source->nearestHydroNodeID]);
-    float v = this->getCurrentV(this->hydroNodes[edge.source->nearestHydroNodeID]);
-    // Get the edge's vector representation
-    float dx = edge.target->x - edge.source->x;
-    float dy = edge.target->y - edge.source->y;
-    // Calculate how colinear the flow vector and the given edge are
-    float d = sqrt(dx * dx + dy * dy);
-    float scalar_proj = u*(dx/d) + v*(dy/d);
-    return scaledFlowSpeed(scalar_proj, *(edge.source));
-}
-
 // Get the current horizontal (E/W) flow velocity in m/s at the given node
 float HydroModel::getCurrentU(const MapNode &node) const {
     return this->getCurrentU(this->hydroNodes[node.nearestHydroNodeID]);
