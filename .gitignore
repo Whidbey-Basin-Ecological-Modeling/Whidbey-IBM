@@ -3128,3 +3128,5 @@ build/*
 rapidjson
 /.idea/workspace.xml
 Catch2
+/run32/map2000d2014/hydro_mapping_*.csv
+/troy_run_listings.csv
