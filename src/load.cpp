@@ -1017,6 +1017,10 @@ void checkAndAddEdge(Edge e) {
 
     addEdgeIfNotDuplicate(edgeSource->edgesOut, e);
     addEdgeIfNotDuplicate(edgeTarget->edgesIn, e);
+
+    // Also populate the unified edge list on both endpoints
+    addEdgeIfNotDuplicate(edgeSource->edges, e);
+    addEdgeIfNotDuplicate(edgeTarget->edges, e);
 }
 
 

@@ -53,6 +53,8 @@ inline void connectNodes(MapNode* nodeA, MapNode* nodeB, float length) {
     Edge edge(nodeA, nodeB, length);
     nodeA->edgesOut.push_back(edge);
     nodeB->edgesIn.push_back(edge);
+    nodeA->edges.push_back(edge);
+    nodeB->edges.push_back(edge);
 }
 
 // Helper to set depth for a node in the mock hydro model

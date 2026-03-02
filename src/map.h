@@ -61,6 +61,11 @@ public:
     MapNode *target; // 'destination' of the edge
     float length; // Edge length (m)
     Edge(MapNode *source, MapNode *target, float length);
+
+    // Given one endpoint of this edge, return the other endpoint
+    MapNode *otherEnd(const MapNode *node) const {
+        return (node == source) ? target : source;
+    }
 };
 
 class MapNode {
@@ -71,6 +76,8 @@ public:
     std::vector<Edge> edgesIn;
     // List of edges for which Edge::source == this
     std::vector<Edge> edgesOut;
+    // Unified (directionless) edge list — contains the union of edgesIn and edgesOut
+    std::vector<Edge> edges;
     float x; // horizontal (longitudinal) UTM Zone 10N coordinate
     float y; // vertical (latitudinal) UTM Zone 10N coordinate
     // see HabitatType declaration above
