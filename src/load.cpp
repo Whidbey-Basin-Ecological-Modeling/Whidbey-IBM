@@ -1276,6 +1276,9 @@ void loadMap(
     std::unordered_set<MapNode *> disconnectedNodes = identifyDisconnectedNodes(dest, recPoints);
     removeDisconnectedNodes(disconnectedNodes, dest, recPoints, monitoringPoints, samplingSites, samplingSitesByNode); //TODO:GROT removes nodes
 
+    // TODO: delete edge validation after refactoring complete
+    validateEdgeConsistency(dest);
+
     std::unordered_set<MapNode *> protectedNodes;
     identifyProtectedNodes(monitoringPoints, samplingSitesByNode, recPoints, protectedNodes);
     simplifyBlindChannels(dest, blindChannelSimplificationRadius, protectedNodes); // TODO:GROT - removes nodes from map. moves some nodes to end of map, preserving ids.
@@ -1283,9 +1286,17 @@ void loadMap(
     if (configMap.getInt(ModelParamKey::VirtualNodes)) {
         expandNearshoreLinks(dest); // TODO:GROT - adds new nodes using negative values for new ids
     };
+
+    // TODO: delete edge validation after refactoring complete
+    // validateEdgeConsistency(dest);
+
     //assignCrossChannelEdges(dest); // OBSOLETE
     fixDisjointDistributaries(dest, recPoints, protectedNodes); //TODO:GROT - deprecate? can change distributaries to blind channels, reports on disconnected and orphaned nodes
     assignNearestHydroNodes(dest, hydroNodes);
     fixElevations(dest, hydroNodes);
+
+    // TODO: remove temporary validation after refactoring complete
+    // validateEdgeConsistency(dest);
+
     outputNodeCounts(dest, "Map");
 }
