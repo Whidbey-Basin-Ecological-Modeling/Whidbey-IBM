@@ -443,6 +443,21 @@ void removeAllEdgesBetween(MapNode *node, MapNode *neighbor) {
             }
         }
     }
+
+    // TODO: remove in/out above when rafactoring complete
+    // remove from edges
+    modified = true;
+    while (modified) {
+        modified = false;
+        for (auto it = node->edges.begin(); it != node->edges.end(); ++it) {
+            if (it->source == neighbor || it->target == neighbor) {
+                node->edges.erase(it);
+                modified = true;
+                break;  // Exit the for loop after erase
+            }
+        }
+    }
+
 }
 
 // Combine two nodes
@@ -583,6 +598,13 @@ MapNode *elaborateEdge(Edge e) {
     newNode->edgesIn.emplace_back(e.source, newNode, e.length/2.0f);
     e.target->edgesIn.emplace_back(newNode, e.target, e.length/2.0f);
     newNode->edgesOut.emplace_back(newNode, e.target, e.length/2.0f);
+    // TODO: remove in/out above when rafactoring complete (replaced by edges below)
+
+    e.source->edges.emplace_back(e.source, newNode, e.length/2.0f);
+    newNode->edges.emplace_back(e.source, newNode, e.length/2.0f);
+    e.target->edges.emplace_back(newNode, e.target, e.length/2.0f);
+    newNode->edges.emplace_back(newNode, e.target, e.length/2.0f);
+
     return newNode;
 }
 
@@ -835,11 +857,8 @@ void fixDisjointDistributaries(std::vector<MapNode *> &map, std::vector<MapNode 
         fringe.pop_back();
         if (!connected.count(curr)) {
             connected.insert(curr);
-            for (Edge &e : curr->edgesIn) {
-                fringe.push_back(e.source);
-            }
-            for (Edge &e : curr->edgesOut) {
-                fringe.push_back(e.target);
+            for (Edge &e: curr->edges) {
+                fringe.push_back(e.otherEnd(curr));
             }
         }
     }
@@ -852,7 +871,7 @@ void fixDisjointDistributaries(std::vector<MapNode *> &map, std::vector<MapNode 
         if (disconnected) {
             ++disconnected_count;
         }
-        if (disconnected && node->edgesIn.empty() && node->edgesOut.empty()) {
+        if (disconnected && node->edges.empty()) {
             ++edgeless;
             if (protectedNodes.count(node)) {
                 ++orphaned_protected;
@@ -894,11 +913,8 @@ std::unordered_set<MapNode *> identifyDisconnectedNodes(const std::vector<MapNod
         walker.pop_back();
         if (!connectedNodes.count(node)) {
             connectedNodes.insert(node);
-            for (Edge &e : node->edgesIn) {
-                walker.push_back(e.source);
-            }
-            for (Edge &e : node->edgesOut) {
-                walker.push_back(e.target);
+            for (const Edge &e : node->edges) {
+                walker.push_back(e.otherEnd(node));
             }
         }
     }
@@ -960,28 +976,18 @@ void removeDisconnectedNodes(const std::unordered_set<MapNode *> &disconnectedNo
 }
 
 void reportDuplicateEdges(const std::vector<MapNode *> &nodes) {
-    int duplicateInEdges = 0;
-    int duplicateOutEdges = 0;
+    int duplicateEdges = 0;
     for (const MapNode *node: nodes) {
-        for (size_t i = 0; i < node->edgesIn.size(); i++) {
-            for (size_t j = i + 1; j < node->edgesIn.size(); j++) {
-                if (node->edgesIn[i].source == node->edgesIn[j].source &&
-                    node->edgesIn[i].target == node->edgesIn[j].target) {
-                    duplicateInEdges++;
-                }
-            }
-        }
-        for (size_t i = 0; i < node->edgesOut.size(); i++) {
-            for (size_t j = i + 1; j < node->edgesOut.size(); j++) {
-                if (node->edgesOut[i].source == node->edgesOut[j].source &&
-                    node->edgesOut[i].target == node->edgesOut[j].target) {
-                    duplicateOutEdges++;
-                }
+        for (size_t i = 0; i < node->edges.size(); i++) {
+            for (size_t j = i + 1; j < node->edges.size(); j++) {
+                if (node->edges[i].source == node->edges[j].source &&
+                    node->edges[i].target == node->edges[j].target) {
+                    duplicateEdges++;
+                    }
             }
         }
     }
-    std::cout << "Found " << duplicateInEdges << " duplicate input edges" << std::endl;
-    std::cout << "Found " << duplicateOutEdges << " duplicate output edges" << std::endl;
+    std::cout << "Found " << duplicateEdges << " duplicate edges" << std::endl;
 }
 
 bool hasReversedEdgeOf(const Edge &newEdge) {
@@ -1035,7 +1041,7 @@ struct EdgeValidationResult {
     }
 };
 
-void validateEdgeConsistency(const std::vector<MapNode *> &map) {
+void validateAllEdgeConsistency(const std::vector<MapNode *> &map) {
     EdgeValidationResult result;
     result.totalNodes = map.size();
 
@@ -1267,7 +1273,7 @@ void loadMap(
     }
 
     // TODO: delete edge validation after refactoring complete
-    validateEdgeConsistency(dest);
+    validateAllEdgeConsistency(dest);
 
     // Clean up clean up everybody do your share
     //condenseMissingNodes(dest);
@@ -1277,7 +1283,7 @@ void loadMap(
     removeDisconnectedNodes(disconnectedNodes, dest, recPoints, monitoringPoints, samplingSites, samplingSitesByNode); //TODO:GROT removes nodes
 
     // TODO: delete edge validation after refactoring complete
-    validateEdgeConsistency(dest);
+    validateAllEdgeConsistency(dest);
 
     std::unordered_set<MapNode *> protectedNodes;
     identifyProtectedNodes(monitoringPoints, samplingSitesByNode, recPoints, protectedNodes);
@@ -1288,7 +1294,7 @@ void loadMap(
     };
 
     // TODO: delete edge validation after refactoring complete
-    // validateEdgeConsistency(dest);
+    validateAllEdgeConsistency(dest);
 
     //assignCrossChannelEdges(dest); // OBSOLETE
     fixDisjointDistributaries(dest, recPoints, protectedNodes); //TODO:GROT - deprecate? can change distributaries to blind channels, reports on disconnected and orphaned nodes
@@ -1296,7 +1302,7 @@ void loadMap(
     fixElevations(dest, hydroNodes);
 
     // TODO: remove temporary validation after refactoring complete
-    // validateEdgeConsistency(dest);
+    validateAllEdgeConsistency(dest);
 
     outputNodeCounts(dest, "Map");
 }
