@@ -403,11 +403,16 @@ void MapView::OnPaint(wxPaintEvent &evt) {
             dc.DrawLine(ccBx0, ccBy0, ccBx1, ccBy1);
         }
         */
-        dc.SetPen(upstreamHighlightPen);
         dc.SetTextForeground(wxColour(128,128,128,128));
-        for (Edge &e : this->selectedNode->edgesIn) {
-            int x1 = (int) zoom(e.source->x, this->mapCenterX, ((float) w)/2.0f, this->viewZoom);
-            int y1 = (int) zoom(e.source->y, this->mapCenterY, ((float) h)/2.0f, -this->viewZoom);
+        for (Edge &e : this->selectedNode->edges) {
+            const bool isUpstream = (e.target == this->selectedNode); // incoming: neighbor -> selected
+            dc.SetPen(isUpstream ? upstreamHighlightPen : downstreamHighlightPen);
+
+            MapNode *other = e.otherEnd(this->selectedNode);
+
+            int x1 = (int) zoom(other->x, this->mapCenterX, ((float) w)/2.0f, this->viewZoom);
+            int y1 = (int) zoom(other->y, this->mapCenterY, ((float) h)/2.0f, -this->viewZoom);
+
             std::string edgeLabel = std::to_string((int) e.length);
             wxSize s = dc.GetTextExtent(edgeLabel);
             if (abs(x1 - sx) > s.GetWidth() || abs(y1 - sy) > s.GetHeight()) {
@@ -415,28 +420,7 @@ void MapView::OnPaint(wxPaintEvent &evt) {
             }
             dc.DrawLine(sx, sy, x1, y1);
         }
-        dc.SetPen(downstreamHighlightPen);
-        for (Edge &e : this->selectedNode->edgesOut) {
-            int x1 = (int) zoom(e.target->x, this->mapCenterX, ((float) w)/2.0f, this->viewZoom);
-            int y1 = (int) zoom(e.target->y, this->mapCenterY, ((float) h)/2.0f, -this->viewZoom);
-            std::string edgeLabel = std::to_string((int) e.length);
-            wxSize s = dc.GetTextExtent(edgeLabel);
-            if (abs(x1 - sx) > s.GetWidth() || abs(y1 - sy) > s.GetHeight()) {
-                dc.DrawText(edgeLabel, (x1 + sx)/2 - s.GetWidth()/2, (y1 + sy)/2 - s.GetHeight()/2);
-            }
-            dc.DrawLine(sx, sy, x1, y1);
-        }
-        dc.SetTextForeground(*wxBLACK);
-        dc.SetPen(wxNullPen);
-        if (this->selectedFishId != -1) {
-            for (auto it = this->selectedFishRange.begin(); it != this->selectedFishRange.end(); ++it) {
-                MapNode *n = it->first;
-                int x0 = (int) zoom(n->x, this->mapCenterX, ((float) w)/2.0f, this->viewZoom);
-                int y0 = (int) zoom(n->y, this->mapCenterY, ((float) h)/2.0f, -this->viewZoom);
-                dc.SetBrush(wxBrush(getRangeColor(it->second)));
-                dc.DrawCircle(x0, y0, 6);
-            }
-        }
+
         dc.SetPen(infoBorderPen);
         dc.SetBrush(infoBgBrush);
         std::vector<std::string> text = getLocInfo(*this->model, *this->selectedNode);
@@ -496,38 +480,38 @@ void MapView::redraw(wxDC &dc, float centerX, float centerY, float viewW, float 
         if (x0 < 0 || x0 > ((int) viewW) || y0 < 0 || y0 > ((int) viewH)) {
             continue;
         }
-        for (Edge &e : n->edgesOut) {
-            if (!this->mapSet.count(e.target)) {
+        for (Edge &e : n->edges) {
+            const bool isOutgoing = (e.source == n);
+            MapNode *other = e.otherEnd(n);
+
+            if (!this->mapSet.count(other)) {
                 dc.SetBrush(*wxRED_BRUSH);
                 dc.DrawCircle(x0, y0, 3);
                 dc.SetBrush(wxNullBrush);
                 continue;
             }
-            if (n->type == HabitatType::DistributaryEdge && e.target->type == HabitatType::DistributaryEdge) {
+
+            // Choose pen color based on direction and types
+            if (n->type == HabitatType::DistributaryEdge && other->type == HabitatType::DistributaryEdge) {
                 dc.SetPen(wxPen(*getHabitatColor(HabitatType::DistributaryEdge)));
             } else {
-                dc.SetPen(wxPen(*getHabitatColor(n->type)));
+                // Legacy behavior:
+                // - outgoing edges used n->type color
+                // - incoming edges used source(node on the other end)->type color (i.e., "other")
+                dc.SetPen(wxPen(*getHabitatColor(isOutgoing ? n->type : other->type)));
             }
-            int x1 = (int) zoom(e.target->x, centerX, viewW/2.0f, this->viewZoom);
-            int y1 = (int) zoom(e.target->y, centerY, viewH/2.0f, -this->viewZoom);
-            dc.DrawLine(x0, y0, x1, y1);
-        }
-        for (Edge &e : n->edgesIn) {
-            if (!this->mapSet.count(e.source)) {
-                dc.SetBrush(*wxRED_BRUSH);
-                dc.DrawCircle(x0, y0, 3);
-                dc.SetBrush(wxNullBrush);
-                continue;
-            }
-            int x1 = (int) zoom(e.source->x, centerX, viewW/2.0f, this->viewZoom);
-            int y1 = (int) zoom(e.source->y, centerY, viewH/2.0f, -this->viewZoom);
-            if (x1 < 0 || x1 > ((int) viewW) || y1 < 0 || y1 > ((int) viewH)) {
-                if (n->type == HabitatType::DistributaryEdge && e.source->type == HabitatType::DistributaryEdge) {
-                    dc.SetPen(wxPen(*getHabitatColor(HabitatType::DistributaryEdge)));
-                } else {
-                    dc.SetPen(wxPen(*getHabitatColor(e.source->type)));
-                }
+
+            int x1 = (int) zoom(other->x, centerX, viewW/2.0f, this->viewZoom);
+            int y1 = (int) zoom(other->y, centerY, viewH/2.0f, -this->viewZoom);
+
+            if (isOutgoing) {
+                // old edgesOut: always draw
                 dc.DrawLine(x0, y0, x1, y1);
+            } else {
+                // old edgesIn: only draw if the other end is offscreen
+                if (x1 < 0 || x1 > ((int) viewW) || y1 < 0 || y1 > ((int) viewH)) {
+                    dc.DrawLine(x0, y0, x1, y1);
+                }
             }
         }
     }
