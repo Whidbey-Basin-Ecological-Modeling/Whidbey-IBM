@@ -1023,6 +1023,108 @@ void checkAndAddEdge(Edge e) {
     addEdgeIfNotDuplicate(edgeTarget->edges, e);
 }
 
+struct EdgeValidationResult {
+    bool passed = true;
+    size_t totalNodes = 0;
+    size_t totalUniqueEdges = 0;
+    std::vector<std::string> errors;
+
+    void fail(const std::string &msg) {
+        passed = false;
+        errors.push_back(msg);
+    }
+};
+
+void validateEdgeConsistency(const std::vector<MapNode *> &map) {
+    EdgeValidationResult result;
+    result.totalNodes = map.size();
+
+    std::unordered_set<MapNode *> mapSet(map.begin(), map.end());
+
+    for (MapNode *node : map) {
+        size_t expectedSize = node->edgesIn.size() + node->edgesOut.size();
+        assert(node->edges.size() == expectedSize);
+
+        for (size_t i = 0; i < node->edges.size(); i++) {
+            const Edge &e = node->edges[i];
+            if (e.source != node && e.target != node) {
+                result.fail("Node " + std::to_string(node->id)
+                    + ": edges[" + std::to_string(i) + "] has neither source nor target == this node");
+            }
+
+            if (e.source == e.target) {
+                result.fail("Node " + std::to_string(node->id) + ": self-loop in edges");
+            }
+
+            for (const Edge &eIn : node->edgesIn) {
+                assert(eIn.target == node);
+                bool found = std::any_of(node->edges.begin(), node->edges.end(),
+                    [&](const Edge &ue) {
+                        return ue.source == eIn.source && ue.target == eIn.target
+                            && ue.length == eIn.length;
+                    });
+                assert(found);
+            }
+
+            for (const Edge &eOut : node->edgesOut) {
+                assert(eOut.source == node);
+                bool found = std::any_of(node->edges.begin(), node->edges.end(),
+                    [&](const Edge &ue) {
+                        return ue.source == eOut.source && ue.target == eOut.target
+                            && ue.length == eOut.length;
+                    });
+                assert(found);
+            }
+
+            MapNode *other = e.otherEnd(node);
+            if (mapSet.count(other) == 0) {
+                result.fail("Node " + std::to_string(node->id)
+                    + ": edges references neighbor not in map");
+            }
+
+            for (size_t j = i + 1; j < node->edges.size(); j++) {
+                if (node->edges[i].source == node->edges[j].source
+                    && node->edges[i].target == node->edges[j].target) {
+                    result.fail("Node " + std::to_string(node->id)
+                        + ": duplicate edge ("
+                        + std::to_string(node->edges[i].source->id) + " -> "
+                        + std::to_string(node->edges[i].target->id) + ")");
+                }
+            }
+
+            bool found = std::any_of(
+                other->edges.begin(), other->edges.end(),
+                [&e](const Edge &oe) {
+                    return oe.source == e.source && oe.target == e.target;
+                }
+            );
+            if (!found) {
+                result.fail("Node " + std::to_string(node->id)
+                    + ": edge (" + std::to_string(e.source->id) + " -> "
+                    + std::to_string(e.target->id)
+                    + ") but neighbor " + std::to_string(other->id)
+                    + " has no matching entry in edges");
+            }
+
+            if (e.length <= 0.0f) {
+                result.fail("Node " + std::to_string(node->id)
+                    + ": edges has non-positive length " + std::to_string(e.length));
+            }
+        }
+        result.totalUniqueEdges += node->edges.size();
+    }
+
+    if (!result.passed) {
+        std::cout << "Validation failed with the following errors:" << std::endl;
+        for (const auto &error : result.errors) {
+            std::cout << "  " << error << std::endl;
+        }
+        std::cout << "Total nodes: " << result.totalNodes << std::endl;
+        std::cout << "Total unique edges: " << result.totalUniqueEdges << std::endl;
+        std::exit(1);
+    }
+    std::cout << "Edge validation passed" << std::endl;
+}
 
 // Load a map from vertex, edge, and geometry files
 // (additionally runs cleanup on the resulting map graph)
@@ -1151,6 +1253,21 @@ void loadMap(
         }
         recPoints.push_back(dest[csvIdToLocalIndex[id]]);
     }
+
+    // TODO: remove edge resort after refactoring complete
+    // Ensure edges iteration order matches legacy edgesIn-then-edgesOut order
+    for (MapNode *node : dest) {
+        std::stable_sort(node->edges.begin(), node->edges.end(),
+            [node](const Edge &a, const Edge &b) {
+                // edgesIn (target == node) come first, then edgesOut (source == node)
+                bool aIsIn = (a.target == node);
+                bool bIsIn = (b.target == node);
+                return aIsIn > bIsIn; // true (1) before false (0)
+            });
+    }
+
+    // TODO: delete edge validation after refactoring complete
+    validateEdgeConsistency(dest);
 
     // Clean up clean up everybody do your share
     //condenseMissingNodes(dest);
