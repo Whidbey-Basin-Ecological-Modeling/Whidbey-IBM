@@ -17,8 +17,8 @@ createConnectedNodes(float distance, HabitatType startType = HabitatType::Distri
     auto nodeB = std::make_unique<MapNode>(HabitatType::Distributary, 0.0, 0.0, 0.0);
 
     Edge edge(nodeA.get(), nodeB.get(), distance);
-    nodeA->edgesOut.push_back(edge);
-    nodeB->edgesIn.push_back(edge);
+    nodeA->edges.push_back(edge);
+    nodeB->edges.push_back(edge);
 
     return {std::move(nodeA), std::move(nodeB), edge};
 }
@@ -62,18 +62,18 @@ TEST_CASE("getReachableNeighbors basic functionality") {
         REQUIRE(fitness == Catch::Approx(1.0f));
     }
 
-    SECTION("Multiple reachable neighbors (some from edgesIn, some from edgesOut)") {
+    SECTION("Multiple reachable neighbors (some as source, some as target)") {
         auto startNode = createMapNode(0.0, 0.0);
         auto outNeighbor1 = createMapNode(1.0, 0.0);
         auto outNeighbor2 = createMapNode(2.0, 0.0);
         auto inNeighbor1 = createMapNode(-1.0, 0.0);
         auto inNeighbor2 = createMapNode(-2.0, 0.0);
 
-        // Connect via edgesOut (startNode is source)
+        // startNode is source
         connectNodes(startNode.get(), outNeighbor1.get(), 1.0f);
         connectNodes(startNode.get(), outNeighbor2.get(), 2.0f);
 
-        // Connect via edgesIn (startNode is target)
+        // startNode is target
         connectNodes(inNeighbor1.get(), startNode.get(), 1.5f);
         connectNodes(inNeighbor2.get(), startNode.get(), 2.5f);
 

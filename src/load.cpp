@@ -1068,11 +1068,13 @@ void reportDuplicateEdges(const std::vector<MapNode *> &nodes) {
 }
 
 bool hasReversedEdgeOf(const Edge &newEdge) {
-    const auto& edgesIn = newEdge.source->edgesIn;
-    return std::any_of(edgesIn.begin(), edgesIn.end(),
-        [&](const Edge& old_edge){
-            return old_edge.source == newEdge.target && old_edge.target == newEdge.source;
-        });
+    const auto &edges = newEdge.source->edges;
+    return std::any_of(edges.begin(), edges.end(),
+        [&](const Edge &old_edge) {
+            return old_edge.source == newEdge.target
+                && old_edge.target == newEdge.source;
+        }
+    );
 }
 
 bool hasMatchingEdge(const std::vector<Edge>& edges, const Edge& e) {

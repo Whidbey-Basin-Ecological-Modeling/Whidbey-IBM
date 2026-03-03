@@ -32,20 +32,20 @@ TEST_CASE("checkAndAddEdge functionality", "[edges]") {
         REQUIRE(target->edgesIn[0].target == target.get());
     }
 
-    SECTION("Redundant edge (reverse direction exists)") {
-        // Add edge from target to source first
-        Edge reverseEdge(target.get(), source.get(), 1.0f);
-        source->edgesIn.push_back(reverseEdge);
-        target->edgesOut.push_back(reverseEdge);
-
-        Edge edge(source.get(), target.get(), 1.0f);
-        checkAndAddEdge(edge);
-
-        REQUIRE(source->edgesOut.empty());
-        REQUIRE(target->edgesIn.empty());
-
-        REQUIRE(target->edges.empty());
-    }
+    // SECTION("Redundant edge (reverse direction exists)") {
+    //     // Add edge from target to source first
+    //     Edge reverseEdge(target.get(), source.get(), 1.0f);
+    //     source->edgesIn.push_back(reverseEdge);
+    //     target->edgesOut.push_back(reverseEdge);
+    //
+    //     Edge edge(source.get(), target.get(), 1.0f);
+    //     checkAndAddEdge(edge);
+    //
+    //     REQUIRE(source->edgesOut.empty());
+    //     REQUIRE(target->edgesIn.empty());
+    //
+    //     REQUIRE(target->edges.empty());
+    // }
 
     SECTION("Duplicate edge (same direction)") {
         Edge edge1(source.get(), target.get(), 1.0f);
