@@ -147,18 +147,12 @@ std::vector<std::tuple<MapNode *, float, float> > FishMovement::getReachableNeig
     MapNode *initialFishLocation
 ) const {
     std::vector<std::tuple<MapNode *, float, float> > neighbors;
-    std::vector<Edge> allEdges;
-    allEdges.reserve(startPoint->edgesIn.size() + startPoint->edgesOut.size());
-    allEdges.insert(allEdges.end(), startPoint->edgesIn.begin(), startPoint->edgesIn.end());
-    allEdges.insert(allEdges.end(), startPoint->edgesOut.begin(), startPoint->edgesOut.end());
-
-    for (Edge &edge: allEdges) {
-        MapNode *startNode = startPoint;
-        MapNode *endNode = (startNode == edge.source ? edge.target : edge.source);
+    for (Edge &edge : startPoint->edges) {
+        MapNode *endNode = edge.otherEnd(startPoint);
 
         if (model.hydroModel.getDepth(*endNode) < MOVEMENT_DEPTH_CUTOFF) continue;
 
-        float transitSpeed = (float) calculateTransitSpeed(edge, startNode, swimSpeed);
+        float transitSpeed = (float) calculateTransitSpeed(edge, startPoint, swimSpeed);
         if (canMoveInDirectionOfEndNode(transitSpeed, swimSpeed)) {
             float edgeCost = (edge.length / transitSpeed) * swimSpeed;
             if (isDistributary(endNode->type) && startPoint == initialFishLocation) {

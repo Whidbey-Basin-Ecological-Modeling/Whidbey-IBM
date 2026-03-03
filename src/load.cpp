@@ -191,21 +191,6 @@ void assignNearestHydroNodesByEdgeDistance(std::vector<MapNode *> &map, const st
 
 void assignNearestHydroNodes(std::vector<MapNode *> &map, std::vector<DistribHydroNode> &hydroNodes) {
     assignNearestHydroNodesByEdgeDistance(map, hydroNodes);
-    return;
-
-    // Set the nearestHydroNodeID field for each node in "map" by finding its nearest
-    // HydroNode in "hydroNodes"
-    for (MapNode *node : map) {
-        node->nearestHydroNodeID = 0;
-        float bestDist = distance(hydroNodes[0].x, hydroNodes[0].y, node->x, node->y);
-        for (unsigned id = 1; id < hydroNodes.size(); ++id) {
-            float dist = distance(hydroNodes[id].x, hydroNodes[id].y, node->x, node->y);
-            if (dist < bestDist) {
-                bestDist = dist;
-                node->nearestHydroNodeID = id;
-            }
-        }
-    }
 }
 
 // Adjust the map's elevation values to make the minimum depth in distributary channels
@@ -594,6 +579,7 @@ MapNode *elaborateEdge(Edge e) {
     MapNode *newNode = new MapNode(e.target->type, newArea, (e.source->elev + e.target->elev)*0.5f, (e.source->pathDist + e.target->pathDist)*0.5f);
     newNode->x = (e.source->x + e.target->x) * 0.5f;
     newNode->y = (e.source->y + e.target->y) * 0.5f;
+
     e.source->edgesOut.emplace_back(e.source, newNode, e.length/2.0f);
     newNode->edgesIn.emplace_back(e.source, newNode, e.length/2.0f);
     e.target->edgesIn.emplace_back(newNode, e.target, e.length/2.0f);
@@ -1260,18 +1246,6 @@ void loadMap(
         recPoints.push_back(dest[csvIdToLocalIndex[id]]);
     }
 
-    // TODO: remove edge resort after refactoring complete
-    // Ensure edges iteration order matches legacy edgesIn-then-edgesOut order
-    for (MapNode *node : dest) {
-        std::stable_sort(node->edges.begin(), node->edges.end(),
-            [node](const Edge &a, const Edge &b) {
-                // edgesIn (target == node) come first, then edgesOut (source == node)
-                bool aIsIn = (a.target == node);
-                bool bIsIn = (b.target == node);
-                return aIsIn > bIsIn; // true (1) before false (0)
-            });
-    }
-
     // TODO: delete edge validation after refactoring complete
     validateAllEdgeConsistency(dest);
 
@@ -1303,6 +1277,18 @@ void loadMap(
 
     // TODO: remove temporary validation after refactoring complete
     validateAllEdgeConsistency(dest);
+
+    // TODO: remove edge resort after refactoring complete
+    // Ensure edges iteration order matches legacy edgesIn-then-edgesOut order
+    for (MapNode *node : dest) {
+        std::stable_sort(node->edges.begin(), node->edges.end(),
+            [node](const Edge &a, const Edge &b) {
+                // edgesIn (target == node) come first, then edgesOut (source == node)
+                bool aIsIn = (a.target == node);
+                bool bIsIn = (b.target == node);
+                return aIsIn > bIsIn; // true (1) before false (0)
+            });
+    }
 
     outputNodeCounts(dest, "Map");
 }

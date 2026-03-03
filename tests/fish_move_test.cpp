@@ -393,13 +393,13 @@ TEST_CASE("Fish::move uses different movement strategies based on configuration"
 
     // Connect A -> B (Outgoing from A)
     Edge edgeOut(nodeA, nodeB.get(), 1.0f);
-    nodeA->edgesOut.push_back(edgeOut);
-    nodeB->edgesIn.push_back(edgeOut);
+    nodeA->edges.push_back(edgeOut);
+    nodeB->edges.push_back(edgeOut);
 
     // Connect C -> A (Incoming to A)
     Edge edgeIn(nodeC.get(), nodeA, 1.0f);
-    nodeC->edgesOut.push_back(edgeIn);
-    nodeA->edgesIn.push_back(edgeIn);
+    nodeC->edges.push_back(edgeIn);
+    nodeA->edges.push_back(edgeIn);
 
     // Set flow to move from Left to Right (+x)
     // This makes moving to C (left) "upstream" and moving to B (right) "downstream"
