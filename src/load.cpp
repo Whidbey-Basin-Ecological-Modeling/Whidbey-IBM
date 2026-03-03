@@ -447,44 +447,71 @@ void removeAllEdgesBetween(MapNode *node, MapNode *neighbor) {
 
 // Combine two nodes
 MapNode *mergeNodes(MapNode *a, MapNode *b) {
-    // Construct a new node to replace them
-    MapNode *newNode = new MapNode(a->type, a->area + b->area, (a->elev + b->elev)*0.5f, (a->pathDist + b->pathDist)*0.5f);
+    MapNode *newNode = new MapNode(
+        a->type,
+        a->area + b->area,
+        (a->elev + b->elev) * 0.5f,
+        (a->pathDist + b->pathDist) * 0.5f
+    );
     newNode->id = a->id;
-    // Place it at the average location of the two merged nodes
+
     newNode->x = (a->x + b->x) / 2.0f;
     newNode->y = (a->y + b->y) / 2.0f;
-    // Extra length to add to edges (distance between either a or b and the new node)
-    float extraLength = sqrt((a->x - b->x)*(a->x - b->x) + (a->y - b->y)*(a->y - b->y))*0.5f;
-    // Create updated edges and remove existing edges held by other nodes that pointed to the
-    // old nodes
-    for (Edge e : a->edgesOut) {
-        if (e.target != b) {
-            removeAllEdgesBetween(e.target, a);
-            e.target->edgesIn.emplace_back(newNode, e.target, e.length + extraLength);
-            newNode->edgesOut.emplace_back(newNode, e.target, e.length + extraLength);
+
+    float extraLength = sqrt((a->x - b->x) * (a->x - b->x) + (a->y - b->y) * (a->y - b->y)) * 0.5f;
+
+    auto hasEdgeExact = [](const std::vector<Edge> &edges, MapNode *src, MapNode *dst) {
+        return std::any_of(edges.begin(), edges.end(), [&](const Edge &e) {
+            return e.source == src && e.target == dst;
+        });
+    };
+
+    auto addDirectedEdgeAllLists = [&](MapNode *src, MapNode *dst, float len) {
+        // Maintain legacy directional lists
+        if (!hasEdgeExact(src->edgesOut, src, dst)) {
+            src->edgesOut.emplace_back(src, dst, len);
         }
-    }
-    for (Edge e : a->edgesIn) {
-        if (e.source != b) {
-            removeAllEdgesBetween(e.source, a);
-            e.source->edgesOut.emplace_back(e.source, newNode, e.length + extraLength);
-            newNode->edgesIn.emplace_back(e.source, newNode, e.length + extraLength);
+        if (!hasEdgeExact(dst->edgesIn, src, dst)) {
+            dst->edgesIn.emplace_back(src, dst, len);
         }
-    }
-    for (Edge e : b->edgesOut) {
-        if (e.target != a) {
-            removeAllEdgesBetween(e.target, b);
-            e.target->edgesIn.emplace_back(newNode, e.target, e.length + extraLength);
-            newNode->edgesOut.emplace_back(newNode, e.target, e.length + extraLength);
+
+        // Maintain unified edge lists (union of in+out) on both endpoints
+        if (!hasEdgeExact(src->edges, src, dst)) {
+            src->edges.emplace_back(src, dst, len);
         }
-    }
-    for (Edge e : b->edgesIn) {
-        if (e.source != a) {
-            removeAllEdgesBetween(e.source, b);
-            e.source->edgesOut.emplace_back(e.source, newNode, e.length + extraLength);
-            newNode->edgesIn.emplace_back(e.source, newNode, e.length + extraLength);
+        if (!hasEdgeExact(dst->edges, src, dst)) {
+            dst->edges.emplace_back(src, dst, len);
         }
-    }
+    };
+
+    auto rewireEndpoint = [&](MapNode *oldNode, MapNode *otherOldNode) {
+        for (const Edge &e: oldNode->edges) {
+            MapNode *neighbor = e.otherEnd(oldNode);
+
+            // Skip the edge between the two nodes being merged
+            if (neighbor == otherOldNode) {
+                continue;
+            }
+
+            // Remove any existing edges held by the neighbor that pointed to the old node
+            removeAllEdgesBetween(neighbor, oldNode);
+
+            // Preserve the original direction of the edge relative to oldNode
+            float newLen = e.length + extraLength;
+            if (e.source == oldNode) {
+                // oldNode -> neighbor becomes newNode -> neighbor
+                addDirectedEdgeAllLists(newNode, neighbor, newLen);
+            } else {
+                // neighbor -> oldNode becomes neighbor -> newNode
+                addDirectedEdgeAllLists(neighbor, newNode, newLen);
+            }
+        }
+    };
+
+    // Create updated edges and remove existing edges held by other nodes that pointed to the old nodes
+    rewireEndpoint(a, b);
+    rewireEndpoint(b, a);
+
     return newNode;
 }
 

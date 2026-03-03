@@ -32,6 +32,8 @@ std::vector<float> loadFloatListInterleaved(std::string &filePath, int n);
 
 void checkAndAddEdge(Edge e);
 
+MapNode *mergeNodes(MapNode *a, MapNode *b);
+
 // Loads a list of sampling sites from a CSV file into a vector of SamplingSites (defined in map.h)
 //void loadSamplingSites(std::string &filePath, std::vector<MapNode *> &map, std::vector<SamplingSite> &out);
 
