@@ -144,8 +144,8 @@ void initializeDijkstraQueue(DijkstraMinQueue & dijkstra_queue, const std::unord
     }
 }
 
-void assignRemainingMapNodesToHydroNodes(DijkstraMinQueue & dijkstraMinQueue) {
-    while (! dijkstraMinQueue.empty()) {
+void assignRemainingMapNodesToHydroNodes(DijkstraMinQueue &dijkstraMinQueue) {
+    while (!dijkstraMinQueue.empty()) {
         auto queueTuple = dijkstraMinQueue.top();
         dijkstraMinQueue.pop();
         const float distance = std::get<0>(queueTuple);
@@ -155,17 +155,15 @@ void assignRemainingMapNodesToHydroNodes(DijkstraMinQueue & dijkstraMinQueue) {
             continue;
         }
 
-        std::vector<std::tuple<MapNode *, float>> neighbors;
-        neighbors.reserve( node->edgesIn.size() + node->edgesOut.size() );
-        for (Edge &edge : node->edgesIn) {
-            neighbors.emplace_back(edge.source, edge.length);
-        }
-        for (Edge &edge : node->edgesOut) {
-            neighbors.emplace_back(edge.target, edge.length);
+        std::vector<std::tuple<MapNode *, float> > neighbors;
+        neighbors.reserve(node->edges.size());
+        for (const Edge &edge: node->edges) {
+            MapNode *neighbor = edge.otherEnd(node);
+            neighbors.emplace_back(neighbor, edge.length);
         }
 
-        for (auto neighbor : neighbors) {
-            MapNode* neighborNode = std::get<0>(neighbor);
+        for (auto neighbor: neighbors) {
+            MapNode *neighborNode = std::get<0>(neighbor);
             float edgeLength = std::get<1>(neighbor);
             float neighborDistance = distance + edgeLength;
             if (neighborDistance < neighborNode->hydroNodeDistance) {
@@ -467,6 +465,7 @@ MapNode *mergeNodes(MapNode *a, MapNode *b) {
     };
 
     auto addDirectedEdgeAllLists = [&](MapNode *src, MapNode *dst, float len) {
+        // TODO: remove the legacy lists when refactoring complete
         // Maintain legacy directional lists
         if (!hasEdgeExact(src->edgesOut, src, dst)) {
             src->edgesOut.emplace_back(src, dst, len);
@@ -760,25 +759,25 @@ void expandNearshoreLinks(std::vector<MapNode *> &map) {
 }
 
 // Count all neighbors of a given node that are distributary nodes
-unsigned countAdjacentDistributaryNodes(MapNode &node) {
-    unsigned count = 0;
-    for (Edge &e : node.edgesIn) {
-        if (isDistributary(e.source->type)) {
-            ++count;
-        }
-    }
-    for (Edge &e : node.edgesOut) {
-        if (isDistributary(e.target->type)) {
-            ++count;
-        }
-    }
-    return count;
-}
+// unsigned countAdjacentDistributaryNodes(MapNode &node) {
+//     unsigned count = 0;
+//     for (Edge &e : node.edgesIn) {
+//         if (isDistributary(e.source->type)) {
+//             ++count;
+//         }
+//     }
+//     for (Edge &e : node.edgesOut) {
+//         if (isDistributary(e.target->type)) {
+//             ++count;
+//         }
+//     }
+//     return count;
+// }
 
 // Shorthand for the difference in path distance between two nodes
-inline float deltaPathDist(MapNode &node1, MapNode &node2) {
-    return fabs(node1.pathDist - node2.pathDist);
-}
+// inline float deltaPathDist(MapNode &node1, MapNode &node2) {
+//     return fabs(node1.pathDist - node2.pathDist);
+// }
 
 
 // Figures out which nodes are channel edges and makes sure that every node in a channel
