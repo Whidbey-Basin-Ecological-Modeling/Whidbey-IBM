@@ -516,10 +516,12 @@ MapNode *mergeNodes(MapNode *a, MapNode *b) {
 }
 
 // Merge nodes that are within a certain radius of each other
-void simplifyBlindChannels(std::vector<MapNode *> &map, float radius, const std::unordered_set<MapNode *> &protectedNodes) {
+void simplifyBlindChannels(std::vector<MapNode *> &map, float radius,
+                           const std::unordered_set<MapNode *> &protectedNodes) {
     std::unordered_set<MapNode *> toRemove;
     std::unordered_set<MapNode *> toAdd;
-    for (MapNode *node : map) {
+
+    for (MapNode *node: map) {
         // Avoid checking for merges with nodes that will already be merged
         // Only merge blind channel nodes
         // Don't touch sampling sites
@@ -528,44 +530,29 @@ void simplifyBlindChannels(std::vector<MapNode *> &map, float radius, const std:
             || protectedNodes.count(node)) {
             continue;
         }
-        // Check outbound edges
+
         bool merged = false;
-        for (Edge e : node->edgesOut) {
+
+        // Unified edges: just iterate neighbors via Edge::otherEnd(node)
+        for (const Edge &e: node->edges) {
+            MapNode *neighbor = e.otherEnd(node);
+
             // Don't merge nodes that are already involved in merges or protected nodes
-            if (toAdd.count(e.target) || protectedNodes.count(e.target)) {
+            if (toAdd.count(neighbor) || protectedNodes.count(neighbor)) {
                 continue;
             }
-            if (e.target->type == HabitatType::BlindChannel && e.length <= radius) {
-                // Tests passed, merge current node with current edge's endpoint
-                toAdd.insert(mergeNodes(node, e.target));
+
+            if (neighbor->type == HabitatType::BlindChannel && e.length <= radius) {
+                // Tests passed, merge current node with its neighbor
+                toAdd.insert(mergeNodes(node, neighbor));
                 toRemove.insert(node);
-                toRemove.insert(e.target);
+                toRemove.insert(neighbor);
                 merged = true;
-                // Stop checking
-                break;
-            }
-        }
-        // Don't bother to check inbound edges if a merge has already been carried out
-        if (merged) {
-            continue;
-        }
-        // Check inbound edges
-        for (Edge e : node->edgesIn) {
-            // Don't merge nodes that are already involved in merges or protected nodes
-            if (toAdd.count(e.source) || protectedNodes.count(e.source)) {
-                continue;
-            }
-            if (e.source->type == HabitatType::BlindChannel && e.length <= radius) {
-                // Tests passed, merge current node with current edge's endpoint
-                toAdd.insert(mergeNodes(node, e.source));
-                toRemove.insert(node);
-                toRemove.insert(e.source);
-                merged = true;
-                // Stop checking
                 break;
             }
         }
     }
+
     // Condense map list to remove old nodes
     // targetIt tracks where in the list to write "good" nodes to (nodes that are still in use)
     auto targetIt = map.begin();
@@ -589,10 +576,88 @@ void simplifyBlindChannels(std::vector<MapNode *> &map, float radius, const std:
         map.erase(targetIt, map.end());
     }
     // Add the new nodes to the list
-    for (MapNode *newNode : toAdd) {
+    for (MapNode *newNode: toAdd) {
         map.push_back(newNode);
     }
 }
+
+// void simplifyBlindChannels(std::vector<MapNode *> &map, float radius, const std::unordered_set<MapNode *> &protectedNodes) {
+//     std::unordered_set<MapNode *> toRemove;
+//     std::unordered_set<MapNode *> toAdd;
+//     for (MapNode *node : map) {
+//         // Avoid checking for merges with nodes that will already be merged
+//         // Only merge blind channel nodes
+//         // Don't touch sampling sites
+//         if (toRemove.count(node)
+//             || node->type != HabitatType::BlindChannel
+//             || protectedNodes.count(node)) {
+//             continue;
+//         }
+//         // Check outbound edges
+//         bool merged = false;
+//         for (Edge e : node->edgesOut) {
+//             // Don't merge nodes that are already involved in merges or protected nodes
+//             if (toAdd.count(e.target) || protectedNodes.count(e.target)) {
+//                 continue;
+//             }
+//             if (e.target->type == HabitatType::BlindChannel && e.length <= radius) {
+//                 // Tests passed, merge current node with current edge's endpoint
+//                 toAdd.insert(mergeNodes(node, e.target));
+//                 toRemove.insert(node);
+//                 toRemove.insert(e.target);
+//                 merged = true;
+//                 // Stop checking
+//                 break;
+//             }
+//         }
+//         // Don't bother to check inbound edges if a merge has already been carried out
+//         if (merged) {
+//             continue;
+//         }
+//         // Check inbound edges
+//         for (Edge e : node->edgesIn) {
+//             // Don't merge nodes that are already involved in merges or protected nodes
+//             if (toAdd.count(e.source) || protectedNodes.count(e.source)) {
+//                 continue;
+//             }
+//             if (e.source->type == HabitatType::BlindChannel && e.length <= radius) {
+//                 // Tests passed, merge current node with current edge's endpoint
+//                 toAdd.insert(mergeNodes(node, e.source));
+//                 toRemove.insert(node);
+//                 toRemove.insert(e.source);
+//                 merged = true;
+//                 // Stop checking
+//                 break;
+//             }
+//         }
+//     }
+//     // Condense map list to remove old nodes
+//     // targetIt tracks where in the list to write "good" nodes to (nodes that are still in use)
+//     auto targetIt = map.begin();
+//     // sourceIt tracks where in the list we're examining
+//     for (auto sourceIt = map.begin(); sourceIt != map.end(); ++sourceIt) {
+//         // Check if the node we're looking at in the list is still good
+//         if (toRemove.count(*sourceIt)) {
+//             // It should be deleted
+//             // Free its memory and wipe it from the list
+//             delete *sourceIt;
+//             *sourceIt = nullptr;
+//         } else {
+//             // It should be kept
+//             // Shift it over into the target position and update the target position
+//             *targetIt = *sourceIt;
+//             ++targetIt;
+//         }
+//     }
+//     // Chop off the unused space at the end of the list
+//     if (targetIt != map.end()) {
+//         map.erase(targetIt, map.end());
+//     }
+//     // Add the new nodes to the list
+//     for (MapNode *newNode : toAdd) {
+//         map.push_back(newNode);
+//     }
+// }
 
 // Create a new node at the halfway point of an edge and link it to the edge's endpoints
 MapNode *elaborateEdge(Edge e) {
@@ -1145,6 +1210,20 @@ void validateAllEdgeConsistency(const std::vector<MapNode *> &map) {
     std::cout << "Edge validation passed" << std::endl;
 }
 
+// TODO: remove this after refactoring complete
+void sortEdgesByDirection(std::vector<MapNode *> &dest) {
+    // Ensure edges iteration order matches legacy edgesIn-then-edgesOut order
+    for (MapNode *node : dest) {
+        std::stable_sort(node->edges.begin(), node->edges.end(),
+                         [node](const Edge &a, const Edge &b) {
+                             // edgesIn (target == node) come first, then edgesOut (source == node)
+                             bool aIsIn = (a.target == node);
+                             bool bIsIn = (b.target == node);
+                             return aIsIn > bIsIn; // true (1) before false (0)
+                         });
+    }
+}
+
 // Load a map from vertex, edge, and geometry files
 // (additionally runs cleanup on the resulting map graph)
 void loadMap(
@@ -1288,6 +1367,10 @@ void loadMap(
 
     std::unordered_set<MapNode *> protectedNodes;
     identifyProtectedNodes(monitoringPoints, samplingSitesByNode, recPoints, protectedNodes);
+
+    // TODO: remove edge resort after refactoring complete
+    sortEdgesByDirection(dest);
+
     simplifyBlindChannels(dest, blindChannelSimplificationRadius, protectedNodes); // TODO:GROT - removes nodes from map. moves some nodes to end of map, preserving ids.
     //fixBrokenEdges(dest);
     if (configMap.getInt(ModelParamKey::VirtualNodes)) {
@@ -1306,16 +1389,7 @@ void loadMap(
     validateAllEdgeConsistency(dest);
 
     // TODO: remove edge resort after refactoring complete
-    // Ensure edges iteration order matches legacy edgesIn-then-edgesOut order
-    for (MapNode *node : dest) {
-        std::stable_sort(node->edges.begin(), node->edges.end(),
-            [node](const Edge &a, const Edge &b) {
-                // edgesIn (target == node) come first, then edgesOut (source == node)
-                bool aIsIn = (a.target == node);
-                bool bIsIn = (b.target == node);
-                return aIsIn > bIsIn; // true (1) before false (0)
-            });
-    }
+    sortEdgesByDirection(dest);
 
     outputNodeCounts(dest, "Map");
 }
