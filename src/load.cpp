@@ -1100,6 +1100,7 @@ void checkAndAddEdge(Edge e) {
     if (hasReversedEdgeOf(e))
         return;
 
+    // TODO: remove after refactoring
     addEdgeIfNotDuplicate(edgeSource->edgesOut, e);
     addEdgeIfNotDuplicate(edgeTarget->edgesIn, e);
 
@@ -1126,6 +1127,7 @@ void validateAllEdgeConsistency(const std::vector<MapNode *> &map) {
 
     std::unordered_set<MapNode *> mapSet(map.begin(), map.end());
 
+    // TODO: remove edgesIn and edgesOut checks when refactoring is done
     for (MapNode *node : map) {
         size_t expectedSize = node->edgesIn.size() + node->edgesOut.size();
         assert(node->edges.size() == expectedSize);

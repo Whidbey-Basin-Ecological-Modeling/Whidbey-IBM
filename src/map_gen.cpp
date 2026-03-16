@@ -7,6 +7,8 @@
 #include <tuple>
 #include <iostream>
 
+/******* map generation currently disabled; to re-enable, port to directionless edges
+
 // Adds an edge from the node "source" to the node "target"
 bool addEdge(MapNode *source, MapNode *target) {
     // Check to make sure we're not adding a redundant edge
@@ -374,3 +376,6 @@ void generateMap(
     //assignIDs(dest);
     return;
 }
+
+
+**********/

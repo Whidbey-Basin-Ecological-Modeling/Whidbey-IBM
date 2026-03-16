@@ -1274,51 +1274,53 @@ Model *modelFromConfig(std::string configPath) {
             config
         );
     } else {
+        std::cout << "Full map generation disabled; only load from config is supported" << std::endl;
+        std::exit(1);
         // Generate map from JSON config params
-        std::vector<MapNode *> map;
-        std::vector<MapNode *> recPoints;
-        generateMap(
-            map, recPoints,
-            d["mapParams"]["m"].GetInt(),
-            d["mapParams"]["n"].GetInt(),
-            d["mapParams"]["a"].GetFloat(),
-            d["mapParams"]["pDist"].GetFloat(),
-            d["mapParams"]["pBlind"].GetFloat()
-        );
-        int simLength = d["simLength"].GetInt();
-        std::vector<std::vector<float> > depths;
-        std::vector<std::vector<float> > temps;
-        float distFlow;
-        env_sim(
-            simLength,
-            map,
-            depths,
-            temps,
-            distFlow
-        );
-        std::vector<int> recCounts;
-        std::vector<std::vector<float> > recSizeDists;
-        float lambda = d["recruitRate"].GetFloat();
-        float meanSize = d["recruitSizeMean"].GetFloat();
-        float sizeStd = d["recruitSizeStd"].GetFloat();
-        for (int day = 0; day <= simLength / 24; ++day) {
-            recCounts.push_back(poisson(lambda));
-        }
-        std::vector<float> recSizeDist;
-        for (int bucketIdx = 0; bucketIdx < 14; ++bucketIdx) {
-            double bucketSize = 35.0 + 5.0 * (double) bucketIdx;
-            recSizeDist.push_back(normal_pdf(bucketSize, meanSize, sizeStd));
-        }
-        for (int week = 0; week <= simLength / (24 * 7); ++week) {
-            recSizeDists.push_back(recSizeDist);
-        }
-        m = new Model(
-            maxThreads,
-            map,
-            recPoints,
-            recCounts, recSizeDists,
-            depths, temps, distFlow
-        );
+        // std::vector<MapNode *> map;
+        // std::vector<MapNode *> recPoints;
+        // generateMap(
+        //     map, recPoints,
+        //     d["mapParams"]["m"].GetInt(),
+        //     d["mapParams"]["n"].GetInt(),
+        //     d["mapParams"]["a"].GetFloat(),
+        //     d["mapParams"]["pDist"].GetFloat(),
+        //     d["mapParams"]["pBlind"].GetFloat()
+        // );
+        // int simLength = d["simLength"].GetInt();
+        // std::vector<std::vector<float> > depths;
+        // std::vector<std::vector<float> > temps;
+        // float distFlow;
+        // env_sim(
+        //     simLength,
+        //     map,
+        //     depths,
+        //     temps,
+        //     distFlow
+        // );
+        // std::vector<int> recCounts;
+        // std::vector<std::vector<float> > recSizeDists;
+        // float lambda = d["recruitRate"].GetFloat();
+        // float meanSize = d["recruitSizeMean"].GetFloat();
+        // float sizeStd = d["recruitSizeStd"].GetFloat();
+        // for (int day = 0; day <= simLength / 24; ++day) {
+        //     recCounts.push_back(poisson(lambda));
+        // }
+        // std::vector<float> recSizeDist;
+        // for (int bucketIdx = 0; bucketIdx < 14; ++bucketIdx) {
+        //     double bucketSize = 35.0 + 5.0 * (double) bucketIdx;
+        //     recSizeDist.push_back(normal_pdf(bucketSize, meanSize, sizeStd));
+        // }
+        // for (int week = 0; week <= simLength / (24 * 7); ++week) {
+        //     recSizeDists.push_back(recSizeDist);
+        // }
+        // m = new Model(
+        //     maxThreads,
+        //     map,
+        //     recPoints,
+        //     recCounts, recSizeDists,
+        //     depths, temps, distFlow
+        // );
     }
     fclose(fp);
     return m;
