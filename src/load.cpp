@@ -1286,11 +1286,10 @@ void loadMap(
     };
 
     //assignCrossChannelEdges(dest); // OBSOLETE
-    checkDisjointDistributariesAndOtherMapErrors(dest, recPoints, protectedNodes); //TODO:GROT - deprecate? can change distributaries to blind channels, reports on disconnected and orphaned nodes
+    checkDisjointDistributariesAndOtherMapErrors(dest, recPoints, protectedNodes);
     assignNearestHydroNodes(dest, hydroNodes);
     fixElevations(dest, hydroNodes);
 
-    // TODO: remove temporary validation after refactoring complete
     validateAllEdgeConsistency(dest);
 
     // TODO: remove edge resort after refactoring complete

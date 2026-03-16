@@ -51,9 +51,6 @@ inline std::function<float(Model&, MapNode&, float)> createMockFitnessCalculator
 // Helper to connect two nodes with an edge
 inline void connectNodes(MapNode* nodeA, MapNode* nodeB, float length) {
     Edge edge(nodeA, nodeB, length);
-    // TODO: remove out and in when refactoring complete
-    // nodeA->edgesOut.push_back(edge);
-    // nodeB->edgesIn.push_back(edge);
     nodeA->edges.push_back(edge);
     nodeB->edges.push_back(edge);
 }
