@@ -16,7 +16,7 @@
   "distribWseTempFile": "data/wse.temp.full.nc",
   "blindChannelSimplificationRadius": 0.0,
   "habitatTypeExitConditionHours": 48,
-  "threadCount": 96,
+  "threadCount": 24,
   "rng_seed" : 0,
   "directionlessEdges": 1,
   "agentAwareness": "medium"

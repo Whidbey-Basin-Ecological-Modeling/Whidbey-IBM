@@ -72,11 +72,7 @@ class MapNode {
 public:
     // ID (index in the map node list)
     int id;
-    // List of edges for which Edge::target == this
-    // std::vector<Edge> edgesIn;
-    // List of edges for which Edge::source == this
-    // std::vector<Edge> edgesOut;
-    // Unified (directionless) edge list — contains the union of edgesIn and edgesOut
+    // Unified (directionless) edge list
     std::vector<Edge> edges;
     float x; // horizontal (longitudinal) UTM Zone 10N coordinate
     float y; // vertical (latitudinal) UTM Zone 10N coordinate
