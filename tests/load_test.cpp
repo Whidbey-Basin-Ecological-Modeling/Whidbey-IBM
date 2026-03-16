@@ -14,7 +14,7 @@ auto createTestNode(int id = 0, HabitatType type = HabitatType::Distributary) {
     node->id = id;
     return node;
 }
-
+/****** TODO: grot
 TEST_CASE("checkAndAddEdge functionality", "[edges]") {
     auto source = createTestNode(1);
     auto target = createTestNode(2);
@@ -122,6 +122,7 @@ TEST_CASE("checkAndAddEdge functionality", "[edges]") {
         REQUIRE(target->edgesIn[0].target == target.get());
     }
 }
+*********/
 
 // TODO: delete all tests above this line after edgesIn and edgesOut are removed
 TEST_CASE("checkAndAddEdge functionality (unified edges)", "[edges]") {

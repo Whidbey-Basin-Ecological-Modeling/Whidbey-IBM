@@ -403,29 +403,29 @@ void removeAllEdgesBetween(MapNode *node, MapNode *neighbor) {
     // Check  out edges
     // Continue to prune edges until none connecting to the target are found
     bool modified = true;
-    while (modified) {
-        modified = false;
-        for (auto it = node->edgesOut.begin(); it != node->edgesOut.end(); ++it) {
-            if (it->target == neighbor) {
-                node->edgesOut.erase(it);
-                modified = true;
-                break;
-            }
-        }
-    }
-    // Check in edges
-    // Continue to prune edges until none connecting to the target are found
-    modified = true;
-    while (modified) {
-        modified = false;
-        for (auto it = node->edgesIn.begin(); it != node->edgesIn.end(); ++it) {
-            if (it->source == neighbor) {
-                node->edgesIn.erase(it);
-                modified = true;
-                break;
-            }
-        }
-    }
+    // while (modified) {
+    //     modified = false;
+    //     for (auto it = node->edgesOut.begin(); it != node->edgesOut.end(); ++it) {
+    //         if (it->target == neighbor) {
+    //             node->edgesOut.erase(it);
+    //             modified = true;
+    //             break;
+    //         }
+    //     }
+    // }
+    // // Check in edges
+    // // Continue to prune edges until none connecting to the target are found
+    // modified = true;
+    // while (modified) {
+    //     modified = false;
+    //     for (auto it = node->edgesIn.begin(); it != node->edgesIn.end(); ++it) {
+    //         if (it->source == neighbor) {
+    //             node->edgesIn.erase(it);
+    //             modified = true;
+    //             break;
+    //         }
+    //     }
+    // }
 
     // TODO: remove in/out above when rafactoring complete
     // remove from edges
@@ -467,12 +467,12 @@ MapNode *mergeNodes(MapNode *a, MapNode *b) {
     auto addDirectedEdgeAllLists = [&](MapNode *src, MapNode *dst, float len) {
         // TODO: remove the legacy lists when refactoring complete
         // Maintain legacy directional lists
-        if (!hasEdgeExact(src->edgesOut, src, dst)) {
-            src->edgesOut.emplace_back(src, dst, len);
-        }
-        if (!hasEdgeExact(dst->edgesIn, src, dst)) {
-            dst->edgesIn.emplace_back(src, dst, len);
-        }
+        // if (!hasEdgeExact(src->edgesOut, src, dst)) {
+        //     src->edgesOut.emplace_back(src, dst, len);
+        // }
+        // if (!hasEdgeExact(dst->edgesIn, src, dst)) {
+        //     dst->edgesIn.emplace_back(src, dst, len);
+        // }
 
         // Maintain unified edge lists (union of in+out) on both endpoints
         if (!hasEdgeExact(src->edges, src, dst)) {
@@ -671,10 +671,10 @@ MapNode *elaborateEdge(Edge e) {
     newNode->x = (e.source->x + e.target->x) * 0.5f;
     newNode->y = (e.source->y + e.target->y) * 0.5f;
 
-    e.source->edgesOut.emplace_back(e.source, newNode, e.length/2.0f);
-    newNode->edgesIn.emplace_back(e.source, newNode, e.length/2.0f);
-    e.target->edgesIn.emplace_back(newNode, e.target, e.length/2.0f);
-    newNode->edgesOut.emplace_back(newNode, e.target, e.length/2.0f);
+    // e.source->edgesOut.emplace_back(e.source, newNode, e.length/2.0f);
+    // newNode->edgesIn.emplace_back(e.source, newNode, e.length/2.0f);
+    // e.target->edgesIn.emplace_back(newNode, e.target, e.length/2.0f);
+    // newNode->edgesOut.emplace_back(newNode, e.target, e.length/2.0f);
     // TODO: remove in/out above when rafactoring complete (replaced by edges below)
 
     e.source->edges.emplace_back(e.source, newNode, e.length/2.0f);
@@ -729,7 +729,11 @@ void expandNearshoreLinks(std::vector<MapNode *> &map) {
         bool updated = true;
         while (updated) {
             updated = false;
-            for (Edge &e : node->edgesOut) {
+            // TODO: clean up
+            // for (Edge &e : node->edgesOut) {
+            for (Edge &e : node->edges) {
+                if (node == e.target) continue;
+
                 if (((e.target->type == HabitatType::Nearshore) != (node->type == HabitatType::Nearshore)) && !toAdd.count(e.target)) {
                     auto newNode = elaborateEdge(e);
                     toAdd.insert(newNode);
@@ -1101,8 +1105,8 @@ void checkAndAddEdge(Edge e) {
         return;
 
     // TODO: remove after refactoring
-    addEdgeIfNotDuplicate(edgeSource->edgesOut, e);
-    addEdgeIfNotDuplicate(edgeTarget->edgesIn, e);
+    // addEdgeIfNotDuplicate(edgeSource->edgesOut, e);
+    // addEdgeIfNotDuplicate(edgeTarget->edgesIn, e);
 
     // Also populate the unified edge list on both endpoints
     addEdgeIfNotDuplicate(edgeSource->edges, e);
@@ -1129,8 +1133,8 @@ void validateAllEdgeConsistency(const std::vector<MapNode *> &map) {
 
     // TODO: remove edgesIn and edgesOut checks when refactoring is done
     for (MapNode *node : map) {
-        size_t expectedSize = node->edgesIn.size() + node->edgesOut.size();
-        assert(node->edges.size() == expectedSize);
+        // size_t expectedSize = node->edgesIn.size() + node->edgesOut.size();
+        // assert(node->edges.size() == expectedSize);
 
         for (size_t i = 0; i < node->edges.size(); i++) {
             const Edge &e = node->edges[i];
@@ -1142,27 +1146,27 @@ void validateAllEdgeConsistency(const std::vector<MapNode *> &map) {
             if (e.source == e.target) {
                 result.fail("Node " + std::to_string(node->id) + ": self-loop in edges");
             }
-
-            for (const Edge &eIn : node->edgesIn) {
-                assert(eIn.target == node);
-                bool found = std::any_of(node->edges.begin(), node->edges.end(),
-                    [&](const Edge &ue) {
-                        return ue.source == eIn.source && ue.target == eIn.target
-                            && ue.length == eIn.length;
-                    });
-                assert(found);
-            }
-
-            for (const Edge &eOut : node->edgesOut) {
-                assert(eOut.source == node);
-                bool found = std::any_of(node->edges.begin(), node->edges.end(),
-                    [&](const Edge &ue) {
-                        return ue.source == eOut.source && ue.target == eOut.target
-                            && ue.length == eOut.length;
-                    });
-                assert(found);
-            }
-
+            // TODO: grot
+            // for (const Edge &eIn : node->edgesIn) {
+            //     assert(eIn.target == node);
+            //     bool found = std::any_of(node->edges.begin(), node->edges.end(),
+            //         [&](const Edge &ue) {
+            //             return ue.source == eIn.source && ue.target == eIn.target
+            //                 && ue.length == eIn.length;
+            //         });
+            //     assert(found);
+            // }
+            //
+            // for (const Edge &eOut : node->edgesOut) {
+            //     assert(eOut.source == node);
+            //     bool found = std::any_of(node->edges.begin(), node->edges.end(),
+            //         [&](const Edge &ue) {
+            //             return ue.source == eOut.source && ue.target == eOut.target
+            //                 && ue.length == eOut.length;
+            //         });
+            //     assert(found);
+            // }
+            //
             MapNode *other = e.otherEnd(node);
             if (mapSet.count(other) == 0) {
                 result.fail("Node " + std::to_string(node->id)
