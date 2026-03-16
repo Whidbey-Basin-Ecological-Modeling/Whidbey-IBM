@@ -888,37 +888,19 @@ void assignCrossChannelEdges(std::vector<MapNode *> &map) {
 
 // Clean up edges that point to deleted or nonexistent nodes
 void fixBrokenEdges(std::vector<MapNode *> &map) {
-    // Make a hash set to be able to easily check if a given node
-    // is part of the map node list
     std::unordered_set<MapNode *> allNodes;
     for (MapNode *node : map) {
         allNodes.insert(node);
     }
-    // For each map node, go through its edges and remove any that don't point to a node
-    // that's actually in the map
-    for (MapNode *node : map) {
-        bool modified = true;
-        while (modified) {
-            modified = false;
-            for (auto it = node->edgesIn.begin(); it != node->edgesIn.end(); ++it) {
-                if (!allNodes.count(it->source)) {
-                    node->edgesIn.erase(it);
-                    modified = true;
-                    break;
-                }
-            }
-        }
-        modified = true;
-        while (modified) {
-            modified = false;
-            for (auto it = node->edgesOut.begin(); it != node->edgesOut.end(); ++it) {
-                if (!allNodes.count(it->target)) {
-                    node->edgesOut.erase(it);
-                    modified = true;
-                    break;
-                }
-            }
-        }
+    for (MapNode* node : map) {
+        auto& edges = node->edges;
+        edges.erase(
+            std::remove_if(edges.begin(), edges.end(),
+                [&](const Edge& edge) {
+                    return !allNodes.count(edge.otherEnd(node));
+                }),
+            edges.end()
+        );
     }
 }
 
