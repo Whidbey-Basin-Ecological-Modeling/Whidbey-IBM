@@ -398,49 +398,16 @@ void loadSamplingSites(std::string &filePath, std::vector<MapNode *> &map, std::
 */
 
 // Remove an edge connecting a given node to a given neighbor
-// from that node's edge lists
+// from that node's edge list
 void removeAllEdgesBetween(MapNode *node, MapNode *neighbor) {
-    // Check  out edges
-    // Continue to prune edges until none connecting to the target are found
-    bool modified = true;
-    // while (modified) {
-    //     modified = false;
-    //     for (auto it = node->edgesOut.begin(); it != node->edgesOut.end(); ++it) {
-    //         if (it->target == neighbor) {
-    //             node->edgesOut.erase(it);
-    //             modified = true;
-    //             break;
-    //         }
-    //     }
-    // }
-    // // Check in edges
-    // // Continue to prune edges until none connecting to the target are found
-    // modified = true;
-    // while (modified) {
-    //     modified = false;
-    //     for (auto it = node->edgesIn.begin(); it != node->edgesIn.end(); ++it) {
-    //         if (it->source == neighbor) {
-    //             node->edgesIn.erase(it);
-    //             modified = true;
-    //             break;
-    //         }
-    //     }
-    // }
-
-    // TODO: remove in/out above when rafactoring complete
-    // remove from edges
-    modified = true;
-    while (modified) {
-        modified = false;
-        for (auto it = node->edges.begin(); it != node->edges.end(); ++it) {
-            if (it->source == neighbor || it->target == neighbor) {
-                node->edges.erase(it);
-                modified = true;
-                break;  // Exit the for loop after erase
-            }
-        }
-    }
-
+    auto& edges = node->edges;
+    edges.erase(
+        std::remove_if(edges.begin(), edges.end(),
+            [&](const Edge& edge) {
+                return (edge.source == neighbor || edge.target == neighbor);
+            }),
+        edges.end()
+    );
 }
 
 // Combine two nodes
