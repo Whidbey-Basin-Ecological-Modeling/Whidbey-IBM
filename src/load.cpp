@@ -1291,9 +1291,5 @@ void loadMap(
     fixElevations(dest, hydroNodes);
 
     validateAllEdgeConsistency(dest);
-
-    // TODO: remove edge resort after refactoring complete
-    sortEdgesByDirection(dest);
-
     outputNodeCounts(dest, "Map");
 }
