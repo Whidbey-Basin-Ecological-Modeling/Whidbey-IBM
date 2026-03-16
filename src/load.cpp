@@ -1041,11 +1041,7 @@ void checkAndAddEdge(Edge e) {
     if (hasReversedEdgeOf(e))
         return;
 
-    // TODO: remove after refactoring
-    // addEdgeIfNotDuplicate(edgeSource->edgesOut, e);
-    // addEdgeIfNotDuplicate(edgeTarget->edgesIn, e);
-
-    // Also populate the unified edge list on both endpoints
+    // populate the unified edge list on both endpoints
     addEdgeIfNotDuplicate(edgeSource->edges, e);
     addEdgeIfNotDuplicate(edgeTarget->edges, e);
 }
@@ -1068,10 +1064,7 @@ void validateAllEdgeConsistency(const std::vector<MapNode *> &map) {
 
     std::unordered_set<MapNode *> mapSet(map.begin(), map.end());
 
-    // TODO: remove edgesIn and edgesOut checks when refactoring is done
     for (MapNode *node : map) {
-        // size_t expectedSize = node->edgesIn.size() + node->edgesOut.size();
-        // assert(node->edges.size() == expectedSize);
 
         for (size_t i = 0; i < node->edges.size(); i++) {
             const Edge &e = node->edges[i];
@@ -1083,27 +1076,7 @@ void validateAllEdgeConsistency(const std::vector<MapNode *> &map) {
             if (e.source == e.target) {
                 result.fail("Node " + std::to_string(node->id) + ": self-loop in edges");
             }
-            // TODO: grot
-            // for (const Edge &eIn : node->edgesIn) {
-            //     assert(eIn.target == node);
-            //     bool found = std::any_of(node->edges.begin(), node->edges.end(),
-            //         [&](const Edge &ue) {
-            //             return ue.source == eIn.source && ue.target == eIn.target
-            //                 && ue.length == eIn.length;
-            //         });
-            //     assert(found);
-            // }
-            //
-            // for (const Edge &eOut : node->edgesOut) {
-            //     assert(eOut.source == node);
-            //     bool found = std::any_of(node->edges.begin(), node->edges.end(),
-            //         [&](const Edge &ue) {
-            //             return ue.source == eOut.source && ue.target == eOut.target
-            //                 && ue.length == eOut.length;
-            //         });
-            //     assert(found);
-            // }
-            //
+
             MapNode *other = e.otherEnd(node);
             if (mapSet.count(other) == 0) {
                 result.fail("Node " + std::to_string(node->id)
@@ -1296,9 +1269,6 @@ void loadMap(
         recPoints.push_back(dest[csvIdToLocalIndex[id]]);
     }
 
-    // TODO: delete edge validation after refactoring complete
-    validateAllEdgeConsistency(dest);
-
     // Clean up clean up everybody do your share
     //condenseMissingNodes(dest);
     reportDuplicateEdges(dest);
@@ -1306,23 +1276,14 @@ void loadMap(
     std::unordered_set<MapNode *> disconnectedNodes = identifyDisconnectedNodes(dest, recPoints);
     removeDisconnectedNodes(disconnectedNodes, dest, recPoints, monitoringPoints, samplingSites, samplingSitesByNode); //TODO:GROT removes nodes
 
-    // TODO: delete edge validation after refactoring complete
-    validateAllEdgeConsistency(dest);
-
     std::unordered_set<MapNode *> protectedNodes;
     identifyProtectedNodes(monitoringPoints, samplingSitesByNode, recPoints, protectedNodes);
-
-    // TODO: remove edge resort after refactoring complete
-    sortEdgesByDirection(dest);
 
     simplifyBlindChannels(dest, blindChannelSimplificationRadius, protectedNodes); // TODO:GROT - removes nodes from map. moves some nodes to end of map, preserving ids.
     //fixBrokenEdges(dest);
     if (configMap.getInt(ModelParamKey::VirtualNodes)) {
         expandNearshoreLinks(dest); // TODO:GROT - adds new nodes using negative values for new ids
     };
-
-    // TODO: delete edge validation after refactoring complete
-    validateAllEdgeConsistency(dest);
 
     //assignCrossChannelEdges(dest); // OBSOLETE
     checkDisjointDistributariesAndOtherMapErrors(dest, recPoints, protectedNodes); //TODO:GROT - deprecate? can change distributaries to blind channels, reports on disconnected and orphaned nodes
