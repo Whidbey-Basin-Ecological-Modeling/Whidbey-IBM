@@ -432,15 +432,6 @@ MapNode *mergeNodes(MapNode *a, MapNode *b) {
     };
 
     auto addDirectedEdgeAllLists = [&](MapNode *src, MapNode *dst, float len) {
-        // TODO: remove the legacy lists when refactoring complete
-        // Maintain legacy directional lists
-        // if (!hasEdgeExact(src->edgesOut, src, dst)) {
-        //     src->edgesOut.emplace_back(src, dst, len);
-        // }
-        // if (!hasEdgeExact(dst->edgesIn, src, dst)) {
-        //     dst->edgesIn.emplace_back(src, dst, len);
-        // }
-
         // Maintain unified edge lists (union of in+out) on both endpoints
         if (!hasEdgeExact(src->edges, src, dst)) {
             src->edges.emplace_back(src, dst, len);
@@ -638,12 +629,6 @@ MapNode *elaborateEdge(Edge e) {
     newNode->x = (e.source->x + e.target->x) * 0.5f;
     newNode->y = (e.source->y + e.target->y) * 0.5f;
 
-    // e.source->edgesOut.emplace_back(e.source, newNode, e.length/2.0f);
-    // newNode->edgesIn.emplace_back(e.source, newNode, e.length/2.0f);
-    // e.target->edgesIn.emplace_back(newNode, e.target, e.length/2.0f);
-    // newNode->edgesOut.emplace_back(newNode, e.target, e.length/2.0f);
-    // TODO: remove in/out above when rafactoring complete (replaced by edges below)
-
     e.source->edges.emplace_back(e.source, newNode, e.length/2.0f);
     newNode->edges.emplace_back(e.source, newNode, e.length/2.0f);
     e.target->edges.emplace_back(newNode, e.target, e.length/2.0f);
@@ -696,8 +681,6 @@ void expandNearshoreLinks(std::vector<MapNode *> &map) {
         bool updated = true;
         while (updated) {
             updated = false;
-            // TODO: clean up
-            // for (Edge &e : node->edgesOut) {
             for (Edge &e : node->edges) {
                 if (node == e.target) continue;
 
@@ -871,10 +854,10 @@ void fixBrokenEdges(std::vector<MapNode *> &map) {
     }
 }
 
-// Mark "distributaries" that aren't connected to the actual distributary network
-// as blind channels
-// TODO: GROT
-void fixDisjointDistributaries(std::vector<MapNode *> &map, std::vector<MapNode *> &recPoints, std::unordered_set<MapNode *> &protectedNodes) {
+// checks for "distributaries" that aren't connected to the actual distributary network.
+// contains code to change them to blind channels, but
+// actually exits if that or various other error conditions are found
+void checkDisjointDistributariesAndOtherMapErrors(std::vector<MapNode *> &map, std::vector<MapNode *> &recPoints, std::unordered_set<MapNode *> &protectedNodes) {
     std::unordered_set<MapNode *> connected;
     std::vector<MapNode *> fringe;
     // Do a graph traversal to find which nodes are connected to the distributary network
@@ -916,6 +899,11 @@ void fixDisjointDistributaries(std::vector<MapNode *> &map, std::vector<MapNode 
     std::cout << "Found " << disconnected_count << " disconnected nodes" << std::endl;
     std::cout << "Found " << edgeless << " orphaned nodes" << std::endl;
     std::cout << "Found " << orphaned_protected << " orphaned protected nodes" << std::endl;
+
+    if (corrected > 0 || disconnected_count > 0 || edgeless > 0 || orphaned_protected > 0) {
+        std::cout << "Please correct the above non-zero reports!" << std::endl;
+        std::exit(1);
+    }
 }
 
 void identifyProtectedNodes(const std::vector<MapNode *> &monitoringPoints, const std::unordered_map<MapNode *, SamplingSite *> &samplingSitesByNode, const std::vector<MapNode *> &recPoints, std::unordered_set<MapNode *> &protectedNodes) {
@@ -1337,7 +1325,7 @@ void loadMap(
     validateAllEdgeConsistency(dest);
 
     //assignCrossChannelEdges(dest); // OBSOLETE
-    fixDisjointDistributaries(dest, recPoints, protectedNodes); //TODO:GROT - deprecate? can change distributaries to blind channels, reports on disconnected and orphaned nodes
+    checkDisjointDistributariesAndOtherMapErrors(dest, recPoints, protectedNodes); //TODO:GROT - deprecate? can change distributaries to blind channels, reports on disconnected and orphaned nodes
     assignNearestHydroNodes(dest, hydroNodes);
     fixElevations(dest, hydroNodes);
 
