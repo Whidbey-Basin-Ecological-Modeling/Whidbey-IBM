@@ -11,6 +11,7 @@
 #include "model.h"
 #include "test_utilities.h"
 #include "util.h"
+#include "catch2/catch_approx.hpp"
 
 class ModelRecruitmentFixture {
 public:
@@ -57,20 +58,39 @@ namespace {
         }
         return expected;
     }
+
+    float expectedForkLengthForSeed(int seed, unsigned bucketIndex) {
+        GlobalRand::reseed(seed);
+        return 35.0f + 5.0f * static_cast<float>(bucketIndex) + unit_rand() * 5.0f;
+    }
+
+    size_t expectedRecruitPointForSeed(int seed, size_t pointCount) {
+        GlobalRand::reseed(seed);
+
+        // recruitSingle() calls unit_rand() once (for fork length) before selecting the recruit point, so we
+        // simulate that here. this test is obviously brittle for this reason.
+        // sample() is overridden in this test, so it does not consume RNG.
+        (void) unit_rand();
+
+        return static_cast<size_t>(GlobalRand::int_rand(0, static_cast<int>(pointCount) - 1));
+    }
 }
 
 TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::planRecruitment", "[model][recruitment]") {
     SECTION("clears any existing daily plan before generating a new one") {
-        model.recDayPlan.assign(24, 9UL);
-        setRecCounts({3});
+        const auto oldRecCount = 9UL;
+        const auto expectedRecCount = 3UL;
+
+        model.recDayPlan.assign(24, oldRecCount);
+        setRecCounts({expectedRecCount});
         GlobalRand::reseed(42);
 
         model.planRecruitment();
 
         REQUIRE(model.recDayPlan.size() == 24);
-        REQUIRE(sumPlan(model.recDayPlan) == 3UL);
+        REQUIRE(sumPlan(model.recDayPlan) == expectedRecCount);
         for (size_t slot: model.recDayPlan) {
-            REQUIRE(slot <= 3UL);
+            REQUIRE(slot <= expectedRecCount);
         }
     }
 
@@ -133,5 +153,124 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::planRecruitment", "[model][rec
         model.planRecruitment();
 
         REQUIRE(sumPlan(model.recDayPlan) == expectedDailyTotal);
+    }
+}
+
+TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruitSingle", "[model][recruitment]") {
+    SECTION("adds one fish, increments next ID, uses the seeded recruit point, and tags the recruit") {
+        auto pointA = createMapNode(10.0f, 20.0f);
+        auto pointB = createMapNode(30.0f, 40.0f);
+        pointA->id = 101;
+        pointB->id = 202;
+
+        model.recPoints = {pointA.get(), pointB.get()};
+        model.recSizeDists = {
+            std::vector<float>{0.1f, 0.2f, 0.7f}
+        };
+        model.time = 17;
+        model.recTimeIntercept = 0;
+        model.nextFishID = 0UL;
+        model.individuals.clear();
+        model.livingIndividuals.clear();
+
+        constexpr int seed = 42;
+        constexpr unsigned bucketIndex = 2U;
+        const size_t expectedPointIndex = expectedRecruitPointForSeed(seed, model.recPoints.size());
+        const float expectedForkLength = expectedForkLengthForSeed(seed, bucketIndex);
+
+        GlobalRand::reseed(seed);
+        SampleOverrideHelper sampleOverride([](float *, unsigned) -> unsigned {
+            return bucketIndex;
+        });
+
+        model.recruitSingle();
+
+        REQUIRE(model.individuals.size() == 1UL);
+        REQUIRE(model.livingIndividuals.size() == 1UL);
+        REQUIRE(model.livingIndividuals.front() == 0UL);
+        REQUIRE(model.nextFishID == 1UL);
+
+        const Fish &fish = model.individuals.front();
+        REQUIRE(fish.id == 0UL);
+        REQUIRE(fish.spawnTime == model.time);
+        REQUIRE(fish.location == model.recPoints[expectedPointIndex]);
+        REQUIRE(fish.taggedTime == model.time);
+        REQUIRE(fish.locationHistory != nullptr);
+        REQUIRE(fish.growthHistory != nullptr);
+        REQUIRE(fish.pmaxHistory != nullptr);
+        REQUIRE(fish.mortalityHistory != nullptr);
+        REQUIRE(fish.tempHistory != nullptr);
+        REQUIRE(fish.depthHistory != nullptr);
+        REQUIRE(fish.flowSpeedHistory_old != nullptr);
+        REQUIRE(fish.flowVelocityHistory != nullptr);
+        REQUIRE(fish.locationHistory->size() == 1UL);
+        REQUIRE((*fish.locationHistory)[0] == fish.location->id);
+        REQUIRE(fish.forkLength == Catch::Approx(expectedForkLength).margin(0.0001f));
+        REQUIRE(fish.forkLength >= 45.0f);
+        REQUIRE(fish.forkLength < 50.0f);
+    }
+
+    // ... existing code ...
+
+    SECTION("clamps to the last size bucket when the recruit week exceeds available distributions") {
+        auto point = createMapNode(0.0f, 0.0f);
+        point->id = 7;
+
+        model.recPoints = {point.get()};
+
+        // Create 2 weekly distributions with distinct patterns
+        // Week 0: heavily weighted toward bucket 0 (35-40mm)
+        // Week 1 (last): heavily weighted toward bucket 2 (45-50mm)
+        model.recSizeDists = {
+            std::vector<float>{10.0f, 0.0f, 0.0f},  // Week 0: bucket 0 dominant
+            std::vector<float>{0.0f, 0.0f, 10.0f},  // Week 1: bucket 2 dominant
+        };
+
+        // Set time to week 3 (exceeds the 2 available weeks)
+        model.time = 24L * 7L * 3L;  // 3 weeks = 504 hours
+        model.recTimeIntercept = 0;
+
+        // Recruit multiple fish to verify statistical pattern
+        constexpr int seed = 42;
+        GlobalRand::reseed(seed);
+
+        constexpr int numRecruits = 100;
+        int inLastBucketRange = 0;  // Count fish in 45-50mm range
+
+        for (int i = 0; i < numRecruits; ++i) {
+            model.recruitSingle();
+            const Fish& fish = model.individuals.back();
+            if (fish.forkLength >= 45.0f && fish.forkLength < 50.0f) {
+                ++inLastBucketRange;
+            }
+        }
+
+        const Fish& fish = model.individuals.front();
+        REQUIRE(fish.forkLength >= 45.0f);
+        REQUIRE(fish.forkLength < 50.0f);
+
+        // If the last week's distribution is used, nearly all fish should be
+        // in the 45-50mm range (bucket 2). If week 0 were used instead,
+        // nearly all would be in 35-40mm range.
+        CHECK(model.individuals.size() == numRecruits);
+        REQUIRE(inLastBucketRange > numRecruits * 0.9f);  // >90% should be in bucket 2 range
+    }
+
+    SECTION("does not tag recruits whose ID is not a multiple of 2500") {
+        auto point = createMapNode(0.0f, 0.0f);
+        point->id = 7;
+        model.recPoints = {point.get()};
+        model.recSizeDists = {
+            std::vector<float>{1.0f}
+        };
+
+        model.time = 0L;
+        model.nextFishID = 1UL;
+
+        model.recruitSingle();
+
+        REQUIRE(model.individuals.size() == 1UL);
+        REQUIRE(model.individuals.front().taggedTime == -1L);
+        REQUIRE(model.individuals.front().locationHistory == nullptr);
     }
 }

@@ -99,6 +99,8 @@ public:
     // number of consecutive Nearshore hours to satisfy exit condition
     float habitatTypeExitConditionHours;
 
+    unsigned long nextFishID;
+
     Model(
         int globalTimeIntercept,
         int hydroTimeIntercept,
@@ -193,7 +195,6 @@ public:
 
 private:
     ModelConfigMap configMap;
-    unsigned long nextFishID;
     size_t maxThreads;
     float recruitTagRate;
 };
