@@ -1249,14 +1249,53 @@ Model *modelFromConfig(std::string configPath) {
             recPoints.push_back(it->GetUint());
         }
 
+        /*******/
+        // TODO: extract method
+        std::vector<RecruitPopulation> allRecruits;
+
+        // Check if "recruitClasses" exists and is an array
+        if (d.HasMember("recruitPopulations") && d["recruitPopulations"].IsArray()) {
+            const rapidjson::Value& classesArray = d["recruitPopulations"];
+
+            // Iterate through each object in the array
+            for (rapidjson::SizeType i = 0; i < classesArray.Size(); i++) {
+                const rapidjson::Value& recruitObj = classesArray[i];
+                RecruitPopulation population;
+
+                if (recruitObj.HasMember("name") && recruitObj["name"].IsString()) {
+                    population.name = recruitObj["name"].GetString();
+                }
+
+                if (recruitObj.HasMember("entryNodes") && recruitObj["entryNodes"].IsArray()) {
+                    const rapidjson::Value& nodesArray = recruitObj["entryNodes"];
+                    for (rapidjson::SizeType j = 0; j < nodesArray.Size(); j++) {
+                        if (nodesArray[j].IsInt()) {
+                            population.entryNodeIds.push_back(nodesArray[j].GetInt());
+                        }
+                    }
+                }
+
+                if (recruitObj.HasMember("countsFile") && recruitObj["countsFile"].IsString()) {
+                    population.countsFile = recruitObj["countsFile"].GetString();
+                }
+
+                if (recruitObj.HasMember("sizesFile") && recruitObj["sizesFile"].IsString()) {
+                    population.sizesFile = recruitObj["sizesFile"].GetString();
+                }
+
+                allRecruits.push_back(population);
+            }
+        }
+        /*******/
+
         m = new Model(
             timeIntercept,
             hydroTimeIntercept,
             recTimeIntercept,
             maxThreads,
-            std::string(d["recruitCountsFile"].GetString()),
-            std::string(d["recruitSizesFile"].GetString()),
-            recPoints,
+            allRecruits[0].countsFile,
+            allRecruits[0].sizesFile,
+            allRecruits[0].entryNodeIds,
             d.HasMember("habitatTypeExitConditionHours")
                 ? d["habitatTypeExitConditionHours"].GetFloat()
                 : DEFAULT_EXIT_CONDITION_HOURS,

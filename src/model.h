@@ -9,6 +9,7 @@
 #include "map.h"
 #include "hydro.h"
 #include "model_config_map.h"
+#include "RecruitPopulation.h"
 
 #ifndef __FISH_FISH_CLS
 class Fish;
@@ -53,6 +54,8 @@ private:
 public:
     // The hydrology model
     HydroModel& hydroModel;
+
+    std::vector<RecruitPopulation> recruitPopulations;
 
     // Loaded daily recruit counts (see CONFIG_README for file format)
     std::vector<int> recCounts;
