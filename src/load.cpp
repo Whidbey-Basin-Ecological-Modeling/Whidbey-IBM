@@ -1149,7 +1149,7 @@ void loadMap(
     std::string& edgeFilePath,
     std::string& geometryFilePath,
     std::vector<DistribHydroNode> &hydroNodes,
-    std::vector<unsigned> &recPointIds,
+    const std::vector<unsigned>& recPointIds,
     std::vector<MapNode *> &recPoints,
     std::vector<MapNode *> &monitoringPoints,
     std::vector<SamplingSite *> &samplingSites,

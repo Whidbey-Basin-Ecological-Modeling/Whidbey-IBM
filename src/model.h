@@ -9,7 +9,7 @@
 #include "map.h"
 #include "hydro.h"
 #include "model_config_map.h"
-#include "RecruitPopulation.h"
+#include "initial_population.h"
 
 #ifndef __FISH_FISH_CLS
 class Fish;
@@ -55,7 +55,7 @@ public:
     // The hydrology model
     HydroModel& hydroModel;
 
-    std::vector<RecruitPopulation> recruitPopulations;
+    std::vector<InitialPopulation> initialPopulations;
 
     // Loaded daily recruit counts (see CONFIG_README for file format)
     std::vector<int> recCounts;
@@ -111,7 +111,8 @@ public:
         size_t maxThreads,
         std::string recCountFilename,
         std::string recSizeDistsFilename,
-        std::vector<unsigned> recPointIds,
+        std::vector<unsigned> initialPopPointIds,
+        std::vector<InitialPopulation> allInitialPopulations,
         float habitatTypeExitConditionHours,
         std::string mapLocationFilename,
         std::string mapEdgeFilename,

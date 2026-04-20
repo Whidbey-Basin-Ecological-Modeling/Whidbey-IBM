@@ -42,12 +42,14 @@ Model::Model(
     // The maximum number of threads to spawn for multithreaded computation of movement + growth/death
     size_t maxThreads,
 
+
     // Path of the file containing the daily recruitment counts
     std::string recCountFilename,
     // Path of the file containing the biweekly recruitment size distributions
     std::string recSizeDistsFilename,
     // List of map node IDs where new recruits enter the model
-    std::vector<unsigned> recPointIds,
+    std::vector<unsigned> initialPopPointIds,
+    std::vector<InitialPopulation> allInitialPopulations,
     float habitatTypeExitConditionHours,
     // Path of the file containing map node descriptions (area, habitat type, elevation, among other columns)
     std::string mapLocationFilename,
@@ -71,6 +73,7 @@ Model::Model(
 ) : defaultHydroModel(std::make_unique<HydroModel>(cresTideFilename, flowVolFilename, airTempFilename,
                                                    flowSpeedFilename, distribWseTempFilename, hydroTimeIntercept)),
     hydroModel(*defaultHydroModel),
+    initialPopulations(std::move(allInitialPopulations)),
     recTimeIntercept(recTimeIntercept),
     globalTimeIntercept(globalTimeIntercept),
     firstHighTide(false),
@@ -81,11 +84,13 @@ Model::Model(
     mortConstC(MORT_CONST_C),
     habitatTypeExitConditionHours(habitatTypeExitConditionHours),
     nextFishID(0UL),
+    configMap(config),
     maxThreads(maxThreads),
-    recruitTagRate(0.5f),
-    configMap(config) {
+    recruitTagRate(0.5f) {
+
     if (getInt(ModelParamKey::DirectionlessEdges)) std::cout << "directionless edges!" << std::endl;
 
+    InitialPopulation& initialPopulation = initialPopulations[0];
     // Load the map
     loadMap(
         // The resulting nodes are stored in the model's "map" field
@@ -94,8 +99,8 @@ Model::Model(
         mapEdgeFilename,
         mapGeometryFilename,
         hydroModel.hydroNodes,
-        recPointIds,
-        this->recPoints,
+        initialPopulation.entryNodeIds,
+        initialPopulation.recPoints,
         this->monitoringPoints,
         this->samplingSites,
         blindChannelSimplificationRadius,
@@ -105,9 +110,9 @@ Model::Model(
         this->monitoringHistory.emplace_back();
     }
     // Load the recruit counts, the data is stored in the model's "recCounts" field
-    loadIntList(recCountFilename, this->recCounts);
+    loadIntList(initialPopulation.countsFile, initialPopulation.recCounts);
     // Ditto for recruit sizes and sampling sites
-    loadRecSizeDists(recSizeDistsFilename, this->recSizeDists);
+    loadRecSizeDists(initialPopulation.sizesFile, initialPopulation.recSizeDists);
     // Make room in the recruit plan vector (per-timestep recruit counts for the current day)
     this->recDayPlan.resize(24, 0UL);
 }
@@ -393,8 +398,8 @@ void Model::recruitSingle() {
     constexpr unsigned DAYS_IN_WEEK = 7;
     constexpr unsigned TIMESTEPS_IN_WEEK = TIMESTEPS_IN_DAY * DAYS_IN_WEEK;
     const size_t recruitWeek = (this->time + this->recTimeIntercept) / (TIMESTEPS_IN_WEEK);
-    const size_t recruitWeekIndex = std::min(recruitWeek, this->recSizeDists.size() - 1);
-    std::vector<float> &recSizeDist = this->recSizeDists[recruitWeekIndex];
+    const size_t recruitWeekIndex = std::min(recruitWeek, initialPopulations[0].recSizeDists.size() - 1);
+    std::vector<float> &recSizeDist = initialPopulations[0].recSizeDists[recruitWeekIndex];
 
     // Sample the fork length bucket index from the distribution
     unsigned flIdx = sample(recSizeDist.data(), recSizeDist.size());
@@ -407,7 +412,7 @@ void Model::recruitSingle() {
         this->time,
         forkLength,
         // This samples a random (uniform) recruit start node
-        this->recPoints[GlobalRand::int_rand(0, (int) this->recPoints.size() - 1)]
+        initialPopulations[0].recPoints[GlobalRand::int_rand(0, (int) initialPopulations[0].recPoints.size() - 1)]
     );
     // this->addHistoryBuffers();
     const size_t last_id = this->individuals.back().id;
@@ -433,7 +438,7 @@ void Model::planRecruitment() {
         this->recDayPlan[i] = 0;
     }
     // Get the day's daily recruit count
-    size_t count = this->recCounts[(this->time + this->recTimeIntercept) / 24];
+    size_t count = initialPopulations[0].recCounts[(this->time + this->recTimeIntercept) / 24];
     // For each recruit in the day, place it in a random timestep's slot
     for (size_t i = 0; i < count; ++i) {
         size_t timestep = GlobalRand::int_rand(0, 23);
@@ -1242,32 +1247,26 @@ Model *modelFromConfig(std::string configPath) {
         int timeIntercept = std::max(recStartTime, hydroStartTime);
         int recTimeIntercept = timeIntercept - recStartTime;
         int hydroTimeIntercept = timeIntercept - hydroStartTime;
-        // load the JSON list of entry nodes into a CPP vector
-        std::vector<unsigned> recPoints;
-        rapidjson::Value &recPointArr = d["recruitEntryNodes"];
-        for (rapidjson::Value::ConstValueIterator it = recPointArr.Begin(); it != recPointArr.End(); ++it) {
-            recPoints.push_back(it->GetUint());
-        }
 
         /*******/
-        // TODO: extract method
-        std::vector<RecruitPopulation> allRecruits;
+        // TODO: extract method, probably move to InitialPopulation class
+        std::vector<InitialPopulation> allInitialPopulations;
 
         // Check if "recruitClasses" exists and is an array
-        if (d.HasMember("recruitPopulations") && d["recruitPopulations"].IsArray()) {
-            const rapidjson::Value& classesArray = d["recruitPopulations"];
+        if (d.HasMember("initialPopulations") && d["initialPopulations"].IsArray()) {
+            const rapidjson::Value& populationsArray = d["initialPopulations"];
 
             // Iterate through each object in the array
-            for (rapidjson::SizeType i = 0; i < classesArray.Size(); i++) {
-                const rapidjson::Value& recruitObj = classesArray[i];
-                RecruitPopulation population;
+            for (rapidjson::SizeType i = 0; i < populationsArray.Size(); i++) {
+                const rapidjson::Value& populationObj = populationsArray[i];
+                InitialPopulation population;
 
-                if (recruitObj.HasMember("name") && recruitObj["name"].IsString()) {
-                    population.name = recruitObj["name"].GetString();
+                if (populationObj.HasMember("name") && populationObj["name"].IsString()) {
+                    population.name = populationObj["name"].GetString();
                 }
 
-                if (recruitObj.HasMember("entryNodes") && recruitObj["entryNodes"].IsArray()) {
-                    const rapidjson::Value& nodesArray = recruitObj["entryNodes"];
+                if (populationObj.HasMember("entryNodes") && populationObj["entryNodes"].IsArray()) {
+                    const rapidjson::Value& nodesArray = populationObj["entryNodes"];
                     for (rapidjson::SizeType j = 0; j < nodesArray.Size(); j++) {
                         if (nodesArray[j].IsInt()) {
                             population.entryNodeIds.push_back(nodesArray[j].GetInt());
@@ -1275,15 +1274,15 @@ Model *modelFromConfig(std::string configPath) {
                     }
                 }
 
-                if (recruitObj.HasMember("countsFile") && recruitObj["countsFile"].IsString()) {
-                    population.countsFile = recruitObj["countsFile"].GetString();
+                if (populationObj.HasMember("countsFile") && populationObj["countsFile"].IsString()) {
+                    population.countsFile = populationObj["countsFile"].GetString();
                 }
 
-                if (recruitObj.HasMember("sizesFile") && recruitObj["sizesFile"].IsString()) {
-                    population.sizesFile = recruitObj["sizesFile"].GetString();
+                if (populationObj.HasMember("sizesFile") && populationObj["sizesFile"].IsString()) {
+                    population.sizesFile = populationObj["sizesFile"].GetString();
                 }
 
-                allRecruits.push_back(population);
+                allInitialPopulations.push_back(population);
             }
         }
         /*******/
@@ -1293,9 +1292,10 @@ Model *modelFromConfig(std::string configPath) {
             hydroTimeIntercept,
             recTimeIntercept,
             maxThreads,
-            allRecruits[0].countsFile,
-            allRecruits[0].sizesFile,
-            allRecruits[0].entryNodeIds,
+            allInitialPopulations[0].countsFile,
+            allInitialPopulations[0].sizesFile,
+            allInitialPopulations[0].entryNodeIds,
+            std::move(allInitialPopulations),
             d.HasMember("habitatTypeExitConditionHours")
                 ? d["habitatTypeExitConditionHours"].GetFloat()
                 : DEFAULT_EXIT_CONDITION_HOURS,

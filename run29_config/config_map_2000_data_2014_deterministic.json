@@ -7,7 +7,7 @@
   "recStartTimestep": 744,
   "hydroStartTimestep": 0,
 
-  "recruitPopulations": [
+  "initialPopulations": [
     {
       "name": "Skagit Recruits",
       "entryNodes": [29331, 29346, 29401],
@@ -15,10 +15,6 @@
       "sizesFile": "data/skagit_weekly_lengths_2014_ed.csv"
     }
   ],
-
-  "recruitEntryNodes": [29331,29346,29401],
-  "recruitCountsFile": "data/skagit_migrants_2014_feb_start.csv",
-  "recruitSizesFile": "data/skagit_weekly_lengths_2014_ed.csv",
   "samplingSitesFile": "data/sampling_sites.csv",
   "mapNodesFile": "data/maps_dec/Skagit2000_vertices_2019_elev.csv",
   "mapEdgesFile": "data/maps_dec/Skagit2000_edges_new.csv",

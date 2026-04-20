@@ -9,9 +9,9 @@
 
 class MapNode;
 
-class RecruitPopulation {
+class InitialPopulation {
 public:
-    RecruitPopulation() = default;
+    InitialPopulation() = default;
 
     std::string name;
 

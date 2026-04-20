@@ -102,6 +102,8 @@ public:
         MapNode *location
     );
 
+    virtual ~Fish() = default;
+
     /*
     * Populate 'out' with a mapping from reachable map locations
     * to the associated travel cost (meters swum)
