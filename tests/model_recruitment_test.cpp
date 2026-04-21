@@ -155,6 +155,36 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::planRecruitment", "[model][rec
 
         REQUIRE(sumPlan(model.initialPopulations[0].recDayPlan) == expectedDailyTotal);
     }
+
+    SECTION("sets recDayPlan for every initial population") {
+        model.initialPopulations.emplace_back();
+
+        model.initialPopulations[0].recCounts = {2};
+        model.initialPopulations[1].recCounts = {5};
+
+        model.initialPopulations[0].recDayPlan.assign(24, 111UL);
+        model.initialPopulations[1].recDayPlan.assign(24, 222UL);
+
+        const int seed = 42;
+        GlobalRand::reseed(seed);
+
+        std::vector<size_t> expected0(24, 0UL);
+        for (size_t i = 0; i < 2UL; ++i) {
+            ++expected0[GlobalRand::int_rand(0, 23)];
+        }
+
+        std::vector<size_t> expected1(24, 0UL);
+        for (size_t i = 0; i < 5UL; ++i) {
+            ++expected1[GlobalRand::int_rand(0, 23)];
+        }
+
+        GlobalRand::reseed(seed);
+        model.planRecruitment();
+
+        CHECK(model.initialPopulations.size() == 2UL);
+        REQUIRE(model.initialPopulations[0].recDayPlan == expected0);
+        REQUIRE(model.initialPopulations[1].recDayPlan == expected1);
+    }
 }
 
 TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruitSingle", "[model][recruitment]") {
