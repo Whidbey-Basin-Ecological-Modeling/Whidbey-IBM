@@ -18,7 +18,8 @@ public:
     ModelRecruitmentFixture()
         : hydroModel(std::make_unique<MockHydroModel>()),
           model(hydroModel.get()) {
-        model.recDayPlan.resize(24, 0UL);
+        model.initialPopulations.emplace_back();
+        model.initialPopulations[0].recDayPlan.resize(24, 0UL);
         model.time = 0;
         model.recTimeIntercept = 0;
     }
@@ -28,7 +29,7 @@ protected:
     Model model;
 
     void setRecCounts(const std::vector<int> &counts) {
-        model.recCounts = counts;
+        model.initialPopulations[0].recCounts = counts;
     }
 
     void setTime(long t) {
@@ -40,7 +41,7 @@ protected:
     }
 
     void seedPlan(const std::vector<size_t> &plan) {
-        model.recDayPlan = plan;
+        model.initialPopulations[0].recDayPlan = plan;
     }
 };
 
@@ -81,15 +82,15 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::planRecruitment", "[model][rec
         const auto oldRecCount = 9UL;
         const auto expectedRecCount = 3UL;
 
-        model.recDayPlan.assign(24, oldRecCount);
+        model.initialPopulations[0].recDayPlan.assign(24, oldRecCount);
         setRecCounts({expectedRecCount});
         GlobalRand::reseed(42);
 
         model.planRecruitment();
 
-        REQUIRE(model.recDayPlan.size() == 24);
-        REQUIRE(sumPlan(model.recDayPlan) == expectedRecCount);
-        for (size_t slot: model.recDayPlan) {
+        REQUIRE(model.initialPopulations[0].recDayPlan.size() == 24);
+        REQUIRE(sumPlan(model.initialPopulations[0].recDayPlan) == expectedRecCount);
+        for (size_t slot: model.initialPopulations[0].recDayPlan) {
             REQUIRE(slot <= expectedRecCount);
         }
     }
@@ -98,12 +99,12 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::planRecruitment", "[model][rec
         setRecCounts({2, 5, 7});
         setTime(24);
         setIntercept(24);
-        const auto expectedDailyTotal = static_cast<size_t>(model.recCounts[2]);
+        const auto expectedDailyTotal = static_cast<size_t>(model.initialPopulations[0].recCounts[2]);
         GlobalRand::reseed(42);
 
         model.planRecruitment();
 
-        REQUIRE(sumPlan(model.recDayPlan) == expectedDailyTotal);
+        REQUIRE(sumPlan(model.initialPopulations[0].recDayPlan) == expectedDailyTotal);
     }
 
     SECTION("produces the same plan for a fixed seed") {
@@ -114,18 +115,18 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::planRecruitment", "[model][rec
 
         model.planRecruitment();
 
-        REQUIRE(model.recDayPlan == expected);
+        REQUIRE(model.initialPopulations[0].recDayPlan == expected);
     }
 
     SECTION("handles a zero recruit count") {
-        model.recDayPlan.assign(24, 4UL);
+        model.initialPopulations[0].recDayPlan.assign(24, 4UL);
         setRecCounts({0});
         GlobalRand::reseed(42);
 
         model.planRecruitment();
 
-        REQUIRE(sumPlan(model.recDayPlan) == 0UL);
-        for (size_t slot: model.recDayPlan) {
+        REQUIRE(sumPlan(model.initialPopulations[0].recDayPlan) == 0UL);
+        for (size_t slot: model.initialPopulations[0].recDayPlan) {
             REQUIRE(slot == 0UL);
         }
     }
@@ -136,9 +137,9 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::planRecruitment", "[model][rec
 
         model.planRecruitment();
 
-        REQUIRE(model.recDayPlan.size() == 24);
-        REQUIRE(sumPlan(model.recDayPlan) == 48UL);
-        for (size_t slot: model.recDayPlan) {
+        REQUIRE(model.initialPopulations[0].recDayPlan.size() == 24);
+        REQUIRE(sumPlan(model.initialPopulations[0].recDayPlan) == 48UL);
+        for (size_t slot: model.initialPopulations[0].recDayPlan) {
             REQUIRE(slot <= 48UL);
         }
     }
@@ -147,12 +148,12 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::planRecruitment", "[model][rec
         setRecCounts({1, 9, 4});
         setTime(23);
         setIntercept(1);
-        const auto expectedDailyTotal = static_cast<size_t>(model.recCounts[1]);
+        const auto expectedDailyTotal = static_cast<size_t>(model.initialPopulations[0].recCounts[1]);
         GlobalRand::reseed(42);
 
         model.planRecruitment();
 
-        REQUIRE(sumPlan(model.recDayPlan) == expectedDailyTotal);
+        REQUIRE(sumPlan(model.initialPopulations[0].recDayPlan) == expectedDailyTotal);
     }
 }
 
@@ -163,8 +164,8 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruitSingle", "[model][recru
         pointA->id = 101;
         pointB->id = 202;
 
-        model.recPoints = {pointA.get(), pointB.get()};
-        model.recSizeDists = {
+        model.initialPopulations[0].recPoints = {pointA.get(), pointB.get()};
+        model.initialPopulations[0].recSizeDists = {
             std::vector<float>{0.1f, 0.2f, 0.7f}
         };
         model.time = 17;
@@ -175,7 +176,7 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruitSingle", "[model][recru
 
         constexpr int seed = 42;
         constexpr unsigned bucketIndex = 2U;
-        const size_t expectedPointIndex = expectedRecruitPointForSeed(seed, model.recPoints.size());
+        const size_t expectedPointIndex = expectedRecruitPointForSeed(seed, model.initialPopulations[0].recPoints.size());
         const float expectedForkLength = expectedForkLengthForSeed(seed, bucketIndex);
 
         GlobalRand::reseed(seed);
@@ -193,7 +194,7 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruitSingle", "[model][recru
         const Fish &fish = model.individuals.front();
         REQUIRE(fish.id == 0UL);
         REQUIRE(fish.spawnTime == model.time);
-        REQUIRE(fish.location == model.recPoints[expectedPointIndex]);
+        REQUIRE(fish.location == model.initialPopulations[0].recPoints[expectedPointIndex]);
         REQUIRE(fish.taggedTime == model.time);
         REQUIRE(fish.locationHistory != nullptr);
         REQUIRE(fish.growthHistory != nullptr);
@@ -216,12 +217,12 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruitSingle", "[model][recru
         auto point = createMapNode(0.0f, 0.0f);
         point->id = 7;
 
-        model.recPoints = {point.get()};
+        model.initialPopulations[0].recPoints = {point.get()};
 
         // Create 2 weekly distributions with distinct patterns
         // Week 0: heavily weighted toward bucket 0 (35-40mm)
         // Week 1 (last): heavily weighted toward bucket 2 (45-50mm)
-        model.recSizeDists = {
+        model.initialPopulations[0].recSizeDists = {
             std::vector<float>{10.0f, 0.0f, 0.0f},  // Week 0: bucket 0 dominant
             std::vector<float>{0.0f, 0.0f, 10.0f},  // Week 1: bucket 2 dominant
         };
@@ -259,8 +260,8 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruitSingle", "[model][recru
     SECTION("does not tag recruits whose ID is not a multiple of 2500") {
         auto point = createMapNode(0.0f, 0.0f);
         point->id = 7;
-        model.recPoints = {point.get()};
-        model.recSizeDists = {
+        model.initialPopulations[0].recPoints = {point.get()};
+        model.initialPopulations[0].recSizeDists = {
             std::vector<float>{1.0f}
         };
 
