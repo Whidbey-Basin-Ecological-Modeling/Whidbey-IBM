@@ -395,14 +395,14 @@ void Model::countAll(bool updateTracking) {
 }
 
 // Generates a single recruit and adds it to a random recruit start node
-void Model::recruitSingle() {
+void Model::recruitSingle(size_t populationIdx) {
     // Get the current slice of the recruit size distribution data
     constexpr unsigned TIMESTEPS_IN_DAY = 24;
     constexpr unsigned DAYS_IN_WEEK = 7;
     constexpr unsigned TIMESTEPS_IN_WEEK = TIMESTEPS_IN_DAY * DAYS_IN_WEEK;
     const size_t recruitWeek = (this->time + this->recTimeIntercept) / (TIMESTEPS_IN_WEEK);
-    const size_t recruitWeekIndex = std::min(recruitWeek, initialPopulations[0].recSizeDists.size() - 1);
-    std::vector<float> &recSizeDist = initialPopulations[0].recSizeDists[recruitWeekIndex];
+    const size_t recruitWeekIndex = std::min(recruitWeek, initialPopulations[populationIdx].recSizeDists.size() - 1);
+    std::vector<float> &recSizeDist = initialPopulations[populationIdx].recSizeDists[recruitWeekIndex];
 
     // Sample the fork length bucket index from the distribution
     unsigned flIdx = sample(recSizeDist.data(), recSizeDist.size());
@@ -415,7 +415,7 @@ void Model::recruitSingle() {
         this->time,
         forkLength,
         // This samples a random (uniform) recruit start node
-        initialPopulations[0].recPoints[GlobalRand::int_rand(0, (int) initialPopulations[0].recPoints.size() - 1)]
+        initialPopulations[populationIdx].recPoints[GlobalRand::int_rand(0, (int) initialPopulations[populationIdx].recPoints.size() - 1)]
     );
     // this->addHistoryBuffers();
     const size_t last_id = this->individuals.back().id;
@@ -426,11 +426,13 @@ void Model::recruitSingle() {
 
 // Recruit all recruits for the current timestep
 void Model::recruit() {
-    // Get the current timestep's recruit count from the day's recruit "plan"
-    size_t currRecCount = initialPopulations[0].recDayPlan[this->time % 24];
-    // Recruit that many fish
-    for (size_t i = 0; i < currRecCount; ++i) {
-        this->recruitSingle();
+    for (size_t popIndex = 0; popIndex < initialPopulations.size(); ++popIndex) {
+        // Get the current timestep's recruit count from the day's recruit "plan"
+        size_t currRecCount = initialPopulations[popIndex].recDayPlan[this->time % 24];
+        // Recruit that many fish
+        for (size_t i = 0; i < currRecCount; ++i) {
+            this->recruitSingle(popIndex);
+        }
     }
 }
 

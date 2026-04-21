@@ -214,7 +214,7 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruitSingle", "[model][recru
             return bucketIndex;
         });
 
-        model.recruitSingle();
+        model.recruitSingle(0);
 
         REQUIRE(model.individuals.size() == 1UL);
         REQUIRE(model.livingIndividuals.size() == 1UL);
@@ -241,7 +241,50 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruitSingle", "[model][recru
         REQUIRE(fish.forkLength < 50.0f);
     }
 
-    // ... existing code ...
+    SECTION("uses the requested initial population when recruiting a single fish") {
+        model.initialPopulations.emplace_back();
+
+        auto firstPoint = createMapNode(10.0f, 10.0f);
+        auto firstPointB = createMapNode(20.0f, 20.0f);
+        auto secondPoint = createMapNode(30.0f, 30.0f);
+
+        firstPoint->id = 101;
+        firstPointB->id = 202;
+        secondPoint->id = 303;
+
+        model.initialPopulations[0].recPoints = {firstPoint.get(), firstPointB.get()};
+        model.initialPopulations[0].recSizeDists = {
+            std::vector<float>{1.0f, 0.0f, 0.0f}
+        };
+
+        model.initialPopulations[1].recPoints = {secondPoint.get()};
+        model.initialPopulations[1].recSizeDists = {
+            std::vector<float>{0.0f, 0.0f, 1.0f}
+        };
+
+        model.time = 0L;
+        model.recTimeIntercept = 0;
+        model.nextFishID = 0UL;
+        model.individuals.clear();
+        model.livingIndividuals.clear();
+
+        constexpr int seed = 42;
+        GlobalRand::reseed(seed);
+        SampleOverrideHelper sampleOverride([](float *, unsigned) -> unsigned {
+            return 2U;
+        });
+
+        model.recruitSingle(1);
+
+        REQUIRE(model.individuals.size() == 1UL);
+        REQUIRE(model.livingIndividuals.size() == 1UL);
+        REQUIRE(model.nextFishID == 1UL);
+
+        const Fish &fish = model.individuals.front();
+        REQUIRE(fish.location == secondPoint.get());
+        REQUIRE(fish.forkLength >= 45.0f);
+        REQUIRE(fish.forkLength < 50.0f);
+    }
 
     SECTION("clamps to the last size bucket when the recruit week exceeds available distributions") {
         auto point = createMapNode(0.0f, 0.0f);
@@ -269,7 +312,7 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruitSingle", "[model][recru
         int inLastBucketRange = 0;  // Count fish in 45-50mm range
 
         for (int i = 0; i < numRecruits; ++i) {
-            model.recruitSingle();
+            model.recruitSingle(0);
             const Fish& fish = model.individuals.back();
             if (fish.forkLength >= 45.0f && fish.forkLength < 50.0f) {
                 ++inLastBucketRange;
@@ -298,10 +341,77 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruitSingle", "[model][recru
         model.time = 0L;
         model.nextFishID = 1UL;
 
-        model.recruitSingle();
+        model.recruitSingle(0);
 
         REQUIRE(model.individuals.size() == 1UL);
         REQUIRE(model.individuals.front().taggedTime == -1L);
         REQUIRE(model.individuals.front().locationHistory == nullptr);
+    }
+}
+
+TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruit", "[model][recruitment]") {
+    SECTION("recruits the correct total number across all populations") {
+        // Set up two populations with different recruitment plans
+        model.initialPopulations.emplace_back();
+        model.initialPopulations[1].recDayPlan.resize(24, 0UL);
+
+        auto point0 = createMapNode(10.0f, 10.0f);
+        auto point1 = createMapNode(20.0f, 20.0f);
+        point0->id = 101;
+        point1->id = 202;
+
+        model.initialPopulations[0].recPoints = {point0.get()};
+        model.initialPopulations[0].recSizeDists = {std::vector<float>{1.0f}};
+        model.initialPopulations[0].recDayPlan[0] = 3;  // 3 recruits from population 0
+
+        model.initialPopulations[1].recPoints = {point1.get()};
+        model.initialPopulations[1].recSizeDists = {std::vector<float>{1.0f}};
+        model.initialPopulations[1].recDayPlan[0] = 2;  // 2 recruits from population 1
+
+        model.time = 0;
+        model.nextFishID = 0UL;
+        model.individuals.clear();
+        model.livingIndividuals.clear();
+
+        model.recruit();
+
+        REQUIRE(model.individuals.size() == 5UL);
+        REQUIRE(model.livingIndividuals.size() == 5UL);
+    }
+
+    SECTION("uses the correct timestep index into recDayPlan for all populations") {
+        // Set up two populations with data in multiple timesteps
+        model.initialPopulations.emplace_back();
+        model.initialPopulations[1].recDayPlan.resize(24, 0UL);
+
+        auto point0 = createMapNode(10.0f, 10.0f);
+        auto point1 = createMapNode(20.0f, 20.0f);
+        point0->id = 101;
+        point1->id = 202;
+
+        model.initialPopulations[0].recPoints = {point0.get()};
+        model.initialPopulations[0].recSizeDists = {std::vector<float>{1.0f}};
+        // Populate multiple timesteps: timestep 7 has the recruits we expect
+        model.initialPopulations[0].recDayPlan[0] = 10;
+        model.initialPopulations[0].recDayPlan[7] = 3;
+        model.initialPopulations[0].recDayPlan[15] = 5;
+
+        model.initialPopulations[1].recPoints = {point1.get()};
+        model.initialPopulations[1].recSizeDists = {std::vector<float>{1.0f}};
+        model.initialPopulations[1].recDayPlan[0] = 8;
+        model.initialPopulations[1].recDayPlan[7] = 2;
+        model.initialPopulations[1].recDayPlan[15] = 4;
+
+        // Set time to timestep 7 (mod 24)
+        model.time = 7;
+        model.nextFishID = 0UL;
+        model.individuals.clear();
+        model.livingIndividuals.clear();
+
+        model.recruit();
+
+        // Should recruit only from timestep 7: 3 from population 0 and 2 from population 1
+        REQUIRE(model.individuals.size() == 5UL);
+        REQUIRE(model.livingIndividuals.size() == 5UL);
     }
 }
