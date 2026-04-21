@@ -8,6 +8,8 @@
 #include "map.h"
 
 class ModelConfigMap;
+class InitialPopulation;
+
 // Utility function to split a string into chunks delimited by a given character
 std::vector<std::string> split(std::string& s, char c);
 
@@ -46,8 +48,7 @@ void loadMap(
     std::string& edgeFilePath,
     std::string& geometryFilePath,
     std::vector<DistribHydroNode> &hydroNodes,
-    const std::vector<unsigned>& recPointIds,
-    std::vector<MapNode *> &recPoints,
+    std::vector<InitialPopulation> &initialPopulations,
     std::vector<MapNode *> &monitoringPoints,
     std::vector<SamplingSite *> &samplingSites,
     float blindChannelSimplificationRadius,

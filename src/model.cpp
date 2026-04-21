@@ -43,6 +43,7 @@ Model::Model(
     size_t maxThreads,
 
 
+    //TODO: GROT
     // Path of the file containing the daily recruitment counts
     std::string recCountFilename,
     // Path of the file containing the biweekly recruitment size distributions
@@ -90,7 +91,7 @@ Model::Model(
 
     if (getInt(ModelParamKey::DirectionlessEdges)) std::cout << "directionless edges!" << std::endl;
 
-    InitialPopulation& initialPopulation = initialPopulations[0];
+    InitialPopulation& firstPopulation = initialPopulations[0];
     // Load the map
     loadMap(
         // The resulting nodes are stored in the model's "map" field
@@ -99,8 +100,7 @@ Model::Model(
         mapEdgeFilename,
         mapGeometryFilename,
         hydroModel.hydroNodes,
-        initialPopulation.entryNodeIds,
-        initialPopulation.recPoints,
+        initialPopulations,
         this->monitoringPoints,
         this->samplingSites,
         blindChannelSimplificationRadius,
@@ -109,12 +109,15 @@ Model::Model(
     for (size_t i = 0; i < this->monitoringPoints.size(); ++i) {
         this->monitoringHistory.emplace_back();
     }
-    // Load the recruit counts, the data is stored in the model's "recCounts" field
-    loadIntList(initialPopulation.countsFile, initialPopulation.recCounts);
-    // Ditto for recruit sizes and sampling sites
-    loadRecSizeDists(initialPopulation.sizesFile, initialPopulation.recSizeDists);
-    // Make room in the recruit plan vector (per-timestep recruit counts for the current day)
-    initialPopulation.recDayPlan.resize(24, 0UL);
+
+    for (auto& initialPopulation : initialPopulations) {
+        // Load the recruit counts, the data is stored in the model's "recCounts" field
+        loadIntList(initialPopulation.countsFile, initialPopulation.recCounts);
+        // Ditto for recruit sizes
+        loadRecSizeDists(initialPopulation.sizesFile, initialPopulation.recSizeDists);
+        // Make room in the recruit plan vector (per-timestep recruit counts for the current day)
+        initialPopulation.recDayPlan.resize(24, 0UL);
+    }
 }
 
 // TODO: DEPRECATED, remove

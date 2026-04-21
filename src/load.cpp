@@ -17,6 +17,7 @@
 #include "custom_exceptions.h"
 #include "load_utils.h"
 #include "hydro.h"
+#include "initial_population.h"
 #include "model_config_map.h"
 
 // calculate distance between <x1, y1> and <x2, y2>
@@ -1149,8 +1150,7 @@ void loadMap(
     std::string& edgeFilePath,
     std::string& geometryFilePath,
     std::vector<DistribHydroNode> &hydroNodes,
-    const std::vector<unsigned>& recPointIds,
-    std::vector<MapNode *> &recPoints,
+    std::vector<InitialPopulation> &initialPopulations,
     std::vector<MapNode *> &monitoringPoints,
     std::vector<SamplingSite *> &samplingSites,
     float blindChannelSimplificationRadius,
@@ -1262,22 +1262,27 @@ void loadMap(
         dest[csvIdToLocalIndex[id]]->x = std::stof(chunks[0]);
         dest[csvIdToLocalIndex[id]]->y = std::stof(chunks[1]);
     }
-    for (unsigned id : recPointIds) {
-        if (!csvIdToLocalIndex.count(id)) {
-            std::cerr << "Recruitment node " << id << " doesn't exist" << std::endl;
+    for (auto &initialPopulation : initialPopulations) {
+        for (unsigned id : initialPopulation.entryNodeIds) {
+            if (!csvIdToLocalIndex.count(id)) {
+                std::cerr << "Recruitment node " << id << " doesn't exist" << std::endl;
+            }
+            initialPopulation.recPoints.push_back(dest[csvIdToLocalIndex[id]]);
         }
-        recPoints.push_back(dest[csvIdToLocalIndex[id]]);
     }
-
     // Clean up clean up everybody do your share
     //condenseMissingNodes(dest);
     reportDuplicateEdges(dest);
 
-    std::unordered_set<MapNode *> disconnectedNodes = identifyDisconnectedNodes(dest, recPoints);
-    removeDisconnectedNodes(disconnectedNodes, dest, recPoints, monitoringPoints, samplingSites, samplingSitesByNode); //TODO:GROT removes nodes
+    std::vector<MapNode *> allRecruitPoints;
+    for (auto initialPopulation : initialPopulations) {
+        allRecruitPoints.insert(allRecruitPoints.end(), initialPopulation.recPoints.begin(), initialPopulation.recPoints.end());
+    }
+    std::unordered_set<MapNode *> disconnectedNodes = identifyDisconnectedNodes(dest, allRecruitPoints);
+    removeDisconnectedNodes(disconnectedNodes, dest, allRecruitPoints, monitoringPoints, samplingSites, samplingSitesByNode); //TODO:GROT removes nodes
 
     std::unordered_set<MapNode *> protectedNodes;
-    identifyProtectedNodes(monitoringPoints, samplingSitesByNode, recPoints, protectedNodes);
+    identifyProtectedNodes(monitoringPoints, samplingSitesByNode, allRecruitPoints, protectedNodes);
 
     simplifyBlindChannels(dest, blindChannelSimplificationRadius, protectedNodes); // TODO:GROT - removes nodes from map. moves some nodes to end of map, preserving ids.
     //fixBrokenEdges(dest);
@@ -1286,7 +1291,7 @@ void loadMap(
     };
 
     //assignCrossChannelEdges(dest); // OBSOLETE
-    checkDisjointDistributariesAndOtherMapErrors(dest, recPoints, protectedNodes);
+    checkDisjointDistributariesAndOtherMapErrors(dest, allRecruitPoints, protectedNodes);
     assignNearestHydroNodes(dest, hydroNodes);
     fixElevations(dest, hydroNodes);
 
