@@ -27,7 +27,7 @@ public:
     // A list of per-timestep recruit counts, resampled once per day such that sum(recDayPlan) == recCounts[day]
     std::vector<size_t> recDayPlan;
 
-    // original config initializer values
+    // original config file initializer values
     std::string countsFile;
     std::string sizesFile;
     std::vector<unsigned> entryNodeIds;

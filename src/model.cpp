@@ -114,9 +114,10 @@ Model::Model(
     // Ditto for recruit sizes and sampling sites
     loadRecSizeDists(initialPopulation.sizesFile, initialPopulation.recSizeDists);
     // Make room in the recruit plan vector (per-timestep recruit counts for the current day)
-    this->recDayPlan.resize(24, 0UL);
+    initialPopulation.recDayPlan.resize(24, 0UL);
 }
 
+// TODO: DEPRECATED, remove
 // Load model components from simulated data (map & environmental conditions)
 Model::Model(
     size_t maxThreads,
@@ -127,26 +128,28 @@ Model::Model(
     std::vector<std::vector<float> > &depths,
     std::vector<std::vector<float> > &temps,
     float distFlow
-) : map(map),
+) :
+    // map(map),
     defaultHydroModel(std::make_unique<HydroModel>(map, depths, temps, distFlow)),
-    hydroModel(*defaultHydroModel),
-    recCounts(recCounts),
-    recSizeDists(recSizeDists),
-    recPoints(recPoints),
-    recTimeIntercept(0),
-    globalTimeIntercept(0),
-    firstHighTide(false),
-    time(0UL),
-    deadCount(0),
-    exitedCount(0),
-    mortConstA(MORT_CONST_A),
-    mortConstC(MORT_CONST_C),
-    habitatTypeExitConditionHours(DEFAULT_EXIT_CONDITION_HOURS),
-    nextFishID(0UL),
-    maxThreads(maxThreads),
-    recruitTagRate(0.5f) {
+    hydroModel(*defaultHydroModel)
+//     recCounts(recCounts),
+//     recSizeDists(recSizeDists),
+//     recPoints(recPoints),
+//     recTimeIntercept(0),
+//     globalTimeIntercept(0),
+//     firstHighTide(false),
+//     time(0UL),
+//     deadCount(0),
+//     exitedCount(0),
+//     mortConstA(MORT_CONST_A),
+//     mortConstC(MORT_CONST_C),
+//     habitatTypeExitConditionHours(DEFAULT_EXIT_CONDITION_HOURS),
+//     nextFishID(0UL),
+//     maxThreads(maxThreads),
+    // recruitTagRate(0.5f)
+{
     // Make room in the recruit plan vector (per-timestep recruit counts for the current day)
-    this->recDayPlan.resize(24, 0UL);
+    // this->recDayPlan.resize(24, 0UL);
 }
 
 Model::Model(HydroModel *hydroModel)
@@ -424,7 +427,7 @@ void Model::recruitSingle() {
 // Recruit all recruits for the current timestep
 void Model::recruit() {
     // Get the current timestep's recruit count from the day's recruit "plan"
-    size_t currRecCount = this->recDayPlan[this->time % 24];
+    size_t currRecCount = initialPopulations[0].recDayPlan[this->time % 24];
     // Recruit that many fish
     for (size_t i = 0; i < currRecCount; ++i) {
         this->recruitSingle();
@@ -435,14 +438,14 @@ void Model::recruit() {
 void Model::planRecruitment() {
     // Wipe whatever's in the plan array right now
     for (size_t i = 0; i < 24; ++i) {
-        this->recDayPlan[i] = 0;
+        initialPopulations[0].recDayPlan[i] = 0;
     }
     // Get the day's daily recruit count
     size_t count = initialPopulations[0].recCounts[(this->time + this->recTimeIntercept) / 24];
     // For each recruit in the day, place it in a random timestep's slot
     for (size_t i = 0; i < count; ++i) {
         size_t timestep = GlobalRand::int_rand(0, 23);
-        ++this->recDayPlan[timestep];
+        ++initialPopulations[0].recDayPlan[timestep];
     }
 }
 
