@@ -349,35 +349,6 @@ void Model::countAll(bool updateTracking) {
     }
 }
 
-// Generates a single recruit and adds it to a random recruit start node
-void Model::recruitSingle(const InitialPopulation &initialPopulation) {
-    // Get the current slice of the recruit size distribution data
-    constexpr unsigned TIMESTEPS_IN_DAY = 24;
-    constexpr unsigned DAYS_IN_WEEK = 7;
-    constexpr unsigned TIMESTEPS_IN_WEEK = TIMESTEPS_IN_DAY * DAYS_IN_WEEK;
-    const size_t recruitWeek = (this->time + this->recTimeIntercept) / (TIMESTEPS_IN_WEEK);
-    const size_t recruitWeekIndex = std::min(recruitWeek, initialPopulation.recSizeDists.size() - 1);
-    const std::vector<float> &recSizeDist = initialPopulation.recSizeDists[recruitWeekIndex];
-
-    // Sample the fork length bucket index from the distribution
-    unsigned flIdx = sample(recSizeDist.data(), recSizeDist.size());
-    // Calculate the fork length from the bucket index
-    float forkLength = 35.0f + 5.0f * flIdx + unit_rand() * 5.0f;
-    // Construct a fish and place it in the *ALL* fish list
-    this->individuals.emplace_back(
-        // This gets the new fish's ID (current val of nextFishID) and then updates nextFishID
-        this->nextFishID++,
-        this->time,
-        forkLength,
-        // This samples a random (uniform) recruit start node
-        initialPopulation.recPoints[GlobalRand::int_rand(0, (int) initialPopulation.recPoints.size() - 1)]
-    );
-    // this->addHistoryBuffers();
-    const size_t last_id = this->individuals.back().id;
-    this->tagIndividual(last_id);
-    // Place the new fish's ID in the living fish list
-    this->livingIndividuals.push_back(last_id);
-}
 
 // Recruit all recruits for the current timestep
 void Model::recruit() {
@@ -386,7 +357,7 @@ void Model::recruit() {
         size_t currRecCount = initialPopulations[popIndex].recDayPlan[this->time % 24];
         // Recruit that many fish
         for (size_t i = 0; i < currRecCount; ++i) {
-            this->recruitSingle(initialPopulations[popIndex]);
+            initialPopulations[popIndex].recruitSingle(*this);
         }
     }
 }

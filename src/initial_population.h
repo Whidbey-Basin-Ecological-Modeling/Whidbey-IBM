@@ -9,6 +9,7 @@
 #include <rapidjson/document.h>
 
 class MapNode;
+class Model;
 
 class InitialPopulation {
 public:
@@ -36,6 +37,7 @@ public:
     static std::vector<InitialPopulation> parseFromConfig(const rapidjson::Document& doc);
     void readAndInitializeData();
     void setRecruitPoints(const std::vector<MapNode *> & dest, const std::unordered_map<unsigned int, unsigned int> & csvIdToInternalIndex);
+    void recruitSingle(Model &model);
 
 private:
     void loadRecSizeDists();

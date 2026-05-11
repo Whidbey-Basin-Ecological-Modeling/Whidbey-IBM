@@ -4,6 +4,8 @@
 
 #include <fstream>
 #include "initial_population.h"
+#include "model.h"
+#include "util.h"
 
 #include <iostream>
 
@@ -97,5 +99,34 @@ void InitialPopulation::setRecruitPoints(const std::vector<MapNode *> &dest,
         }
         recPoints.push_back(dest[csvIdToInternalIndex.at(id)]);
     }
+}
+
+void InitialPopulation::recruitSingle(Model &model) {
+    // Get the current slice of the recruit size distribution data
+    constexpr unsigned TIMESTEPS_IN_DAY = 24;
+    constexpr unsigned DAYS_IN_WEEK = 7;
+    constexpr unsigned TIMESTEPS_IN_WEEK = TIMESTEPS_IN_DAY * DAYS_IN_WEEK;
+    const size_t recruitWeek = (model.time + model.recTimeIntercept) / (TIMESTEPS_IN_WEEK);
+    const size_t recruitWeekIndex = std::min(recruitWeek, recSizeDists.size() - 1);
+    const std::vector<float> &recSizeDist = recSizeDists[recruitWeekIndex];
+
+    // Sample the fork length bucket index from the distribution
+    unsigned flIdx = sample(recSizeDist.data(), recSizeDist.size());
+    // Calculate the fork length from the bucket index
+    float forkLength = 35.0f + 5.0f * flIdx + unit_rand() * 5.0f;
+    // Construct a fish and place it in the *ALL* fish list
+    model.individuals.emplace_back(
+        // This gets the new fish's ID (current val of nextFishID) and then updates nextFishID
+        model.nextFishID++,
+        model.time,
+        forkLength,
+        // This samples a random (uniform) recruit start node
+        recPoints[GlobalRand::int_rand(0, (int) recPoints.size() - 1)]
+    );
+    // model.addHistoryBuffers();
+    const size_t last_id = model.individuals.back().id;
+    model.tagIndividual(last_id);
+    // Place the new fish's ID in the living fish list
+    model.livingIndividuals.push_back(last_id);
 }
 

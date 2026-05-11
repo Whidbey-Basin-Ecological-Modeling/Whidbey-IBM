@@ -68,7 +68,7 @@ namespace {
     size_t expectedRecruitPointForSeed(int seed, size_t pointCount) {
         GlobalRand::reseed(seed);
 
-        // recruitSingle() calls unit_rand() once (for fork length) before selecting the recruit point, so we
+        // InitialPopulation::recruitSingle() calls unit_rand() once (for fork length) before selecting the recruit point, so we
         // simulate that here. this test is obviously brittle for this reason.
         // sample() is overridden in this test, so it does not consume RNG.
         (void) unit_rand();
@@ -187,7 +187,7 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::planRecruitment", "[model][rec
     }
 }
 
-TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruitSingle", "[model][recruitment]") {
+TEST_CASE_METHOD(ModelRecruitmentFixture, "InitialPopulation::recruitSingle", "[model][recruitment]") {
     SECTION("adds one fish, increments next ID, uses the seeded recruit point, and tags the recruit") {
         auto pointA = createMapNode(10.0f, 20.0f);
         auto pointB = createMapNode(30.0f, 40.0f);
@@ -214,7 +214,7 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruitSingle", "[model][recru
             return bucketIndex;
         });
 
-        model.recruitSingle(model.initialPopulations[0]);
+        model.initialPopulations[0].recruitSingle(model);
 
         REQUIRE(model.individuals.size() == 1UL);
         REQUIRE(model.livingIndividuals.size() == 1UL);
@@ -274,7 +274,7 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruitSingle", "[model][recru
             return 2U;
         });
 
-        model.recruitSingle(model.initialPopulations[1]);
+        model.initialPopulations[1].recruitSingle(model);
 
         REQUIRE(model.individuals.size() == 1UL);
         REQUIRE(model.livingIndividuals.size() == 1UL);
@@ -312,7 +312,7 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruitSingle", "[model][recru
         int inLastBucketRange = 0;  // Count fish in 45-50mm range
 
         for (int i = 0; i < numRecruits; ++i) {
-            model.recruitSingle(model.initialPopulations[0]);
+            model.initialPopulations[0].recruitSingle(model);
             const Fish& fish = model.individuals.back();
             if (fish.forkLength >= 45.0f && fish.forkLength < 50.0f) {
                 ++inLastBucketRange;
@@ -341,7 +341,7 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruitSingle", "[model][recru
         model.time = 0L;
         model.nextFishID = 1UL;
 
-        model.recruitSingle(model.initialPopulations[0]);
+        model.initialPopulations[0].recruitSingle(model);
 
         REQUIRE(model.individuals.size() == 1UL);
         REQUIRE(model.individuals.front().taggedTime == -1L);

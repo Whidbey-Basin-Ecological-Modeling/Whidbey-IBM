@@ -144,8 +144,6 @@ public:
     void growAndDieAll();
     // Generates and adds new fish according to the current timestep's entry in recDayPlan
     void recruit();
-    // Generates and adds a single new fish
-    void recruitSingle(const InitialPopulation &initialPopulation);
     // Resamples recDayPlan to determine per-timestep recruit counts for the next day
     void planRecruitment();
     // Computes sampling results and adds new entries to samplingHistory
