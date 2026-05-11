@@ -365,17 +365,7 @@ void Model::recruit() {
 // Generate the day's per-timestep recruit counts
 void Model::planRecruitment() {
     for (auto & initialPopulation : initialPopulations) {
-        // Wipe whatever's in the plan array right now
-        for (size_t i = 0; i < 24; ++i) {
-            initialPopulation.recDayPlan[i] = 0;
-        }
-        // Get the day's daily recruit count
-        size_t count = initialPopulation.recCounts[(this->time + this->recTimeIntercept) / 24];
-        // For each recruit in the day, place it in a random timestep's slot
-        for (size_t i = 0; i < count; ++i) {
-            size_t timestep = GlobalRand::int_rand(0, 23);
-            ++initialPopulation.recDayPlan[timestep];
-        }
+        initialPopulation.planRecruitment(this->time, this->recTimeIntercept);
     }
 }
 

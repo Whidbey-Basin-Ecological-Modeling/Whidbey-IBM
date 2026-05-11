@@ -38,6 +38,7 @@ public:
     void readAndInitializeData();
     void setRecruitPoints(const std::vector<MapNode *> & dest, const std::unordered_map<unsigned int, unsigned int> & csvIdToInternalIndex);
     void recruitSingle(Model &model);
+    void planRecruitment(long time, int recTimeIntercept);
 
 private:
     void loadRecSizeDists();

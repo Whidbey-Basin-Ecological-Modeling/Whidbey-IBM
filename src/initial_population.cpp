@@ -130,3 +130,17 @@ void InitialPopulation::recruitSingle(Model &model) {
     model.livingIndividuals.push_back(last_id);
 }
 
+void InitialPopulation::planRecruitment(long time, int recTimeIntercept) {
+    // Wipe whatever's in the plan array right now
+    for (size_t i = 0; i < 24; ++i) {
+        recDayPlan[i] = 0;
+    }
+    // Get the day's daily recruit count
+    size_t count = recCounts[(time + recTimeIntercept) / 24];
+    // For each recruit in the day, place it in a random timestep's slot
+    for (size_t i = 0; i < count; ++i) {
+        size_t timestep = GlobalRand::int_rand(0, 23);
+        ++recDayPlan[timestep];
+    }
+}
+
