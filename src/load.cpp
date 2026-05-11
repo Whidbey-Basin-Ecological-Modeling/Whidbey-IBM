@@ -1128,19 +1128,6 @@ void validateAllEdgeConsistency(const std::vector<MapNode *> &map) {
     std::cout << "Edge validation passed" << std::endl;
 }
 
-// TODO: remove this after refactoring complete
-void sortEdgesByDirection(std::vector<MapNode *> &dest) {
-    // Ensure edges iteration order matches legacy edgesIn-then-edgesOut order
-    for (MapNode *node : dest) {
-        std::stable_sort(node->edges.begin(), node->edges.end(),
-                         [node](const Edge &a, const Edge &b) {
-                             // edgesIn (target == node) come first, then edgesOut (source == node)
-                             bool aIsIn = (a.target == node);
-                             bool bIsIn = (b.target == node);
-                             return aIsIn > bIsIn; // true (1) before false (0)
-                         });
-    }
-}
 
 // Load a map from vertex, edge, and geometry files
 // (additionally runs cleanup on the resulting map graph)
@@ -1279,15 +1266,15 @@ void loadMap(
         allRecruitPoints.insert(allRecruitPoints.end(), initialPopulation.recPoints.begin(), initialPopulation.recPoints.end());
     }
     std::unordered_set<MapNode *> disconnectedNodes = identifyDisconnectedNodes(dest, allRecruitPoints);
-    removeDisconnectedNodes(disconnectedNodes, dest, allRecruitPoints, monitoringPoints, samplingSites, samplingSitesByNode); //TODO:GROT removes nodes
+    removeDisconnectedNodes(disconnectedNodes, dest, allRecruitPoints, monitoringPoints, samplingSites, samplingSitesByNode);
 
     std::unordered_set<MapNode *> protectedNodes;
     identifyProtectedNodes(monitoringPoints, samplingSitesByNode, allRecruitPoints, protectedNodes);
 
-    simplifyBlindChannels(dest, blindChannelSimplificationRadius, protectedNodes); // TODO:GROT - removes nodes from map. moves some nodes to end of map, preserving ids.
+    simplifyBlindChannels(dest, blindChannelSimplificationRadius, protectedNodes);
     //fixBrokenEdges(dest);
     if (configMap.getInt(ModelParamKey::VirtualNodes)) {
-        expandNearshoreLinks(dest); // TODO:GROT - adds new nodes using negative values for new ids
+        expandNearshoreLinks(dest);
     };
 
     //assignCrossChannelEdges(dest); // OBSOLETE

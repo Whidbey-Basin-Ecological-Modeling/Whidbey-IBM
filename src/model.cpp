@@ -42,14 +42,6 @@ Model::Model(
     // The maximum number of threads to spawn for multithreaded computation of movement + growth/death
     size_t maxThreads,
 
-
-    //TODO: GROT
-    // Path of the file containing the daily recruitment counts
-    std::string recCountFilename,
-    // Path of the file containing the biweekly recruitment size distributions
-    std::string recSizeDistsFilename,
-    // List of map node IDs where new recruits enter the model
-    std::vector<unsigned> initialPopPointIds,
     std::vector<InitialPopulation> allInitialPopulations,
     float habitatTypeExitConditionHours,
     // Path of the file containing map node descriptions (area, habitat type, elevation, among other columns)
@@ -91,7 +83,6 @@ Model::Model(
 
     if (getInt(ModelParamKey::DirectionlessEdges)) std::cout << "directionless edges!" << std::endl;
 
-    InitialPopulation& firstPopulation = initialPopulations[0];
     // Load the map
     loadMap(
         // The resulting nodes are stored in the model's "map" field
@@ -120,40 +111,6 @@ Model::Model(
     }
 }
 
-// TODO: DEPRECATED, remove
-// Load model components from simulated data (map & environmental conditions)
-Model::Model(
-    size_t maxThreads,
-    std::vector<MapNode *> &map,
-    std::vector<MapNode *> &recPoints,
-    std::vector<int> &recCounts,
-    std::vector<std::vector<float> > &recSizeDists,
-    std::vector<std::vector<float> > &depths,
-    std::vector<std::vector<float> > &temps,
-    float distFlow
-) :
-    // map(map),
-    defaultHydroModel(std::make_unique<HydroModel>(map, depths, temps, distFlow)),
-    hydroModel(*defaultHydroModel)
-//     recCounts(recCounts),
-//     recSizeDists(recSizeDists),
-//     recPoints(recPoints),
-//     recTimeIntercept(0),
-//     globalTimeIntercept(0),
-//     firstHighTide(false),
-//     time(0UL),
-//     deadCount(0),
-//     exitedCount(0),
-//     mortConstA(MORT_CONST_A),
-//     mortConstC(MORT_CONST_C),
-//     habitatTypeExitConditionHours(DEFAULT_EXIT_CONDITION_HOURS),
-//     nextFishID(0UL),
-//     maxThreads(maxThreads),
-    // recruitTagRate(0.5f)
-{
-    // Make room in the recruit plan vector (per-timestep recruit counts for the current day)
-    // this->recDayPlan.resize(24, 0UL);
-}
 
 Model::Model(HydroModel *hydroModel)
     : defaultHydroModel(nullptr),
@@ -171,14 +128,17 @@ Model::Model(HydroModel *hydroModel)
       maxThreads(1),
       recruitTagRate(0.5f) {}
 
+
 void Model::masterUpdate() {
     if (this->time % 24 == 0) {
         this->update24h();
     }
-    if ((this->time / 24) % 14 == 0) { // GROT changed to 7
-        // On a sampling day
-        // TODO add sampling parameters to config
-        if (this->time % 24 == 12) {
+    constexpr unsigned BI_WEEKLY_DAYS = 14;
+    constexpr unsigned SAMPLING_HOUR = 12;
+
+    // On a sampling day
+    if ((this->time / 24) % BI_WEEKLY_DAYS == 0) {
+        if (this->time % 24 == SAMPLING_HOUR) {
             this->sampling();
         }
         // Currently all sites are treated as beach seine
@@ -208,14 +168,11 @@ void Model::update1h() {
     // Add an entry to the population history
     this->populationHistory.push_back(this->livingIndividuals.size());
     // Record monitoring sites
-    //this->checkMonitoringNodes(); // TODO: GROT
     for (size_t i = 0; i < this->monitoringPoints.size(); ++i) {
         MapNode *n = this->monitoringPoints[i];
         this->monitoringHistory[i].emplace_back(n->residentIds.size(), n->popDensity, hydroModel.getDepth(*n), hydroModel.getTemp(*n));
     }
 }
-
-// TODO: longer timestep, move based on current state, explore discretely? <-- think about this more
 
 void Model::update24h() {
     // Generate the per-timestep recruit counts for the day
@@ -1258,54 +1215,14 @@ Model *modelFromConfig(std::string configPath) {
         int recTimeIntercept = timeIntercept - recStartTime;
         int hydroTimeIntercept = timeIntercept - hydroStartTime;
 
-        /*******/
-        // TODO: extract method, probably move to InitialPopulation class
-        std::vector<InitialPopulation> allInitialPopulations;
-
-        // Check if "recruitClasses" exists and is an array
-        if (d.HasMember("initialPopulations") && d["initialPopulations"].IsArray()) {
-            const rapidjson::Value& populationsArray = d["initialPopulations"];
-
-            // Iterate through each object in the array
-            for (rapidjson::SizeType i = 0; i < populationsArray.Size(); i++) {
-                const rapidjson::Value& populationObj = populationsArray[i];
-                InitialPopulation population;
-
-                if (populationObj.HasMember("name") && populationObj["name"].IsString()) {
-                    population.name = populationObj["name"].GetString();
-                }
-
-                if (populationObj.HasMember("entryNodes") && populationObj["entryNodes"].IsArray()) {
-                    const rapidjson::Value& nodesArray = populationObj["entryNodes"];
-                    for (rapidjson::SizeType j = 0; j < nodesArray.Size(); j++) {
-                        if (nodesArray[j].IsInt()) {
-                            population.entryNodeIds.push_back(nodesArray[j].GetInt());
-                        }
-                    }
-                }
-
-                if (populationObj.HasMember("countsFile") && populationObj["countsFile"].IsString()) {
-                    population.countsFile = populationObj["countsFile"].GetString();
-                }
-
-                if (populationObj.HasMember("sizesFile") && populationObj["sizesFile"].IsString()) {
-                    population.sizesFile = populationObj["sizesFile"].GetString();
-                }
-
-                allInitialPopulations.push_back(population);
-            }
-        }
-        /*******/
+        std::vector<InitialPopulation> initialPopulations = InitialPopulation::parseFromConfig(d);
 
         m = new Model(
             timeIntercept,
             hydroTimeIntercept,
             recTimeIntercept,
             maxThreads,
-            allInitialPopulations[0].countsFile,
-            allInitialPopulations[0].sizesFile,
-            allInitialPopulations[0].entryNodeIds,
-            std::move(allInitialPopulations),
+            std::move(initialPopulations),
             d.HasMember("habitatTypeExitConditionHours")
                 ? d["habitatTypeExitConditionHours"].GetFloat()
                 : DEFAULT_EXIT_CONDITION_HOURS,

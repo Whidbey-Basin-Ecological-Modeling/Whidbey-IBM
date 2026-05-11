@@ -3,20 +3,21 @@ cmake_minimum_required(VERSION 3.16)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(MODEL_SOURCES
-        ../src/hydro.cpp
-        ../src/map.cpp
-        ../src/load.cpp
         ../src/model_config_map.cpp
-        ../src/load_utils.cpp
-        ../src/util.cpp
+        ../src/env_sim.cpp
+        ../src/fish.cpp
         ../src/fish_movement.cpp
         ../src/fish_movement_downstream.cpp
         ../src/fish_movement_factory.cpp
-        ../src/model.cpp
-        ../src/map_gen.cpp
-        ../src/fish.cpp
-        ../src/env_sim.cpp
         ../src/fish_movement_high_awareness.cpp
+        ../src/hydro.cpp
+        ../src/initial_population.cpp
+        ../src/load.cpp
+        ../src/load_utils.cpp
+        ../src/map.cpp
+        ../src/map_gen.cpp
+        ../src/model.cpp
+        ../src/util.cpp
 )
 
 set(TEST_SOURCES

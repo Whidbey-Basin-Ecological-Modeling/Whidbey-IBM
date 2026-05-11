@@ -354,11 +354,11 @@ void generateMap(
         } else {
             dest.push_back(node);
             node->pathDist = distances[node];
-            // TODO check polarity of cpp pathDist field (increase as approach source? or nearshore?)
+            // (not done) check polarity of cpp pathDist field (increase as approach source? or nearshore?)
         }
     }
     // Recruits can enter at any top node
-    // TODO: Make sure reachability check includes pathing to nearshore
+    // (not done) Make sure reachability check includes pathing to nearshore
     std::unordered_map<MapNode *, float> distancesToNearshore;
     std::vector<MapNode *> nearshoreList;
     for (MapNode *node : nearshoreNodes) {

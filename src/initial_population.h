@@ -6,6 +6,7 @@
 #define RECRUIT_POPULATION_H
 
 #include <vector>
+#include <rapidjson/document.h>
 
 class MapNode;
 
@@ -31,6 +32,8 @@ public:
     std::string countsFile;
     std::string sizesFile;
     std::vector<unsigned> entryNodeIds;
+
+    static std::vector<InitialPopulation> parseFromConfig(const rapidjson::Document& doc);
 };
 
-#endif RECRUIT_POPULATION_H
+#endif

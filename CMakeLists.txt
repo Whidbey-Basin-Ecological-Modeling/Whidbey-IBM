@@ -112,6 +112,7 @@ set(COMMON_SOURCES
   src/model_config_map.cpp
   src/util.cpp
   src/fish_movement_high_awareness.cpp
+  src/initial_population.cpp
 )
 
 # Create headless executable

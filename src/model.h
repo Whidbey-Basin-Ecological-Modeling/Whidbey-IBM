@@ -57,16 +57,6 @@ public:
 
     std::vector<InitialPopulation> initialPopulations;
 
-    // TODO: GROT
-    // // Loaded daily recruit counts (see CONFIG_README for file format)
-    // std::vector<int> recCounts;
-    // // Loaded weekly recruit size distributions (see CONFIG_README for file format)
-    // std::vector<std::vector<float>> recSizeDists;
-    // // Map locations at which recruits are added
-    // std::vector<MapNode *> recPoints;
-    // A list of per-timestep recruit counts, resampled once per day such that sum(recDayPlan) == recCounts[day]
-    // std::vector<size_t> recDayPlan;
-
     // The list of SamplingSite structs that determine where and how biweekly sampling is conducted (see SamplingSite in map.h)
     std::vector<SamplingSite *> samplingSites;
     // List of locations for which to track population/environmental values per timestep
@@ -111,9 +101,6 @@ public:
         int hydroTimeIntercept,
         int recTimeIntercept,
         size_t maxThreads,
-        std::string recCountFilename,
-        std::string recSizeDistsFilename,
-        std::vector<unsigned> initialPopPointIds,
         std::vector<InitialPopulation> allInitialPopulations,
         float habitatTypeExitConditionHours,
         std::string mapLocationFilename,
