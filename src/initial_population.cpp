@@ -93,6 +93,7 @@ void InitialPopulation::setRecruitPoints(const std::vector<MapNode *> &dest,
     for (unsigned id : entryNodeIds) {
         if (!csvIdToLocalIndex.count(id)) {
             std::cerr << "Recruitment node " << id << " doesn't exist" << std::endl;
+            continue;
         }
         recPoints.push_back(dest[csvIdToLocalIndex.at(id)]);
     }
