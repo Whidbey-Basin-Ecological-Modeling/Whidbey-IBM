@@ -210,11 +210,11 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruitSingle", "[model][recru
         const float expectedForkLength = expectedForkLengthForSeed(seed, bucketIndex);
 
         GlobalRand::reseed(seed);
-        SampleOverrideHelper sampleOverride([](float *, unsigned) -> unsigned {
+        SampleOverrideHelper sampleOverride([](const float *, unsigned) -> unsigned {
             return bucketIndex;
         });
 
-        model.recruitSingle(0);
+        model.recruitSingle(model.initialPopulations[0]);
 
         REQUIRE(model.individuals.size() == 1UL);
         REQUIRE(model.livingIndividuals.size() == 1UL);
@@ -270,11 +270,11 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruitSingle", "[model][recru
 
         constexpr int seed = 42;
         GlobalRand::reseed(seed);
-        SampleOverrideHelper sampleOverride([](float *, unsigned) -> unsigned {
+        SampleOverrideHelper sampleOverride([](const float *, unsigned) -> unsigned {
             return 2U;
         });
 
-        model.recruitSingle(1);
+        model.recruitSingle(model.initialPopulations[1]);
 
         REQUIRE(model.individuals.size() == 1UL);
         REQUIRE(model.livingIndividuals.size() == 1UL);
@@ -312,7 +312,7 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruitSingle", "[model][recru
         int inLastBucketRange = 0;  // Count fish in 45-50mm range
 
         for (int i = 0; i < numRecruits; ++i) {
-            model.recruitSingle(0);
+            model.recruitSingle(model.initialPopulations[0]);
             const Fish& fish = model.individuals.back();
             if (fish.forkLength >= 45.0f && fish.forkLength < 50.0f) {
                 ++inLastBucketRange;
@@ -341,7 +341,7 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruitSingle", "[model][recru
         model.time = 0L;
         model.nextFishID = 1UL;
 
-        model.recruitSingle(0);
+        model.recruitSingle(model.initialPopulations[0]);
 
         REQUIRE(model.individuals.size() == 1UL);
         REQUIRE(model.individuals.front().taggedTime == -1L);

@@ -45,7 +45,7 @@ float unit_normal_rand() {
 // Optional test hook; defaults to nullptr in production.
 SampleFunction sampleOverrideForTesting = nullptr;
 
-unsigned sample(float *weights, unsigned weightsLen) {
+unsigned sample(const float *weights, unsigned weightsLen) {
     if (sampleOverrideForTesting != nullptr) {
         return sampleOverrideForTesting(weights, weightsLen);
     }

@@ -89,13 +89,13 @@ void InitialPopulation::readAndInitializeData() {
 }
 
 void InitialPopulation::setRecruitPoints(const std::vector<MapNode *> &dest,
-    const std::unordered_map<unsigned int, unsigned int> &csvIdToLocalIndex) {
+    const std::unordered_map<unsigned int, unsigned int> &csvIdToInternalIndex) {
     for (unsigned id : entryNodeIds) {
-        if (!csvIdToLocalIndex.count(id)) {
+        if (!csvIdToInternalIndex.count(id)) {
             std::cerr << "Recruitment node " << id << " doesn't exist" << std::endl;
             continue;
         }
-        recPoints.push_back(dest[csvIdToLocalIndex.at(id)]);
+        recPoints.push_back(dest[csvIdToInternalIndex.at(id)]);
     }
 }
 

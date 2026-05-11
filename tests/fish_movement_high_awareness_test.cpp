@@ -38,7 +38,7 @@ TEST_CASE("FishMovementHighAwareness::determineNextLocation integration", "[fish
     FishMovementHighAwareness mover(testModel, swimSpeed, swimRange, fitnessCalc);
 
     // Verify weights and force selection of the neighbor (EndNode)
-    auto sampler = [](float *weights, unsigned weightsLen) -> unsigned {
+    auto sampler = [](const float *weights, unsigned weightsLen) -> unsigned {
         CHECK(weightsLen == 2);
 
         float totalFitness = startFitness + endFitness;

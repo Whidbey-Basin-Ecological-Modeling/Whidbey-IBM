@@ -35,7 +35,7 @@ public:
 
     static std::vector<InitialPopulation> parseFromConfig(const rapidjson::Document& doc);
     void readAndInitializeData();
-    void setRecruitPoints(const std::vector<MapNode *> & dest, const std::unordered_map<unsigned int, unsigned int> & csvIdToLocalIndex);
+    void setRecruitPoints(const std::vector<MapNode *> & dest, const std::unordered_map<unsigned int, unsigned int> & csvIdToInternalIndex);
 
 private:
     void loadRecSizeDists();

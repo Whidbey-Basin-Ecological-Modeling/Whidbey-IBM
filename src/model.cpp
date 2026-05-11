@@ -350,14 +350,14 @@ void Model::countAll(bool updateTracking) {
 }
 
 // Generates a single recruit and adds it to a random recruit start node
-void Model::recruitSingle(size_t populationIdx) {
+void Model::recruitSingle(const InitialPopulation &initialPopulation) {
     // Get the current slice of the recruit size distribution data
     constexpr unsigned TIMESTEPS_IN_DAY = 24;
     constexpr unsigned DAYS_IN_WEEK = 7;
     constexpr unsigned TIMESTEPS_IN_WEEK = TIMESTEPS_IN_DAY * DAYS_IN_WEEK;
     const size_t recruitWeek = (this->time + this->recTimeIntercept) / (TIMESTEPS_IN_WEEK);
-    const size_t recruitWeekIndex = std::min(recruitWeek, initialPopulations[populationIdx].recSizeDists.size() - 1);
-    std::vector<float> &recSizeDist = initialPopulations[populationIdx].recSizeDists[recruitWeekIndex];
+    const size_t recruitWeekIndex = std::min(recruitWeek, initialPopulation.recSizeDists.size() - 1);
+    const std::vector<float> &recSizeDist = initialPopulation.recSizeDists[recruitWeekIndex];
 
     // Sample the fork length bucket index from the distribution
     unsigned flIdx = sample(recSizeDist.data(), recSizeDist.size());
@@ -370,7 +370,7 @@ void Model::recruitSingle(size_t populationIdx) {
         this->time,
         forkLength,
         // This samples a random (uniform) recruit start node
-        initialPopulations[populationIdx].recPoints[GlobalRand::int_rand(0, (int) initialPopulations[populationIdx].recPoints.size() - 1)]
+        initialPopulation.recPoints[GlobalRand::int_rand(0, (int) initialPopulation.recPoints.size() - 1)]
     );
     // this->addHistoryBuffers();
     const size_t last_id = this->individuals.back().id;
@@ -386,7 +386,7 @@ void Model::recruit() {
         size_t currRecCount = initialPopulations[popIndex].recDayPlan[this->time % 24];
         // Recruit that many fish
         for (size_t i = 0; i < currRecCount; ++i) {
-            this->recruitSingle(popIndex);
+            this->recruitSingle(initialPopulations[popIndex]);
         }
     }
 }

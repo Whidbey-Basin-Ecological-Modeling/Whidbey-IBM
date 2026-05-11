@@ -91,7 +91,7 @@ TEST_CASE("Fish::move terminates immediately when stay option is selected", "[fi
     hydroModel->vValue = 0.0f;
 
     // Neighbor list is [stay at A, neighbor B, ...]; index 0 is always "stay".
-    auto staySampler = [](float *weights, unsigned weightsLen) -> unsigned {
+    auto staySampler = [](const float *weights, unsigned weightsLen) -> unsigned {
         (void) weights;
         (void) weightsLen;
         return 0U; // Always choose "stay"
@@ -137,7 +137,7 @@ TEST_CASE("Fish::move terminates when selecting the same location in a later ite
     static std::vector<unsigned> sequence{1U, 0U};
     static size_t seqPos = 0;
 
-    auto sequencedSampler = [](float *weights, unsigned weightsLen) -> unsigned {
+    auto sequencedSampler = [](const float *weights, unsigned weightsLen) -> unsigned {
         CHECK(weightsLen == 3U);
         CHECK(seqPos < sequence.size());
         return sequence[seqPos++];
@@ -186,7 +186,7 @@ TEST_CASE("Fish::move terminates when remaining time is exhausted", "[fish][move
     // First iteration: choose neighbor B (index 1). After this,
     // accumulatedCost ≈ swimRange, so remainingTime ≈ 0 and neighbors
     // will not be added in the second loop iteration.
-    auto chooseNeighbor = [](float *weights, unsigned weightsLen) -> unsigned {
+    auto chooseNeighbor = [](const float *weights, unsigned weightsLen) -> unsigned {
         CHECK(weightsLen == 2U);
         return 1U; // choose B (non-stay option)
     };
@@ -236,7 +236,7 @@ TEST_CASE("Fish::move selects neighbors based on normalized fitness weights", "[
 
     SECTION("Verify weights and select index 0 (Stay)") {
         // Expect weights [1/6, 2/6, 3/6]
-        auto sampler = [](float *weights, unsigned weightsLen) -> unsigned {
+        auto sampler = [](const float *weights, unsigned weightsLen) -> unsigned {
             sampleCallCount++;
             if (sampleCallCount == 1) {
                 CHECK(weightsLen == 3);
@@ -258,7 +258,7 @@ TEST_CASE("Fish::move selects neighbors based on normalized fitness weights", "[
 
     SECTION("Verify weights and select index 1 (Node B)") {
         // Move to B, then stay
-        auto sampler = [](float *weights, unsigned weightsLen) -> unsigned {
+        auto sampler = [](const float *weights, unsigned weightsLen) -> unsigned {
             sampleCallCount++;
             if (sampleCallCount == 1) {
                 CHECK(weightsLen == 3);
@@ -280,7 +280,7 @@ TEST_CASE("Fish::move selects neighbors based on normalized fitness weights", "[
 
     SECTION("Verify weights and select index 2 (Node C)") {
         // Move to C, then stay
-        auto sampler = [](float *weights, unsigned weightsLen) -> unsigned {
+        auto sampler = [](const float *weights, unsigned weightsLen) -> unsigned {
             sampleCallCount++;
             if (sampleCallCount == 1) {
                 CHECK(weightsLen == 3);
@@ -324,7 +324,7 @@ TEST_CASE("Fish::move calculates weights correctly for equal fitness neighbors",
     fish.fitnessFn = [&](MapNode &n) { return 1.0f; };
 
     // Expect weights [1/3, 1/3, 1/3]
-    auto sampler = [](float *weights, unsigned weightsLen) -> unsigned {
+    auto sampler = [](const float *weights, unsigned weightsLen) -> unsigned {
         CHECK(weightsLen == 3);
 
         REQUIRE(weights[0] == Catch::Approx(1.0f / 3.0f).margin(0.0001f));
@@ -368,7 +368,7 @@ TEST_CASE("Fish::move calculates weights correctly for one dominant fitness neig
         return 0.1f;
     };
 
-    auto sampler = [](float *weights, unsigned weightsLen) -> unsigned {
+    auto sampler = [](const float *weights, unsigned weightsLen) -> unsigned {
         CHECK(weightsLen == 3);
 
         float totalFitness = 10.2f;
@@ -413,7 +413,7 @@ TEST_CASE("Fish::move uses different movement strategies based on configuration"
     );
 
     static unsigned optionCount = 0;
-    auto sampler = [](float *, unsigned weightsLen) -> unsigned {
+    auto sampler = [](const float *, unsigned weightsLen) -> unsigned {
         optionCount = weightsLen;
         return 0; // Stay
     };
