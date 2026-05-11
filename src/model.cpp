@@ -102,12 +102,7 @@ Model::Model(
     }
 
     for (auto& initialPopulation : initialPopulations) {
-        // Load the recruit counts, the data is stored in the model's "recCounts" field
-        loadIntList(initialPopulation.countsFile, initialPopulation.recCounts);
-        // Ditto for recruit sizes
-        loadRecSizeDists(initialPopulation.sizesFile, initialPopulation.recSizeDists);
-        // Make room in the recruit plan vector (per-timestep recruit counts for the current day)
-        initialPopulation.recDayPlan.resize(24, 0UL);
+        initialPopulation.readAndInitializeData();
     }
 }
 

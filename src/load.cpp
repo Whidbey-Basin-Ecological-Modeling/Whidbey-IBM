@@ -226,33 +226,6 @@ std::vector<std::string> split(std::string &s, char c) {
     return result;
 }
 
-// Load a recruit size distribution array from a CSV
-void loadRecSizeDists(std::string &filePath, std::vector<std::vector<float>> &out) {
-    std::ifstream f;
-    f.open(filePath);
-    std::string line;
-    bool first = true;
-    // Get lines from the file until it's empty
-    while (std::getline(f, line)) {
-        if (first) {
-            // Skip the first line since it's a header with field names
-            first = false;
-            continue;
-        }
-        // Make sure the line isn't empty
-        if (line.size() > 0) {
-            // Put a new list (to hold this row) on the output list
-            out.emplace_back();
-            // Get a reference to it
-            std::vector<float> &dist = out.back();
-            // Convert each comma-separated field into a float
-            for (std::string chunk : split(line, ',')) {
-                dist.push_back(std::stof(chunk));
-            }
-        }
-    }
-}
-
 // Load a list of integers from a file (where each integer is on its own line)
 // The argument "out" is where the results will be stored
 void loadIntList(std::string &filePath, std::vector<int> &out) {
@@ -1129,6 +1102,12 @@ void validateAllEdgeConsistency(const std::vector<MapNode *> &map) {
 }
 
 
+void initializeAllRecruitPoints(std::vector<InitialPopulation> &initialPopulations, std::vector<MapNode *> &dest, const std::unordered_map<unsigned int, unsigned int> &csvIdToLocalIndex) {
+    for (auto &initialPopulation : initialPopulations) {
+        initialPopulation.setRecruitPoints(dest, csvIdToLocalIndex);
+    }
+}
+
 // Load a map from vertex, edge, and geometry files
 // (additionally runs cleanup on the resulting map graph)
 void loadMap(
@@ -1249,27 +1228,21 @@ void loadMap(
         dest[csvIdToLocalIndex[id]]->x = std::stof(chunks[0]);
         dest[csvIdToLocalIndex[id]]->y = std::stof(chunks[1]);
     }
-    for (auto &initialPopulation : initialPopulations) {
-        for (unsigned id : initialPopulation.entryNodeIds) {
-            if (!csvIdToLocalIndex.count(id)) {
-                std::cerr << "Recruitment node " << id << " doesn't exist" << std::endl;
-            }
-            initialPopulation.recPoints.push_back(dest[csvIdToLocalIndex[id]]);
-        }
-    }
+    initializeAllRecruitPoints(initialPopulations, dest, csvIdToLocalIndex);
+
     // Clean up clean up everybody do your share
     //condenseMissingNodes(dest);
     reportDuplicateEdges(dest);
 
-    std::vector<MapNode *> allRecruitPoints;
+    std::vector<MapNode *> recruitPoints;
     for (auto initialPopulation : initialPopulations) {
-        allRecruitPoints.insert(allRecruitPoints.end(), initialPopulation.recPoints.begin(), initialPopulation.recPoints.end());
+        recruitPoints.insert(recruitPoints.end(), initialPopulation.recPoints.begin(), initialPopulation.recPoints.end());
     }
-    std::unordered_set<MapNode *> disconnectedNodes = identifyDisconnectedNodes(dest, allRecruitPoints);
-    removeDisconnectedNodes(disconnectedNodes, dest, allRecruitPoints, monitoringPoints, samplingSites, samplingSitesByNode);
+    std::unordered_set<MapNode *> disconnectedNodes = identifyDisconnectedNodes(dest, recruitPoints);
+    removeDisconnectedNodes(disconnectedNodes, dest, recruitPoints, monitoringPoints, samplingSites, samplingSitesByNode);
 
     std::unordered_set<MapNode *> protectedNodes;
-    identifyProtectedNodes(monitoringPoints, samplingSitesByNode, allRecruitPoints, protectedNodes);
+    identifyProtectedNodes(monitoringPoints, samplingSitesByNode, recruitPoints, protectedNodes);
 
     simplifyBlindChannels(dest, blindChannelSimplificationRadius, protectedNodes);
     //fixBrokenEdges(dest);
@@ -1278,7 +1251,7 @@ void loadMap(
     };
 
     //assignCrossChannelEdges(dest); // OBSOLETE
-    checkDisjointDistributariesAndOtherMapErrors(dest, allRecruitPoints, protectedNodes);
+    checkDisjointDistributariesAndOtherMapErrors(dest, recruitPoints, protectedNodes);
     assignNearestHydroNodes(dest, hydroNodes);
     fixElevations(dest, hydroNodes);
 

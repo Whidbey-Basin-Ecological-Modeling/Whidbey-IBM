@@ -2,7 +2,12 @@
 // Created by Troy Frever on 5/11/26.
 //
 
+#include <fstream>
 #include "initial_population.h"
+
+#include <iostream>
+
+#include "load.h"
 
 std::vector<InitialPopulation> InitialPopulation::parseFromConfig(const rapidjson::Document& doc) {
     std::vector<InitialPopulation> allInitialPopulations;
@@ -42,3 +47,54 @@ std::vector<InitialPopulation> InitialPopulation::parseFromConfig(const rapidjso
     }
     return allInitialPopulations;
 }
+
+void InitialPopulation::loadRecSizeDists() {
+    std::ifstream f;
+    f.open(sizesFile);
+    std::string line;
+    bool first = true;
+    // Get lines from the file until it's empty
+    while (std::getline(f, line)) {
+        if (first) {
+            // Skip the first line since it's a header with field names
+            first = false;
+            continue;
+        }
+
+        if (!line.empty()) {
+            // Put a new list (to hold this row) on the output list
+            recSizeDists.emplace_back();
+            // Get a reference to it
+            std::vector<float> &dist = recSizeDists.back();
+            // Convert each comma-separated field into a float
+            for (const std::string& chunk : split(line, ',')) {
+                dist.push_back(std::stof(chunk));
+            }
+        }
+    }
+}
+
+void InitialPopulation::initializeRecDayPlan() {
+        recDayPlan.resize(24, 0UL);
+}
+
+void InitialPopulation::loadRecruitCounts() {
+        loadIntList(countsFile, recCounts);
+}
+
+void InitialPopulation::readAndInitializeData() {
+    loadRecruitCounts();
+    loadRecSizeDists();
+    initializeRecDayPlan();
+}
+
+void InitialPopulation::setRecruitPoints(const std::vector<MapNode *> &dest,
+    const std::unordered_map<unsigned int, unsigned int> &csvIdToLocalIndex) {
+    for (unsigned id : entryNodeIds) {
+        if (!csvIdToLocalIndex.count(id)) {
+            std::cerr << "Recruitment node " << id << " doesn't exist" << std::endl;
+        }
+        recPoints.push_back(dest[csvIdToLocalIndex.at(id)]);
+    }
+}
+
