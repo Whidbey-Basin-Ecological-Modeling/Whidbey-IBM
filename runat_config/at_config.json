@@ -11,7 +11,7 @@
     {
       "name": "Skagit Recruits",
       "entryNodes": [29331, 29346, 29401],
-      "countsFile": "data/skagit_migrants_2014_feb_start.csv",
+      "countsFile": "runat_config/at_counts.csv",
       "sizesFile": "data/skagit_weekly_lengths_2014_ed.csv"
     }
   ],
