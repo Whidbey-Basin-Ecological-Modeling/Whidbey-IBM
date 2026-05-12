@@ -135,11 +135,11 @@ void getMonthAndDayOfMonth(int day, std::string &monthOut, int &dayOfMonthOut) {
 
 std::string formatTimestep(Model &model, int timestep) {
     int globalTimestep = timestep + model.globalTimeIntercept;
-    int day = globalTimestep / 24;
+    int day = globalTimestep / Model::TIMESTEPS_PER_DAY;
     std::string month;
     int dayOfMonth;
     getMonthAndDayOfMonth(day, month, dayOfMonth);
-    int hour = globalTimestep % 24;
+    int hour = globalTimestep % Model::TIMESTEPS_PER_DAY;
     std::string amPm = hour < 12 ? "am" : "pm";
     int minute = 0;
     std::string minuteStr = std::to_string(minute);
@@ -762,10 +762,10 @@ void FishFrame::setUpdateIncrement(wxCommandEvent &evt) {
             this->updateRate = 1;
             return;
         case 1:
-            this->updateRate = 24;
+            this->updateRate = Model::TIMESTEPS_PER_DAY;
             return;
         case 2:
-            this->updateRate = 24*7;
+            this->updateRate = Model::TIMESTEPS_PER_DAY * 7;
             return;
     }
 }

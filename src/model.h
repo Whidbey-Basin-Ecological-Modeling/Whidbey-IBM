@@ -70,6 +70,8 @@ public:
     // Whether or not a high tide has already occurred since the start of the current day
     bool firstHighTide;
 
+    static constexpr int TIMESTEPS_PER_DAY = 24;
+
     // The current timestep
     long time;
     // The list containing all Fish instances, living, dead, and exited

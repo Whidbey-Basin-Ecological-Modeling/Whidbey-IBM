@@ -77,7 +77,7 @@ void InitialPopulation::loadRecSizeDists() {
 }
 
 void InitialPopulation::initializeRecDayPlan() {
-        recDayPlan.resize(24, 0UL);
+        recDayPlan.resize(Model::TIMESTEPS_PER_DAY, 0UL);
 }
 
 void InitialPopulation::loadRecruitCounts() {
@@ -103,7 +103,7 @@ void InitialPopulation::setRecruitPoints(const std::vector<MapNode *> &dest,
 
 void InitialPopulation::recruit(Model &model) {
     // Get the current timestep's recruit count from the day's recruit "plan"
-    size_t currRecCount = recDayPlan[model.time % 24];
+    size_t currRecCount = recDayPlan[model.time % Model::TIMESTEPS_PER_DAY];
     // Recruit that many fish
     for (size_t i = 0; i < currRecCount; ++i) {
         recruitSingle(model);
@@ -112,10 +112,9 @@ void InitialPopulation::recruit(Model &model) {
 
 void InitialPopulation::recruitSingle(Model &model) {
     // Get the current slice of the recruit size distribution data
-    constexpr unsigned TIMESTEPS_IN_DAY = 24;
     constexpr unsigned DAYS_IN_WEEK = 7;
-    constexpr unsigned TIMESTEPS_IN_WEEK = TIMESTEPS_IN_DAY * DAYS_IN_WEEK;
-    const size_t recruitWeek = (model.time + model.recTimeIntercept) / (TIMESTEPS_IN_WEEK);
+    constexpr unsigned TIMESTEPS_IN_WEEK = Model::TIMESTEPS_PER_DAY * DAYS_IN_WEEK;
+    const size_t recruitWeek = (model.time + model.recTimeIntercept) / TIMESTEPS_IN_WEEK;
     const size_t recruitWeekIndex = std::min(recruitWeek, recSizeDists.size() - 1);
     const std::vector<float> &recSizeDist = recSizeDists[recruitWeekIndex];
 
@@ -141,14 +140,14 @@ void InitialPopulation::recruitSingle(Model &model) {
 
 void InitialPopulation::planRecruitment(long time, int recTimeIntercept) {
     // Wipe whatever's in the plan array right now
-    for (size_t i = 0; i < 24; ++i) {
+    for (size_t i = 0; i < Model::TIMESTEPS_PER_DAY; ++i) {
         recDayPlan[i] = 0;
     }
     // Get the day's daily recruit count
-    size_t count = recCounts[(time + recTimeIntercept) / 24];
+    size_t count = recCounts[(time + recTimeIntercept) / Model::TIMESTEPS_PER_DAY];
     // For each recruit in the day, place it in a random timestep's slot
     for (size_t i = 0; i < count; ++i) {
-        size_t timestep = GlobalRand::int_rand(0, 23);
+        size_t timestep = GlobalRand::int_rand(0, Model::TIMESTEPS_PER_DAY - 1);
         ++recDayPlan[timestep];
     }
 }

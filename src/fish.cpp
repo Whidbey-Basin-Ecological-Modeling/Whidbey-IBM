@@ -506,7 +506,7 @@ float Fish::getGrowth(Model &model, MapNode &loc, float cost, float Pmax) const 
     // (g*g^-1*d^-1)
     const float Delta = Consumption - Respiration - SpecificDynamicAction - Egestion - Excretion;
     //96 timesteps a day -- 15min each
-    const float Growth = (Delta / 24) * mass ;
+    const float Growth = (Delta / Model::TIMESTEPS_PER_DAY) * mass ;
     return Growth;
 }
 

@@ -19,7 +19,7 @@ public:
         : hydroModel(std::make_unique<MockHydroModel>()),
           model(hydroModel.get()) {
         model.initialPopulations.emplace_back();
-        model.initialPopulations[0].recDayPlan.resize(24, 0UL);
+        model.initialPopulations[0].recDayPlan.resize(Model::TIMESTEPS_PER_DAY, 0UL);
         model.time = 0;
         model.recTimeIntercept = 0;
     }
@@ -53,9 +53,9 @@ namespace {
     std::vector<size_t> expectedPlanForSeed(int seed, size_t recruitCount) {
         GlobalRand::reseed(seed);
 
-        std::vector<size_t> expected(24, 0UL);
+        std::vector<size_t> expected(Model::TIMESTEPS_PER_DAY, 0UL);
         for (size_t i = 0; i < recruitCount; ++i) {
-            ++expected[GlobalRand::int_rand(0, 23)];
+            ++expected[GlobalRand::int_rand(0, Model::TIMESTEPS_PER_DAY - 1)];
         }
         return expected;
     }
@@ -82,13 +82,13 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::planRecruitment", "[model][rec
         const auto oldRecCount = 9UL;
         const auto expectedRecCount = 3UL;
 
-        model.initialPopulations[0].recDayPlan.assign(24, oldRecCount);
+        model.initialPopulations[0].recDayPlan.assign(Model::TIMESTEPS_PER_DAY, oldRecCount);
         setRecCounts({expectedRecCount});
         GlobalRand::reseed(42);
 
         model.planRecruitment();
 
-        REQUIRE(model.initialPopulations[0].recDayPlan.size() == 24);
+        REQUIRE(model.initialPopulations[0].recDayPlan.size() == Model::TIMESTEPS_PER_DAY);
         REQUIRE(sumPlan(model.initialPopulations[0].recDayPlan) == expectedRecCount);
         for (size_t slot: model.initialPopulations[0].recDayPlan) {
             REQUIRE(slot <= expectedRecCount);
@@ -97,8 +97,8 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::planRecruitment", "[model][rec
 
     SECTION("uses the recruit-count day indexed by time and intercept") {
         setRecCounts({2, 5, 7});
-        setTime(24);
-        setIntercept(24);
+        setTime(Model::TIMESTEPS_PER_DAY);
+        setIntercept(Model::TIMESTEPS_PER_DAY);
         const auto expectedDailyTotal = static_cast<size_t>(model.initialPopulations[0].recCounts[2]);
         GlobalRand::reseed(42);
 
@@ -119,7 +119,7 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::planRecruitment", "[model][rec
     }
 
     SECTION("handles a zero recruit count") {
-        model.initialPopulations[0].recDayPlan.assign(24, 4UL);
+        model.initialPopulations[0].recDayPlan.assign(Model::TIMESTEPS_PER_DAY, 4UL);
         setRecCounts({0});
         GlobalRand::reseed(42);
 
@@ -131,13 +131,13 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::planRecruitment", "[model][rec
         }
     }
 
-    SECTION("supports a larger recruit count without exceeding the 24 hourly slots") {
+    SECTION("supports a larger recruit count without exceeding the hourly slots") {
         setRecCounts({48});
         GlobalRand::reseed(11);
 
         model.planRecruitment();
 
-        REQUIRE(model.initialPopulations[0].recDayPlan.size() == 24);
+        REQUIRE(model.initialPopulations[0].recDayPlan.size() == Model::TIMESTEPS_PER_DAY);
         REQUIRE(sumPlan(model.initialPopulations[0].recDayPlan) == 48UL);
         for (size_t slot: model.initialPopulations[0].recDayPlan) {
             REQUIRE(slot <= 48UL);
@@ -162,20 +162,20 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::planRecruitment", "[model][rec
         model.initialPopulations[0].recCounts = {2};
         model.initialPopulations[1].recCounts = {5};
 
-        model.initialPopulations[0].recDayPlan.assign(24, 111UL);
-        model.initialPopulations[1].recDayPlan.assign(24, 222UL);
+        model.initialPopulations[0].recDayPlan.assign(Model::TIMESTEPS_PER_DAY, 111UL);
+        model.initialPopulations[1].recDayPlan.assign(Model::TIMESTEPS_PER_DAY, 222UL);
 
         const int seed = 42;
         GlobalRand::reseed(seed);
 
-        std::vector<size_t> expected0(24, 0UL);
+        std::vector<size_t> expected0(Model::TIMESTEPS_PER_DAY, 0UL);
         for (size_t i = 0; i < 2UL; ++i) {
-            ++expected0[GlobalRand::int_rand(0, 23)];
+            ++expected0[GlobalRand::int_rand(0, Model::TIMESTEPS_PER_DAY - 1)];
         }
 
-        std::vector<size_t> expected1(24, 0UL);
+        std::vector<size_t> expected1(Model::TIMESTEPS_PER_DAY, 0UL);
         for (size_t i = 0; i < 5UL; ++i) {
-            ++expected1[GlobalRand::int_rand(0, 23)];
+            ++expected1[GlobalRand::int_rand(0, Model::TIMESTEPS_PER_DAY - 1)];
         }
 
         GlobalRand::reseed(seed);
@@ -301,7 +301,7 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "InitialPopulation::recruitSingle", "[
         };
 
         // Set time to week 3 (exceeds the 2 available weeks)
-        model.time = 24L * 7L * 3L;  // 3 weeks = 504 hours
+        model.time = Model::TIMESTEPS_PER_DAY * 7L * 3L;  // 3 weeks
         model.recTimeIntercept = 0;
 
         // Recruit multiple fish to verify statistical pattern
@@ -353,7 +353,7 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruit", "[model][recruitment
     SECTION("recruits the correct total number across all populations") {
         // Set up two populations with different recruitment plans
         model.initialPopulations.emplace_back();
-        model.initialPopulations[1].recDayPlan.resize(24, 0UL);
+        model.initialPopulations[1].recDayPlan.resize(Model::TIMESTEPS_PER_DAY, 0UL);
 
         auto point0 = createMapNode(10.0f, 10.0f);
         auto point1 = createMapNode(20.0f, 20.0f);
@@ -382,7 +382,7 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruit", "[model][recruitment
     SECTION("uses the correct timestep index into recDayPlan for all populations") {
         // Set up two populations with data in multiple timesteps
         model.initialPopulations.emplace_back();
-        model.initialPopulations[1].recDayPlan.resize(24, 0UL);
+        model.initialPopulations[1].recDayPlan.resize(Model::TIMESTEPS_PER_DAY, 0UL);
 
         auto point0 = createMapNode(10.0f, 10.0f);
         auto point1 = createMapNode(20.0f, 20.0f);

@@ -125,15 +125,15 @@ Model::Model(HydroModel *hydroModel)
 
 
 void Model::masterUpdate() {
-    if (this->time % 24 == 0) {
+    if (this->time % TIMESTEPS_PER_DAY == 0) {
         this->update24h();
     }
     constexpr unsigned BI_WEEKLY_DAYS = 14;
     constexpr unsigned SAMPLING_HOUR = 12;
 
     // On a sampling day
-    if ((this->time / 24) % BI_WEEKLY_DAYS == 0) {
-        if (this->time % 24 == SAMPLING_HOUR) {
+    if ((this->time / TIMESTEPS_PER_DAY) % BI_WEEKLY_DAYS == 0) {
+        if (this->time % TIMESTEPS_PER_DAY == SAMPLING_HOUR) {
             this->sampling();
         }
         // Currently all sites are treated as beach seine
@@ -1220,7 +1220,7 @@ Model *modelFromConfig(std::string configPath) {
         // float lambda = d["recruitRate"].GetFloat();
         // float meanSize = d["recruitSizeMean"].GetFloat();
         // float sizeStd = d["recruitSizeStd"].GetFloat();
-        // for (int day = 0; day <= simLength / 24; ++day) {
+        // for (int day = 0; day <= simLength / TIMESTEPS_PER_DAY; ++day) {
         //     recCounts.push_back(poisson(lambda));
         // }
         // std::vector<float> recSizeDist;
@@ -1228,7 +1228,7 @@ Model *modelFromConfig(std::string configPath) {
         //     double bucketSize = 35.0 + 5.0 * (double) bucketIdx;
         //     recSizeDist.push_back(normal_pdf(bucketSize, meanSize, sizeStd));
         // }
-        // for (int week = 0; week <= simLength / (24 * 7); ++week) {
+        // for (int week = 0; week <= simLength / (TIMESTEPS_PER_DAY * 7); ++week) {
         //     recSizeDists.push_back(recSizeDist);
         // }
         // m = new Model(
