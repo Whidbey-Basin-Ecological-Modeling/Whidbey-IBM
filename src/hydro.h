@@ -16,11 +16,9 @@ class HydroModel {
 public:
     HydroModel(
         std::string cresTideFilename,
-        std::string flowVolFilename,
-        std::string airTempFilename,
         std::string flowSpeedFilename,
         std::string distribWseTempFilename,
-        int hydroTimeIntercept // Timesteps between midnight on Jan 1 and the start of the cresTide, flowVol, and airTemp data
+        int hydroTimeIntercept // Timesteps between midnight on Jan 1 and the start of the cresTide data
     );
 
     HydroModel(
@@ -62,10 +60,6 @@ protected:
 public:
     // The loaded crescent tide data, in m
     std::vector<float> cresTideData;
-    // The loaded flow volume data, in m^3/s
-    std::vector<float> flowVolData;
-    // The loaded air temperature data, in degrees C
-    std::vector<float> airTempData;
     // The loaded flow data, as DistribHydroNodes (see map.h)
     std::vector<DistribHydroNode> hydroNodes;
 
@@ -77,8 +71,6 @@ private:
 
     int hydroTimeIntercept;
     float currCresTide;
-    float currFlowVol;
-    float currAirTemp;
     long currTimestep;
 
 };

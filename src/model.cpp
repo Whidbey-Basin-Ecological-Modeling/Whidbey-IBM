@@ -54,17 +54,12 @@ Model::Model(
     float blindChannelSimplificationRadius,
     // Path of the crescent tide data (1 row per timestep)
     std::string cresTideFilename,
-    // Path of the flow volume data (1 row per timestep)
-    std::string flowVolFilename,
-    // Path of the air temperature data (1 row per timestep)
-    std::string airTempFilename,
     // Path of the flow speed data (netCDF)
     std::string flowSpeedFilename,
     // Path of the distributary WSE/temp data (netCDF)
     std::string distribWseTempFilename,
     const ModelConfigMap &config
-) : defaultHydroModel(std::make_unique<HydroModel>(cresTideFilename, flowVolFilename, airTempFilename,
-                                                   flowSpeedFilename, distribWseTempFilename, hydroTimeIntercept)),
+) : defaultHydroModel(std::make_unique<HydroModel>(cresTideFilename, flowSpeedFilename, distribWseTempFilename, hydroTimeIntercept)),
     hydroModel(*defaultHydroModel),
     initialPopulations(std::move(allInitialPopulations)),
     recTimeIntercept(recTimeIntercept),
@@ -1184,8 +1179,6 @@ Model *modelFromConfig(std::string configPath) {
                 ? d["blindChannelSimplificationRadius"].GetFloat()
                 : 0.0f,
             std::string(d["tideFile"].GetString()),
-            std::string(d["flowVolFile"].GetString()),
-            std::string(d["airTempFile"].GetString()),
             std::string(d["flowSpeedFile"].GetString()),
             std::string(d["distribWseTempFile"].GetString()),
             config

@@ -20,8 +20,6 @@
   "mapEdgesFile": "data/maps_dec/Skagit2000_edges_new.csv",
   "mapGeometryFile": "data/maps_dec/Skagit2000_geometry_new.csv",
   "tideFile": "data/cresTide.csv",
-  "flowVolFile": "data/flowM3ps.csv",
-  "airTempFile": "data/airTempC.csv",
   "flowSpeedFile": "data/mod_flow_condensed.nc",
   "distribWseTempFile": "data/wse.temp.full.nc",
   "blindChannelSimplificationRadius": 0.0,

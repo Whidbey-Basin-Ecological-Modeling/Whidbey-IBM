@@ -4,25 +4,6 @@
 #include <cmath>
 #include <iostream>
 
-#define WSE_intercept 0.3373725
-#define WSE_flow_m3ps 0.00011386 // flow = m3/s
-#define WSE_cres_tide 0.07900028 // cres tide = ft
-#define WSE_elev_m 0.2723198
- // Elev = dist.d88 (NAVD88)
-#define WSE_elev_x_flow 0.00020908
-#define WSE_elev_x_cres_tide -0.02709448
-#define WSE_flow_x_cres_tide -0.00002296
-
-#define WT_intercept 4.091089
-#define WT_flow_m3ps -0.00113428
-#define WT_cres_tide 0.0602203
-#define WT_elev_m 0.2295117
- // Elev = dist.d88 (NAVD88)
-#define WT_elev_x_flow -0.003524042
-#define WT_elev_x_cres_tide -0.03843391
-#define WT_flow_x_cres_tide 0.0001238108
-#define WT_air_temp_c 0.781514
-
 #define MIN_WATER_TEMP 0.01f
 #define MIN_WATER_TEMP_DISTRIBUTARY 4.0f
 #define MAX_WATER_TEMP 30.0f
@@ -30,29 +11,14 @@
 #define MIN_DEPTH 0.0f
 #define MIN_DEPTH_DISTRIBUTARY 0.2f
 
-// Calculate water temperature from flow (m^3/s), tide (m), node elevation (m), and air temperature (degrees C)
-inline float WT_predict(float flow, float cres_tide, float elev_m, float air_temp_c) {
-  return WT_intercept + WT_flow_m3ps*flow + WT_cres_tide*cres_tide + WT_elev_m*elev_m + WT_elev_x_flow*elev_m*flow + WT_elev_x_cres_tide*elev_m*cres_tide + WT_flow_x_cres_tide*flow*cres_tide + WT_air_temp_c*air_temp_c;
-}
-
-// Calculate water surface elevation from flow (m^3/s), tide (m), and node elevation (m)
-inline float WSE_predict(float flow, float cres_tide, float elev_m) {
-  float l = WSE_intercept + WSE_flow_m3ps*flow + WSE_cres_tide*cres_tide + WSE_elev_m*elev_m + WSE_elev_x_flow*elev_m*flow + WSE_elev_x_cres_tide*elev_m*cres_tide + WSE_flow_x_cres_tide*flow*cres_tide;
-  return exp(l) - 1.0f;
-}
-
 // Initialize a hydro model from datafiles at the provided paths and a timestep offset into the data
 HydroModel::HydroModel(
     std::string cresTideFilename,
-    std::string flowVolFilename,
-    std::string airTempFilename,
     std::string flowSpeedFilename,
     std::string distribWseTempFilename,
     int hydroTimeIntercept
 ) :
     cresTideData(loadFloatListInterleaved(cresTideFilename, 4)),
-    flowVolData(loadFloatListInterleaved(flowVolFilename, 4)),
-    airTempData(loadFloatListInterleaved(airTempFilename, 4)),
     hydroNodes(),
     useSimData(false),
     hydroTimeIntercept(hydroTimeIntercept)
@@ -84,8 +50,6 @@ void HydroModel::updateTime(long newTime) {
     this->currTimestep = newTime;
     if (!this->useSimData) {
         this->currCresTide = this->cresTideData[getTime()];
-        this->currFlowVol = this->flowVolData[getTime()];
-        this->currAirTemp = this->airTempData[getTime()];
     }
 }
 
