@@ -352,13 +352,8 @@ void Model::countAll(bool updateTracking) {
 
 // Recruit all recruits for the current timestep
 void Model::recruit() {
-    for (size_t popIndex = 0; popIndex < initialPopulations.size(); ++popIndex) {
-        // Get the current timestep's recruit count from the day's recruit "plan"
-        size_t currRecCount = initialPopulations[popIndex].recDayPlan[this->time % 24];
-        // Recruit that many fish
-        for (size_t i = 0; i < currRecCount; ++i) {
-            initialPopulations[popIndex].recruitSingle(*this);
-        }
+    for (auto & initialPopulation : initialPopulations) {
+        initialPopulation.recruit(*this);
     }
 }
 

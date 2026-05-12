@@ -37,8 +37,10 @@ public:
     static std::vector<InitialPopulation> parseFromConfig(const rapidjson::Document& doc);
     void readAndInitializeData();
     void setRecruitPoints(const std::vector<MapNode *> & dest, const std::unordered_map<unsigned int, unsigned int> & csvIdToInternalIndex);
-    void recruitSingle(Model &model);
+
     void planRecruitment(long time, int recTimeIntercept);
+    void recruit(Model &model);
+    void recruitSingle(Model &model);
 
 private:
     void loadRecSizeDists();

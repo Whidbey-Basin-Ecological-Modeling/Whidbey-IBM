@@ -101,6 +101,15 @@ void InitialPopulation::setRecruitPoints(const std::vector<MapNode *> &dest,
     }
 }
 
+void InitialPopulation::recruit(Model &model) {
+    // Get the current timestep's recruit count from the day's recruit "plan"
+    size_t currRecCount = recDayPlan[model.time % 24];
+    // Recruit that many fish
+    for (size_t i = 0; i < currRecCount; ++i) {
+        recruitSingle(model);
+    }
+}
+
 void InitialPopulation::recruitSingle(Model &model) {
     // Get the current slice of the recruit size distribution data
     constexpr unsigned TIMESTEPS_IN_DAY = 24;
