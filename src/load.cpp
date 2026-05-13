@@ -11,6 +11,7 @@
 #include <queue>
 #include <tuple>
 #include <algorithm>
+#include <chrono>
 #include <netcdf>
 
 #include "load.h"
@@ -37,55 +38,60 @@ void loadDistribHydro(std::string &flowPath, std::string &wseTempPath, std::vect
     netCDF::NcFile wseTempSourceFile(wseTempPath, netCDF::NcFile::FileMode::read);
     size_t nodeCount = flowSourceFile.getDim("node").getSize();
     size_t timeCount = flowSourceFile.getDim("time").getSize();
-    netCDF::NcVar x = flowSourceFile.getVar("x");
-    netCDF::NcVar y = flowSourceFile.getVar("y");
-    netCDF::NcVar u = flowSourceFile.getVar("u");
-    netCDF::NcVar v = flowSourceFile.getVar("v");
-    netCDF::NcVar wse = wseTempSourceFile.getVar("wse");
-    netCDF::NcVar temp = wseTempSourceFile.getVar("temp");
-    // Create each node
-    std::cout << std::endl;
+    std::cout << "Loading " << nodeCount << " hydro nodes and " << timeCount << " timesteps..." << std::endl;
+
+    netCDF::NcVar xVar = flowSourceFile.getVar("x");
+    netCDF::NcVar yVar = flowSourceFile.getVar("y");
+    netCDF::NcVar uVar = flowSourceFile.getVar("u");
+    netCDF::NcVar vVar = flowSourceFile.getVar("v");
+    netCDF::NcVar wseVar = wseTempSourceFile.getVar("wse");
+    netCDF::NcVar tempVar = wseTempSourceFile.getVar("temp");
+
+    std::vector<float> all_x(nodeCount);
+    std::vector<float> all_y(nodeCount);
+    xVar.getVar(all_x.data());
+    yVar.getVar(all_y.data());
+
     std::vector<std::string> error_log;
 
     for (size_t i = 0; i < nodeCount; ++i) {
-        std::cout << "\rloading distributary hydrology data: " << (i+1) << "/" << nodeCount;
-        std::cout.flush();
         nodesOut.emplace_back(i);
         try {
             DistribHydroNode &node = nodesOut.back();
-            std::vector<size_t> coordIndex{i};
-            x.getVar(coordIndex, &node.x);
-            y.getVar(coordIndex, &node.y);
-            validate_required_value(NetCDFVarFillAdapter(x), node.x, "Unrecoverable error: missing geo 'x' for hydro node: " + std::to_string(i+1));
-            validate_required_value(NetCDFVarFillAdapter(y), node.y, "Unrecoverable error: missing geo 'y' for hydro node: " + std::to_string(i+1));
-
-            // These vectors are passed as indices to getVar to retrieve the NetCDF data
-            std::vector<size_t> flowIndex{0, i};
-            std::vector<size_t> flowCounts{timeCount, 1};
-            // resize the lists' memory footprint ahead of time to fit the right number of timesteps
-            node.us.resize(timeCount);
-            node.vs.resize(timeCount);
-            node.wses.resize(timeCount);
-            node.temps.resize(timeCount);
-            // Retrieve the data from the NetCDF file, store it in the node's flow component lists
-            u.getVar(flowIndex, flowCounts, node.us.data());
-            v.getVar(flowIndex, flowCounts, node.vs.data());
-            wse.getVar(flowIndex, flowCounts, node.wses.data());
-            temp.getVar(flowIndex, flowCounts, node.temps.data());
-
-            fix_all_missing_values(timeCount, NetCDFVarFillAdapter(u), node.us, "u (hydro u velocity), node: " + std::to_string(i+1), &error_log);
-            fix_all_missing_values(timeCount, NetCDFVarFillAdapter(v), node.vs, "v (hydro v velocity), node: " + std::to_string(i+1), &error_log);
-            fix_all_missing_values(timeCount, NetCDFVarFillAdapter(wse), node.wses, "wse (water surface elevation), node: " + std::to_string(i+1), &error_log);
-            fix_all_missing_values(timeCount, NetCDFVarFillAdapter(temp), node.temps, "temp (hydro temperature), node: " + std::to_string(i+1), &error_log);
+            node.x = all_x[i];
+            node.y = all_y[i];
+            validate_required_value(NetCDFVarFillAdapter(xVar), node.x, "Unrecoverable error: missing geo 'x' for hydro node: " + std::to_string(i+1));
+            validate_required_value(NetCDFVarFillAdapter(yVar), node.y, "Unrecoverable error: missing geo 'y' for hydro node: " + std::to_string(i+1));
         } catch (CustomExceptionWithMessage &e) {
             std::cout << std::endl;
             std::cout << "ERROR! " << e.what() << "; skipping hydro node " << i+1 << "..." << std::endl;
             std::cout << "Please fix this error in " << flowPath << " or " << wseTempPath << std::endl << std::endl;
-
             nodesOut.pop_back();
         }
     }
-    std::cout << std::endl << "done loading hydro" << std::endl;
+
+    auto processVar = [&](netCDF::NcVar &var, const std::string &name, auto accessor) {
+        std::cout << "Loading bulk " << name << " data..." << std::endl;
+        std::vector<float> buffer(timeCount * nodeCount);
+        var.getVar(buffer.data());
+        for (size_t j = 0; j < nodesOut.size(); ++j) {
+            auto &node = nodesOut[j];
+            size_t i = node.id;
+            auto &vec = accessor(node);
+            vec.resize(timeCount);
+            for (size_t t = 0; t < timeCount; ++t) {
+                vec[t] = buffer[t * nodeCount + i];
+            }
+            fix_all_missing_values(timeCount, NetCDFVarFillAdapter(var), vec, name + ", node: " + std::to_string(i+1), &error_log);
+        }
+    };
+
+    processVar(uVar, "u (hydro u velocity)", [](DistribHydroNode &n) -> std::vector<float>& { return n.us; });
+    processVar(vVar, "v (hydro v velocity)", [](DistribHydroNode &n) -> std::vector<float>& { return n.vs; });
+    processVar(wseVar, "wse (water surface elevation)", [](DistribHydroNode &n) -> std::vector<float>& { return n.wses; });
+    processVar(tempVar, "temp (hydro temperature)", [](DistribHydroNode &n) -> std::vector<float>& { return n.temps; });
+
+    std::cout << "done loading hydro" << std::endl;
     if (error_log.size() > 0) {
         std::cout << "WARNINGS occurred while reading hydro data. Please fix:" << std::endl;
         for (const std::string &error : error_log) {
