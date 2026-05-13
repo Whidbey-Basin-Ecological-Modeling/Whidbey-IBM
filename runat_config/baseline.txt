@@ -1,0 +1,363 @@
+Configuring model...
+8 hardware threads available
+Forcing max threads to 1 due to non-zero RNG seed (42)
+1 thread(s) enabled
+Loading 341 hydro nodes and 9360 timesteps...
+Loading bulk u (hydro u velocity) data...
+Loading bulk v (hydro v velocity) data...
+Loading bulk wse (water surface elevation) data...
+Loading bulk temp (hydro temperature) data...
+done loading hydro
+directionless edges!
+Found 0 duplicate edges
+Removing disconnected node 22158
+Removing disconnected node 22056
+Removing disconnected node 21724
+Nearshore connector nodes: 1 Low tide terrace
+Nearshore connector nodes: 5 Distributary
+Nearshore connector nodes: 5 Distributary edge
+Nearshore connector nodes: 31 Blind channel
+Nearshore connector nodes: 1 Impoundment
+Nearshore connector nodes: 377 Nearshore
+Created 420 new nearshore connector nodes
+Made  0 disconnected 'distributary' nodes into blind channels
+Found 0 disconnected nodes
+Found 0 orphaned nodes
+Found 0 orphaned protected nodes
+Edge validation passed
+Map nodes: 6 Boat harbor
+Map nodes: 150 Low tide terrace
+Map nodes: 1322 Distributary edge
+Map nodes: 2126 Distributary
+Map nodes: 688 Nearshore
+Map nodes: 155 Impoundment
+Map nodes: 27661 Blind channel
+Selected run ID: 0
+Sample data will be saved to run32/map2000d2014/output_0.nc
+
+Step 25: 0 living fish; 0 exited; 1 dead
+
+Step 50: 1 living fish; 0 exited; 1 dead
+
+Step 75: 0 living fish; 0 exited; 3 dead
+
+Step 100: 1 living fish; 0 exited; 3 dead
+
+Step 125: 2 living fish; 0 exited; 3 dead
+
+Step 150: 3 living fish; 0 exited; 3 dead
+
+Step 175: 4 living fish; 0 exited; 3 dead
+
+Step 200: 6 living fish; 0 exited; 3 dead
+
+Step 225: 5 living fish; 0 exited; 4 dead
+
+Step 250: 5 living fish; 0 exited; 5 dead
+
+Step 275: 5 living fish; 0 exited; 7 dead
+
+Step 300: 4 living fish; 0 exited; 8 dead
+
+Step 325: 5 living fish; 0 exited; 9 dead
+
+Step 350: 6 living fish; 0 exited; 9 dead
+
+Step 375: 5 living fish; 0 exited; 10 dead
+
+Step 400: 6 living fish; 0 exited; 10 dead
+
+Step 425: 8 living fish; 0 exited; 12 dead
+
+Step 450: 8 living fish; 0 exited; 14 dead
+
+Step 475: 8 living fish; 0 exited; 15 dead
+
+Step 500: 9 living fish; 0 exited; 16 dead
+
+Step 525: 10 living fish; 0 exited; 18 dead
+
+Step 550: 12 living fish; 0 exited; 18 dead
+
+Step 575: 10 living fish; 0 exited; 22 dead
+
+Step 600: 9 living fish; 0 exited; 25 dead
+
+Step 625: 9 living fish; 0 exited; 27 dead
+
+Step 650: 8 living fish; 0 exited; 30 dead
+
+Step 675: 9 living fish; 0 exited; 31 dead
+
+Step 700: 9 living fish; 0 exited; 33 dead
+
+Step 725: 11 living fish; 0 exited; 33 dead
+
+Step 750: 10 living fish; 0 exited; 36 dead
+
+Step 775: 12 living fish; 0 exited; 36 dead
+
+Step 800: 12 living fish; 0 exited; 38 dead
+
+Step 825: 13 living fish; 0 exited; 40 dead
+
+Step 850: 12 living fish; 0 exited; 42 dead
+
+Step 875: 14 living fish; 0 exited; 43 dead
+
+Step 900: 11 living fish; 0 exited; 47 dead
+
+Step 925: 14 living fish; 0 exited; 48 dead
+
+Step 950: 15 living fish; 1 exited; 48 dead
+
+Step 975: 14 living fish; 1 exited; 51 dead
+
+Step 1000: 18 living fish; 1 exited; 52 dead
+
+Step 1025: 18 living fish; 1 exited; 56 dead
+
+Step 1050: 15 living fish; 1 exited; 61 dead
+
+Step 1075: 18 living fish; 2 exited; 61 dead
+
+Step 1100: 17 living fish; 2 exited; 65 dead
+
+Step 1125: 20 living fish; 2 exited; 65 dead
+
+Step 1150: 22 living fish; 2 exited; 66 dead
+
+Step 1175: 21 living fish; 2 exited; 69 dead
+
+Step 1200: 23 living fish; 2 exited; 71 dead
+
+Step 1225: 22 living fish; 2 exited; 76 dead
+
+Step 1250: 22 living fish; 2 exited; 79 dead
+
+Step 1275: 23 living fish; 2 exited; 82 dead
+
+Step 1300: 22 living fish; 2 exited; 87 dead
+
+Step 1325: 24 living fish; 2 exited; 90 dead
+
+Step 1350: 24 living fish; 2 exited; 92 dead
+
+Step 1375: 27 living fish; 2 exited; 96 dead
+
+Step 1400: 26 living fish; 2 exited; 100 dead
+
+Step 1425: 27 living fish; 2 exited; 103 dead
+
+Step 1450: 25 living fish; 2 exited; 108 dead
+
+Step 1475: 29 living fish; 2 exited; 109 dead
+
+Step 1500: 31 living fish; 2 exited; 112 dead
+
+Step 1525: 26 living fish; 2 exited; 121 dead
+
+Step 1550: 25 living fish; 2 exited; 126 dead
+
+Step 1575: 24 living fish; 3 exited; 129 dead
+
+Step 1600: 24 living fish; 4 exited; 131 dead
+
+Step 1625: 30 living fish; 4 exited; 132 dead
+
+Step 1650: 27 living fish; 5 exited; 137 dead
+
+Step 1675: 30 living fish; 6 exited; 140 dead
+
+Step 1700: 31 living fish; 6 exited; 144 dead
+
+Step 1725: 29 living fish; 6 exited; 149 dead
+
+Step 1750: 31 living fish; 6 exited; 153 dead
+
+Step 1775: 29 living fish; 6 exited; 161 dead
+
+Step 1800: 29 living fish; 6 exited; 166 dead
+
+Step 1825: 32 living fish; 6 exited; 168 dead
+
+Step 1850: 29 living fish; 6 exited; 176 dead
+
+Step 1875: 30 living fish; 6 exited; 178 dead
+
+Step 1900: 31 living fish; 6 exited; 182 dead
+
+Step 1925: 35 living fish; 6 exited; 185 dead
+
+Step 1950: 34 living fish; 6 exited; 189 dead
+
+Step 1975: 38 living fish; 6 exited; 192 dead
+
+Step 2000: 37 living fish; 6 exited; 196 dead
+
+Step 2025: 35 living fish; 7 exited; 203 dead
+
+Step 2050: 37 living fish; 8 exited; 205 dead
+
+Step 2075: 40 living fish; 8 exited; 209 dead
+
+Step 2100: 43 living fish; 8 exited; 212 dead
+
+Step 2125: 39 living fish; 8 exited; 219 dead
+
+Step 2150: 39 living fish; 8 exited; 226 dead
+
+Step 2175: 39 living fish; 8 exited; 230 dead
+
+Step 2200: 42 living fish; 8 exited; 234 dead
+
+Step 2225: 44 living fish; 8 exited; 237 dead
+
+Step 2250: 39 living fish; 8 exited; 244 dead
+
+Step 2275: 44 living fish; 9 exited; 245 dead
+
+Step 2300: 45 living fish; 11 exited; 246 dead
+
+Step 2325: 50 living fish; 11 exited; 248 dead
+
+Step 2350: 47 living fish; 11 exited; 256 dead
+
+Step 2375: 43 living fish; 11 exited; 264 dead
+
+Step 2400: 42 living fish; 11 exited; 271 dead
+
+Step 2425: 44 living fish; 11 exited; 274 dead
+
+Step 2450: 47 living fish; 11 exited; 276 dead
+
+Step 2475: 49 living fish; 11 exited; 280 dead
+
+Step 2500: 44 living fish; 11 exited; 288 dead
+
+Step 2525: 49 living fish; 11 exited; 289 dead
+
+Step 2550: 45 living fish; 11 exited; 295 dead
+
+Step 2575: 48 living fish; 11 exited; 298 dead
+
+Step 2600: 47 living fish; 12 exited; 300 dead
+
+Step 2625: 50 living fish; 13 exited; 302 dead
+
+Step 2650: 53 living fish; 13 exited; 303 dead
+
+Step 2675: 55 living fish; 13 exited; 306 dead
+
+Step 2700: 51 living fish; 13 exited; 311 dead
+
+Step 2725: 50 living fish; 13 exited; 316 dead
+
+Step 2750: 51 living fish; 13 exited; 321 dead
+
+Step 2775: 52 living fish; 13 exited; 324 dead
+
+Step 2800: 55 living fish; 14 exited; 325 dead
+
+Step 2825: 55 living fish; 14 exited; 329 dead
+
+Step 2850: 55 living fish; 15 exited; 333 dead
+
+Step 2875: 51 living fish; 16 exited; 338 dead
+
+Step 2900: 52 living fish; 16 exited; 340 dead
+
+Step 2925: 51 living fish; 16 exited; 345 dead
+
+Step 2950: 52 living fish; 16 exited; 347 dead
+
+Step 2975: 53 living fish; 16 exited; 349 dead
+
+Step 3000: 52 living fish; 16 exited; 353 dead
+
+Step 3025: 51 living fish; 16 exited; 357 dead
+
+Step 3050: 52 living fish; 16 exited; 359 dead
+
+Step 3075: 50 living fish; 16 exited; 365 dead
+
+Step 3100: 51 living fish; 16 exited; 367 dead
+
+Step 3125: 51 living fish; 17 exited; 368 dead
+
+Step 3150: 53 living fish; 17 exited; 370 dead
+
+Step 3175: 49 living fish; 17 exited; 376 dead
+
+Step 3200: 50 living fish; 17 exited; 377 dead
+
+Step 3225: 48 living fish; 19 exited; 380 dead
+
+Step 3250: 47 living fish; 19 exited; 382 dead
+
+Step 3275: 49 living fish; 20 exited; 383 dead
+
+Step 3300: 46 living fish; 20 exited; 388 dead
+
+Step 3325: 43 living fish; 20 exited; 391 dead
+
+Step 3350: 44 living fish; 21 exited; 392 dead
+
+Step 3375: 44 living fish; 22 exited; 394 dead
+
+Step 3400: 42 living fish; 22 exited; 398 dead
+
+Step 3425: 38 living fish; 24 exited; 402 dead
+
+Step 3450: 36 living fish; 25 exited; 404 dead
+
+Step 3475: 36 living fish; 26 exited; 405 dead
+
+Step 3500: 34 living fish; 26 exited; 409 dead
+
+Step 3525: 34 living fish; 26 exited; 411 dead
+
+Step 3550: 37 living fish; 26 exited; 411 dead
+
+Step 3575: 38 living fish; 26 exited; 412 dead
+
+Step 3600: 36 living fish; 26 exited; 416 dead
+
+Step 3625: 37 living fish; 26 exited; 417 dead
+
+Step 3650: 38 living fish; 27 exited; 417 dead
+
+Step 3675: 38 living fish; 27 exited; 419 dead
+
+Step 3700: 38 living fish; 27 exited; 421 dead
+
+Step 3725: 37 living fish; 27 exited; 424 dead
+
+Step 3750: 37 living fish; 27 exited; 425 dead
+
+Step 3775: 37 living fish; 27 exited; 426 dead
+
+Step 3800: 39 living fish; 27 exited; 426 dead
+
+Step 3825: 38 living fish; 27 exited; 427 dead
+
+Step 3850: 35 living fish; 27 exited; 431 dead
+
+Step 3875: 35 living fish; 28 exited; 431 dead
+
+Step 3900: 35 living fish; 28 exited; 432 dead
+
+Step 3925: 35 living fish; 28 exited; 433 dead
+
+Step 3950: 36 living fish; 28 exited; 434 dead
+
+Step 3975: 35 living fish; 28 exited; 436 dead
+
+Finished at step 3984
+In saveTaggedHistories
+
+Values for N: 1, and T: 3985
+
+N: 1,   T: 3985
+
+Finished loading all tracks

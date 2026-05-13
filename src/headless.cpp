@@ -254,7 +254,7 @@ int main(int argc, char **argv) {
 #else
         if (m->time % 330 == 0) {
 #endif
-            std::cout << "\rStep " << m->time << ": " << elapsed << "s elapsed; " << remainingStr << " remaining; " << m->livingIndividuals.size() << " living fish; " << m->exitedCount << " exited; " << m->deadCount << " dead" << std::endl;
+            std::cout << "\rStep " << m->time << ": " << m->livingIndividuals.size() << " living fish; " << m->exitedCount << " exited; " << m->deadCount << " dead" << std::endl;
             std::cout.flush();
 
 #if !defined(QUICK_DEBUG_HACK) || defined(NDEBUG)
@@ -266,7 +266,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    std::cout << std::endl << "Finished at step " << m->time << "; " << totalElapsed << "s elapsed since start" << std::endl;
+    std::cout << std::endl << "Finished at step " << m->time << std::endl;
 
     std::stringstream ss2;
     ss2 << outputPath << "/summary_" << runID << ".nc";
