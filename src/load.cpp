@@ -101,6 +101,80 @@ void loadDistribHydro(std::string &flowPath, std::string &wseTempPath, std::vect
     }
 }
 
+void loadDistribHydro2(std::string &flowPath, std::string &wseTempPath, std::vector<DistribHydroNode> &nodesOut) {
+    netCDF::NcFile flowSourceFile(flowPath, netCDF::NcFile::FileMode::read);
+    netCDF::NcFile wseTempSourceFile(wseTempPath, netCDF::NcFile::FileMode::read);
+    size_t nodeCount = flowSourceFile.getDim("node").getSize();
+    size_t timeCount = flowSourceFile.getDim("time").getSize();
+    std::cout << "Loading " << nodeCount << " hydro nodes and " << timeCount << " timesteps..." << std::endl;
+
+    netCDF::NcVar xVar = flowSourceFile.getVar("x");
+    netCDF::NcVar yVar = flowSourceFile.getVar("y");
+    netCDF::NcVar uVar = flowSourceFile.getVar("u");
+    netCDF::NcVar vVar = flowSourceFile.getVar("v");
+    netCDF::NcVar wseVar = wseTempSourceFile.getVar("wse");
+    netCDF::NcVar tempVar = flowSourceFile.getVar("temperature");
+
+    std::vector<float> all_x(nodeCount);
+    std::vector<float> all_y(nodeCount);
+    xVar.getVar(all_x.data());
+    yVar.getVar(all_y.data());
+
+    std::vector<std::string> error_log;
+
+    for (size_t i = 0; i < nodeCount; ++i) {
+        nodesOut.emplace_back(i);
+        try {
+            DistribHydroNode &node = nodesOut.back();
+            node.x = all_x[i];
+            node.y = all_y[i];
+            validate_required_value(NetCDFVarFillAdapter(xVar), node.x, "Unrecoverable error: missing geo 'x' for hydro node: " + std::to_string(i+1));
+            validate_required_value(NetCDFVarFillAdapter(yVar), node.y, "Unrecoverable error: missing geo 'y' for hydro node: " + std::to_string(i+1));
+        } catch (CustomExceptionWithMessage &e) {
+            std::cout << std::endl;
+            std::cout << "ERROR! " << e.what() << "; skipping hydro node " << i+1 << "..." << std::endl;
+            std::cout << "Please fix this error in " << flowPath << " or " << wseTempPath << std::endl << std::endl;
+            nodesOut.pop_back();
+        }
+    }
+
+    auto processVar = [&](netCDF::NcVar &var, const std::string &name, auto accessor) {
+        std::cout << "Loading bulk " << name << " data..." << std::endl;
+        std::vector<float> buffer(timeCount * nodeCount);
+        var.getVar(buffer.data());
+        for (size_t j = 0; j < nodesOut.size(); ++j) {
+            auto &node = nodesOut[j];
+            size_t i = node.id;
+            auto &vec = accessor(node);
+            vec.resize(timeCount);
+            for (size_t t = 0; t < timeCount; ++t) {
+                // vec[t] = buffer[t * nodeCount + i];
+                // TODO: put the above back; the lines that follow are a temporary hack
+                auto idx = t * nodeCount + i;
+                if (idx >= buffer.size()) {
+                    idx = buffer.size() - 1;
+                }
+                vec[t] = buffer[idx];
+            }
+            fix_all_missing_values(timeCount, NetCDFVarFillAdapter(var), vec, name + ", node: " + std::to_string(i+1), &error_log);
+        }
+    };
+
+    processVar(uVar, "u (hydro u velocity)", [](DistribHydroNode &n) -> std::vector<float>& { return n.us; });
+    processVar(vVar, "v (hydro v velocity)", [](DistribHydroNode &n) -> std::vector<float>& { return n.vs; });
+    processVar(wseVar, "wse (water surface elevation)", [](DistribHydroNode &n) -> std::vector<float>& { return n.wses; });
+    processVar(tempVar, "temp (hydro temperature)", [](DistribHydroNode &n) -> std::vector<float>& { return n.temps; });
+
+    std::cout << "done loading hydro" << std::endl;
+    if (error_log.size() > 0) {
+        std::cout << "WARNINGS occurred while reading hydro data. Please fix:" << std::endl;
+        for (const std::string &error : error_log) {
+            std::cout << error << std::endl;
+        }
+        std::cout << std::endl;
+    }
+}
+
 void assignHydroNodeToMapNodeWithDistance(const unsigned hydroNodeIndex, MapNode *mapNode, const float distance) {
     mapNode->nearestHydroNodeID = hydroNodeIndex;
     mapNode->hydroNodeDistance = distance;

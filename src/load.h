@@ -16,6 +16,7 @@ std::vector<std::string> split(std::string& s, char c);
 // Loads distributary hydrology data from two NetCDF3/4 files into a vector of DistribHydroNodes (defined in map.h)
 // See CONFIG_README for a description of the file formats
 void loadDistribHydro(std::string &flowPath, std::string &wseTempPath, std::vector<DistribHydroNode> &nodesOut);
+void loadDistribHydro2(std::string &flowPath, std::string &wseTempPath, std::vector<DistribHydroNode> &nodesOut);
 
 // Loads recruit size distributions from a CSV file into a 2d float vector
 // See CONFIG_README for a description of the file format
