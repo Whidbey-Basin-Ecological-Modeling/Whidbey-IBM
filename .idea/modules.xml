@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Skagit-IBM.iml" filepath="$PROJECT_DIR$/.idea/Skagit-IBM.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Whidbey-IBM.iml" filepath="$PROJECT_DIR$/.idea/Whidbey-IBM.iml" />
     </modules>
   </component>
 </project>
