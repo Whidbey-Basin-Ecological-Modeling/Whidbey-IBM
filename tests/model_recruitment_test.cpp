@@ -231,6 +231,7 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "InitialPopulation::recruitSingle", "[
         REQUIRE(fish.pmaxHistory != nullptr);
         REQUIRE(fish.mortalityHistory != nullptr);
         REQUIRE(fish.tempHistory != nullptr);
+        REQUIRE(fish.salinityHistory != nullptr);
         REQUIRE(fish.depthHistory != nullptr);
         REQUIRE(fish.flowSpeedHistory_old != nullptr);
         REQUIRE(fish.flowVelocityHistory != nullptr);

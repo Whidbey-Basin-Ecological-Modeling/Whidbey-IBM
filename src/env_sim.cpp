@@ -3,17 +3,19 @@
 #include <cmath>
 #include "util.h"
 
-// "depths" and "temps" are output params, should be empty prior to calling env_sim
+// "depths", "temps", and "salinities" are output params, should be empty prior to calling env_sim
 void env_sim(
     size_t sim_length,
     std::vector<MapNode *> &locs,
     std::vector<std::vector<float>> &depths,
     std::vector<std::vector<float>> &temps,
+    std::vector<std::vector<float>> &salinities,
     float &dist_flow
 ) {
 
     dist_flow = 440.0f;
     const float dist_temp = 14.0f;
+    const float dist_salinity = 0.0f;
     const float temp_sd = 5.0f;
 
     const float dist_depth = 2.0f;
@@ -43,10 +45,12 @@ void env_sim(
     for (MapNode *node : locs) {
         std::vector<float> nodeDepths;
         std::vector<float> nodeTemps;
+        std::vector<float> nodeSalinities;
         for (size_t t = 0; t < sim_length; ++t) {
             if (isDistributary(node->type)) {
                 nodeDepths.push_back(dist_depth);
                 nodeTemps.push_back(dist_temp);
+                nodeSalinities.push_back(dist_salinity);
             } else {
                 float percent_influenced = 1.0f - (node->pathDist - min_dist)/(max_dist-min_dist);
                 float amplitude = max_amplitude * percent_influenced;
@@ -61,10 +65,12 @@ void env_sim(
                     temp = 39.0f;
                 }
                 nodeTemps.push_back(temp);
+                nodeSalinities.push_back(0.0f);
             }
         }
         depths.push_back(nodeDepths);
         temps.push_back(nodeTemps);
+        salinities.push_back(nodeSalinities);
     }
 
 }

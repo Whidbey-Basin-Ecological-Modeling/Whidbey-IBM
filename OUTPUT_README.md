@@ -56,6 +56,12 @@ All model outputs are saved as [netCDF 4](https://www.unidata.ucar.edu/software/
     - `lastGrowth[n]`: floats, most recent timestep's growth for each fish (g)
     - `lastPmax[n]`: floats, most recent timestep's Pmax for each fish (p)
     - `lastMortality[n]`: floats, most recent timestep's mortality risk for each fish (probability value)
+    - `lastTemp[n]`: floats, most recent timestep's temperature for each fish (c)
+    - `lastSalinity[n]`: floats, most recent timestep's salinity for each fish (psu)
+    - `lastDepth[n]`: floats, most recent timestep's water depth for each fish (m)
+    - `lastFlowSpeed[n]`: floats, most recent timestep's flow speed for each fish (m/s)
+    - `lastFlowVelocityU[n]`: floats, most recent timestep's flow velocity u component for each fish (m/s)
+    - `lastFlowVelocityV[n]`: floats, most recent timestep's flow velocity v component for each fish (m/s)
     - `populationHistory[populationHistoryLength]`: ints, per-timestep counts of living individuals in the model
     - `sampleSiteID[sampleHistoryLength]`: ints, each sample's site ID
         - Refer to [data/sampling_sites.csv](data/sampling_sites.csv) for a list of sample site names and coordinates. Site IDs correspond to line numbers (site ID 0 is Grain of Sand, 1 is FWP New Site, etc.)
@@ -98,6 +104,7 @@ All model outputs are saved as [netCDF 4](https://www.unidata.ucar.edu/software/
     - `monitoringPopulationDensity[p][t]`: float, population density at each monitoring point by timestep
     - `monitoringDepth[p][t]`: float, depth at each monitoring point by timestep
     - `monitoringTemp[p][t]`: float, temperature at each monitoring point by timestep
+    - `monitoringSalinity[p][t]`: float, salinity at each monitoring point by timestep
   
 ### Tagged Fish Histories
 
@@ -118,6 +125,7 @@ All model outputs are saved as [netCDF 4](https://www.unidata.ucar.edu/software/
     - `pmaxHistory[n, t]`: floats, the pmax (p) on each timestep for each fish, or 0 if the fish wasn't in the model on the timestep in question
     - `mortalityHistory[n, t]`: floats, the mortality risk (probability) on each timestep for each fish, or 0 if the fish wasn't in the model on the timestep in question
     - `tempHistory[n, t]`: floats, the temperature in the current location at the end of each timestep for each fish, or 0 if the fish wasn't in the model on the timestep in question
+    - `salinityHistory[n, t]`: floats, the salinity in the current location at the end of each timestep for each fish, or 0 if the fish wasn't in the model on the timestep in question
     - `depthHistory[n, t]`: floats, the water depth in the location at the end of each timestep for each fish, or 0 if the fish wasn't in the model on the timestep in question
     - `flowSpeedHistory[n, t]`: floats, the flow speed in the location at the end of each timestep for each fish, or 0 if the fish wasn't in the model on the timestep in question
     - `flowVelocityUHistory[n, t]`: floats, the flow velocity u component in the location at the end of each timestep for each fish, or 0 if the fish wasn't in the model on the timestep in question

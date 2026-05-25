@@ -5,12 +5,13 @@
 #include <unordered_map>
 #include "map.h"
 
-// "depths" and "temps" are output params, should be empty prior to calling env_sim
+// "depths", "temps", and "salinities" are output params, should be empty prior to calling env_sim
 void env_sim(
     size_t sim_length,
     std::vector<MapNode *> &locs,
     std::vector<std::vector<float>> &depths,
     std::vector<std::vector<float>> &temps,
+    std::vector<std::vector<float>> &salinities,
     float &dist_flow
 );
 

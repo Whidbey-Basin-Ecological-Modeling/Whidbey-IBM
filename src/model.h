@@ -40,7 +40,8 @@ typedef struct MonitoringRecord {
     float populationDensity;
     float depth;
     float temp;
-    MonitoringRecord(size_t population, float populationDensity, float depth, float temp) : population(population), populationDensity(populationDensity), depth(depth), temp(temp) {}
+    float salinity;
+    MonitoringRecord(size_t population, float populationDensity, float depth, float temp, float salinity) : population(population), populationDensity(populationDensity), depth(depth), temp(temp), salinity(salinity) {}
 } MonitoringRecord;
 
 class Model {
@@ -123,6 +124,7 @@ public:
         std::vector<std::vector<float>> &recSizeDists,
         std::vector<std::vector<float>> &depths,
         std::vector<std::vector<float>> &temps,
+        std::vector<std::vector<float>> &salinities,
         float distFlow
     );
 

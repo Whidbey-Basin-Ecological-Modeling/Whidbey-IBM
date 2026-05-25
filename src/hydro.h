@@ -8,6 +8,7 @@
 // This struct stores cached hydrology model predictions for a single map location
 typedef struct HydroNode {
     float temp; // temperature in degrees C
+    float salinity; // salinity in psu
     float depth; // meters of water (distance from map elevation to water surface elevation)
     float flowSpeed; // flow speed in m/s
 } HydroNode;
@@ -25,6 +26,7 @@ public:
         std::vector<MapNode *> &map,
         std::vector<std::vector<float>> &depths,
         std::vector<std::vector<float>> &temps,
+        std::vector<std::vector<float>> &salinities,
         float distFlow
     );
 
@@ -40,6 +42,8 @@ public:
     virtual float scaledFlowSpeed(float flowSpeed, const MapNode &node);
     // Return the temperature in degrees C at a given location
     virtual float getTemp(MapNode &node);
+    // Return the salinity in psu at a given location
+    virtual float getSalinity(MapNode &node);
     // Return the water depth in meters at a given location
     virtual float getDepth(MapNode &node);
     // Check if the current timestep is a high tide
@@ -67,6 +71,7 @@ private:
     bool useSimData;
     std::unordered_map<MapNode *, std::vector<float>> simDepths;
     std::unordered_map<MapNode *, std::vector<float>> simTemps;
+    std::unordered_map<MapNode *, std::vector<float>> simSalinities;
     float simDistFlow;
 
     int hydroTimeIntercept;

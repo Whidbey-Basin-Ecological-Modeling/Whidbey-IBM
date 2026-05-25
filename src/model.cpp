@@ -160,7 +160,7 @@ void Model::update1h() {
     // Record monitoring sites
     for (size_t i = 0; i < this->monitoringPoints.size(); ++i) {
         MapNode *n = this->monitoringPoints[i];
-        this->monitoringHistory[i].emplace_back(n->residentIds.size(), n->popDensity, hydroModel.getDepth(*n), hydroModel.getTemp(*n));
+        this->monitoringHistory[i].emplace_back(n->residentIds.size(), n->popDensity, hydroModel.getDepth(*n), hydroModel.getTemp(*n), hydroModel.getSalinity(*n));
     }
 }
 
@@ -459,6 +459,7 @@ void Model::saveState(std::string savePath) {
     float *lastPmaxOut = new float[N];
     float *lastMortalityOut = new float[N];
     float *lastTempOut = new float[N];
+    float *lastSalinityOut = new float[N];
     float *lastDepthOut = new float[N];
     float *lastFlowSpeedOut = new float[N];
     float *lastFlowVelocityUOut = new float[N];
@@ -478,6 +479,7 @@ void Model::saveState(std::string savePath) {
         lastPmaxOut[n] = f.lastPmax;
         lastMortalityOut[n] = f.lastMortality;
         lastTempOut[n] = f.lastTemp;
+        lastSalinityOut[n] = f.lastSalinity;
         lastDepthOut[n] = f.lastDepth;
         lastFlowSpeedOut[n] = f.lastFlowSpeed_old;
         lastFlowVelocityUOut[n] = f.lastFlowVelocity.u;
@@ -509,6 +511,8 @@ void Model::saveState(std::string savePath) {
     lastMortality.putVar(lastMortalityOut);
     netCDF::NcVar lastTemp = targetFile.addVar("lastTemp", netCDF::ncFloat, fishDims);
     lastTemp.putVar(lastTempOut);
+    netCDF::NcVar lastSalinity = targetFile.addVar("lastSalinity", netCDF::ncFloat, fishDims);
+    lastSalinity.putVar(lastSalinityOut);
     netCDF::NcVar lastDepth = targetFile.addVar("lastDepth", netCDF::ncFloat, fishDims);
     lastDepth.putVar(lastDepthOut);
     netCDF::NcVar lastFlowSpeed = targetFile.addVar("lastFlowSpeed", netCDF::ncFloat, fishDims);
@@ -554,6 +558,7 @@ void Model::saveState(std::string savePath) {
     float *monitoringPopulationDensityOut = new float[this->monitoringPoints.size() * this->populationHistory.size()];
     float *monitoringDepthOut = new float[this->monitoringPoints.size() * this->populationHistory.size()];
     float *monitoringTempOut = new float[this->monitoringPoints.size() * this->populationHistory.size()];
+    float *monitoringSalinityOut = new float[this->monitoringPoints.size() * this->populationHistory.size()];
     int *monitoringPointsOut = new int[this->monitoringPoints.size()];
     for (size_t i = 0; i < this->monitoringPoints.size(); ++i) {
         monitoringPointsOut[i] = this->monitoringPoints[i]->id;
@@ -562,6 +567,7 @@ void Model::saveState(std::string savePath) {
             monitoringPopulationDensityOut[i * this->populationHistory.size() + t] = this->monitoringHistory[i][t].populationDensity;
             monitoringDepthOut[i * this->populationHistory.size() + t] = this->monitoringHistory[i][t].depth;
             monitoringTempOut[i * this->populationHistory.size() + t] = this->monitoringHistory[i][t].temp;
+            monitoringSalinityOut[i * this->populationHistory.size() + t] = this->monitoringHistory[i][t].salinity;
         }
     }
 
@@ -573,6 +579,8 @@ void Model::saveState(std::string savePath) {
     monitoringDepth.putVar(monitoringDepthOut);
     netCDF::NcVar monitoringTemp = targetFile.addVar("monitoringTemp", netCDF::ncFloat, monitoringDims);
     monitoringTemp.putVar(monitoringTempOut);
+    netCDF::NcVar monitoringSalinity = targetFile.addVar("monitoringSalinity", netCDF::ncFloat, monitoringDims);
+    monitoringSalinity.putVar(monitoringSalinityOut);
     netCDF::NcVar monitoringPointIDs = targetFile.addVar("monitoringPointIDs", netCDF::ncInt, monitoringPointsDims);
     monitoringPointIDs.putVar(monitoringPointsOut);
 }
@@ -599,6 +607,7 @@ void Model::loadState(std::string loadPath) {
     netCDF::NcVar lastPmax = sourceFile.getVar("lastPmax");
     netCDF::NcVar lastMortality = sourceFile.getVar("lastMortality");
     netCDF::NcVar lastTemp = sourceFile.getVar("lastTemp");
+    netCDF::NcVar lastSalinity = sourceFile.getVar("lastSalinity");
     netCDF::NcVar lastDepth = sourceFile.getVar("lastDepth");
     netCDF::NcVar lastFlowSpeed = sourceFile.getVar("lastFlowSpeed");
     netCDF::NcVar lastFlowVelocityU = sourceFile.getVar("lastFlowVelocityU");
@@ -623,6 +632,7 @@ void Model::loadState(std::string loadPath) {
         lastPmax.getVar(idxVec, &f.lastPmax);
         lastMortality.getVar(idxVec, &f.lastMortality);
         lastTemp.getVar(idxVec, &f.lastTemp);
+        lastSalinity.getVar(idxVec, &f.lastSalinity);
         lastDepth.getVar(idxVec, &f.lastDepth);
         lastFlowSpeed.getVar(idxVec, &f.lastFlowSpeed_old);
         lastFlowVelocityU.getVar(idxVec, &f.lastFlowVelocity.u);
@@ -669,11 +679,13 @@ void Model::loadState(std::string loadPath) {
     netCDF::NcVar monitoringPopulationDensity = sourceFile.getVar("monitoringPopulationDensity");
     netCDF::NcVar monitoringDepth = sourceFile.getVar("monitoringDepth");
     netCDF::NcVar monitoringTemp = sourceFile.getVar("monitoringTemp");
+    netCDF::NcVar monitoringSalinity = sourceFile.getVar("monitoringSalinity");
     int monitoringPointIDDummy;
     int monitoringPopulationDummy;
     float monitoringPopulationDensityDummy;
     float monitoringDepthDummy;
     float monitoringTempDummy;
+    float monitoringSalinityDummy;
     for (size_t i = 0; i < numMonitoringPoints; ++i) {
         idxVec2[0] = i;
         idxVec[0] = i;
@@ -686,8 +698,9 @@ void Model::loadState(std::string loadPath) {
             monitoringPopulationDensity.getVar(idxVec2, &monitoringPopulationDensityDummy);
             monitoringDepth.getVar(idxVec2, &monitoringDepthDummy);
             monitoringTemp.getVar(idxVec2, &monitoringTempDummy);
+            monitoringSalinity.getVar(idxVec2, &monitoringSalinityDummy);
             this->monitoringHistory[i].emplace_back((size_t)
-                monitoringPopulationDummy, monitoringPopulationDensityDummy, monitoringDepthDummy, monitoringTempDummy);
+                monitoringPopulationDummy, monitoringPopulationDensityDummy, monitoringDepthDummy, monitoringTempDummy, monitoringSalinityDummy);
         }
     }
 
@@ -748,6 +761,7 @@ void Model::saveSummary(std::string savePath) {
     float *monitoringPopulationDensityOut = new float[this->monitoringPoints.size() * this->populationHistory.size()];
     float *monitoringDepthOut = new float[this->monitoringPoints.size() * this->populationHistory.size()];
     float *monitoringTempOut = new float[this->monitoringPoints.size() * this->populationHistory.size()];
+    float *monitoringSalinityOut = new float[this->monitoringPoints.size() * this->populationHistory.size()];
     int *monitoringPointsOut = new int[this->monitoringPoints.size()];
     for (size_t i = 0; i < this->monitoringPoints.size(); ++i) {
         monitoringPointsOut[i] = this->monitoringPoints[i]->id;
@@ -756,6 +770,7 @@ void Model::saveSummary(std::string savePath) {
             monitoringPopulationDensityOut[i * this->populationHistory.size() + t] = this->monitoringHistory[i][t].populationDensity;
             monitoringDepthOut[i * this->populationHistory.size() + t] = this->monitoringHistory[i][t].depth;
             monitoringTempOut[i * this->populationHistory.size() + t] = this->monitoringHistory[i][t].temp;
+            monitoringSalinityOut[i * this->populationHistory.size() + t] = this->monitoringHistory[i][t].salinity;
         }
     }
 
@@ -767,6 +782,8 @@ void Model::saveSummary(std::string savePath) {
     monitoringDepth.putVar(monitoringDepthOut);
     netCDF::NcVar monitoringTemp = targetFile.addVar("monitoringTemp", netCDF::ncFloat, monitoringDims);
     monitoringTemp.putVar(monitoringTempOut);
+    netCDF::NcVar monitoringSalinity = targetFile.addVar("monitoringSalinity", netCDF::ncFloat, monitoringDims);
+    monitoringSalinity.putVar(monitoringSalinityOut);
     netCDF::NcVar monitoringPointIDs = targetFile.addVar("monitoringPointIDs", netCDF::ncInt, monitoringPointsDims);
     monitoringPointIDs.putVar(monitoringPointsOut);
 }
@@ -890,6 +907,7 @@ void Model::saveTaggedHistories(std::string savePath) {
     float *pmaxHistoryOut = new float[N * T];
     float *mortalityHistoryOut = new float[N * T];
     float *tempHistoryOut = new float[N * T];
+    float *salinityHistoryOut = new float[N * T];
     float *depthHistoryOut = new float[N * T];
     float *flowSpeedHistoryOut = new float[N * T];
     float *flowVelocityUHistoryOut = new float[N * T];
@@ -930,6 +948,7 @@ void Model::saveTaggedHistories(std::string savePath) {
             pmaxHistoryOut[n * T + t] = outsideTaggedRange ? 0.0f : (*f.pmaxHistory)[t - f.taggedTime];
             mortalityHistoryOut[n * T + t] = outsideTaggedRange ? 0.0f : (*f.mortalityHistory)[t - f.taggedTime];
             tempHistoryOut[n * T + t] = outsideTaggedRange ? 0.0f : (*f.tempHistory)[t - f.taggedTime];
+            salinityHistoryOut[n * T + t] = outsideTaggedRange ? 0.0f : (*f.salinityHistory)[t - f.taggedTime];
             depthHistoryOut[n * T + t] = outsideTaggedRange ? 0.0f : (*f.depthHistory)[t - f.taggedTime];
             flowSpeedHistoryOut[n * T + t] = outsideTaggedRange ? 0.0f : (*f.flowSpeedHistory_old)[t - f.taggedTime];
             flowVelocityUHistoryOut[n * T + t] =
@@ -987,6 +1006,8 @@ void Model::saveTaggedHistories(std::string savePath) {
     mortalityHistory.putVar(mortalityHistoryOut);
     netCDF::NcVar tempHistory = targetFile.addVar("tempHistory", netCDF::ncFloat, dimsNT);
     tempHistory.putVar(tempHistoryOut);
+    netCDF::NcVar salinityHistory = targetFile.addVar("salinityHistory", netCDF::ncFloat, dimsNT);
+    salinityHistory.putVar(salinityHistoryOut);
     netCDF::NcVar depthHistory = targetFile.addVar("depthHistory", netCDF::ncFloat, dimsNT);
     depthHistory.putVar(depthHistoryOut);
     netCDF::NcVar flowSpeedHistory = targetFile.addVar("flowSpeedHistory", netCDF::ncFloat, dimsNT);
@@ -1010,6 +1031,7 @@ void Model::loadTaggedHistories(std::string loadPath) {
     float pmaxDummy;
     float mortalityDummy;
     float tempDummy;
+    float salinityDummy;
     float depthDummy;
     float flowSpeedDummy;
     FlowVelocity flowVelocityDummy;
@@ -1026,6 +1048,7 @@ void Model::loadTaggedHistories(std::string loadPath) {
     netCDF::NcVar pmaxHistory = sourceFile.getVar("pmaxHistory");
     netCDF::NcVar mortalityHistory = sourceFile.getVar("mortalityHistory");
     netCDF::NcVar tempHistory = sourceFile.getVar("tempHistory");
+    netCDF::NcVar salinityHistory = sourceFile.getVar("salinityHistory");
     netCDF::NcVar depthHistory = sourceFile.getVar("depthHistory");
     netCDF::NcVar flowSpeedHistory = sourceFile.getVar("flowSpeedHistory");
     netCDF::NcVar flowVelocityUHistory = sourceFile.getVar("flowVelocityUHistory");
@@ -1060,6 +1083,7 @@ void Model::loadTaggedHistories(std::string loadPath) {
             pmaxHistory.getVar(idxVecNT, &pmaxDummy);
             mortalityHistory.getVar(idxVecNT, &mortalityDummy);
             tempHistory.getVar(idxVecNT, &tempDummy);
+            salinityHistory.getVar(idxVecNT, &salinityDummy);
             depthHistory.getVar(idxVecNT, &depthDummy);
             flowSpeedHistory.getVar(idxVecNT, &flowSpeedDummy);
             flowVelocityUHistory.getVar(idxVecNT, &flowVelocityDummy.u);
@@ -1069,6 +1093,7 @@ void Model::loadTaggedHistories(std::string loadPath) {
             f.pmaxHistory->push_back(pmaxDummy);
             f.mortalityHistory->push_back(mortalityDummy);
             f.tempHistory->push_back(tempDummy);
+            f.salinityHistory->push_back(salinityDummy);
             f.depthHistory->push_back(depthDummy);
             f.flowSpeedHistory_old->push_back(flowSpeedDummy);
             f.flowVelocityHistory->push_back(flowVelocityDummy);
@@ -1088,6 +1113,7 @@ void Model::setHistoryTimestep(long timestep) {
             f.lastPmax = (*f.pmaxHistory)[timestep - f.taggedTime];
             f.lastMortality = (*f.mortalityHistory)[timestep - f.taggedTime];
             f.lastTemp = (*f.tempHistory)[timestep - f.taggedTime];
+            f.lastSalinity = (*f.salinityHistory)[timestep - f.taggedTime];
             f.lastDepth = (*f.depthHistory)[timestep - f.taggedTime];
             f.lastFlowSpeed_old = (*f.flowSpeedHistory_old)[timestep - f.taggedTime];
             f.lastFlowVelocity = (*f.flowVelocityHistory)[timestep - f.taggedTime];

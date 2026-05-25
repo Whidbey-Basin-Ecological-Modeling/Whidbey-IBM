@@ -14,7 +14,8 @@ typedef struct DistribHydroNode {
     std::vector<float> vs; // vertical component of the flow speed vector (m/s), in 1hr increments starting from midnight on Jan 1
     std::vector<float> wses; // Water surface elevation (NAVD88) (m) in 1hr increments starting from midnight on Jan 1
     std::vector<float> temps; // Water temperature (c) in 1hr increments starting from midnight on Jan 1
-    DistribHydroNode(unsigned id) : id(id), us(), vs(), wses(), temps() {}
+    std::vector<float> salinity; // Salinity (psu) in 1hr increments starting from midnight on Jan 1
+    DistribHydroNode(unsigned id) : id(id), us(), vs(), wses(), temps(), salinity() {}
 } DistribHydroNode;
 
 typedef struct FlowVelocity {

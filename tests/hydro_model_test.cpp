@@ -8,9 +8,10 @@ TEST_CASE("hydro updates timestep", "") {
     std::vector<MapNode *> map;
     std::vector<std::vector<float> > depths;
     std::vector<std::vector<float> > temps;
+    std::vector<std::vector<float> > salinities;
     float distFlow = 0;
 
-    HydroModel hydroModel = HydroModel(map, depths, temps, distFlow);
+    HydroModel hydroModel = HydroModel(map, depths, temps, salinities, distFlow);
     hydroModel.updateTime(4);
     REQUIRE(hydroModel.getTime() == 4);
     hydroModel.updateTime(7);
@@ -20,9 +21,10 @@ TEST_CASE("hydro updates timestep", "") {
 static std::vector<MapNode *> dummy_map_nodes;
 static std::vector<std::vector<float> > dummy_depths;
 static std::vector<std::vector<float> > dummy_temps;
+static std::vector<std::vector<float> > dummy_salinities;
 
 TEST_CASE("HydroModel::getScaledFlowVelocityAt tests", "[hydro]") {
-    HydroModel hydro_model(dummy_map_nodes, dummy_depths, dummy_temps, 1.0f);
+    HydroModel hydro_model(dummy_map_nodes, dummy_depths, dummy_temps, dummy_salinities, 1.0f);
     constexpr float DEFAULT_U = 2.0f;
     constexpr float DEFAULT_V = 3.0f;
     hydro_model.hydroNodes.emplace_back(0);
@@ -67,7 +69,7 @@ TEST_CASE("HydroModel::getScaledFlowVelocityAt tests", "[hydro]") {
 }
 
 TEST_CASE("HydroModel::calculateFlowSpeedScalar tests", "[hydro]") {
-    HydroModel hydro_model(dummy_map_nodes, dummy_depths, dummy_temps, 1.0f);
+    HydroModel hydro_model(dummy_map_nodes, dummy_depths, dummy_temps, dummy_salinities, 1.0f);
     constexpr float DEFAULT_U = 2.0f;
     constexpr float DEFAULT_V = 3.0f;
     hydro_model.hydroNodes.emplace_back(0);

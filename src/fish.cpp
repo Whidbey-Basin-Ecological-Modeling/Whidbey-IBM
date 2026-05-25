@@ -85,6 +85,7 @@ Fish::Fish(
         lastPmax(0),
         lastMortality(0),
         lastTemp(0),
+        lastSalinity(0),
         lastDepth(0),
         lastFlowSpeed_old(0),
         lastFlowVelocity(0, 0),
@@ -94,6 +95,7 @@ Fish::Fish(
         growthHistory(nullptr),
         mortalityHistory(nullptr),
         tempHistory(nullptr),
+        salinityHistory(nullptr),
         depthHistory(nullptr),
         flowSpeedHistory_old(nullptr),
         flowVelocityHistory(nullptr),
@@ -390,6 +392,7 @@ bool Fish::move(Model &model) {
     this->travel = accumulatedCost;
 
     this->lastTemp = this->getBoundedTempForGrowth(model, *point);
+    this->lastSalinity = model.hydroModel.getSalinity(*point);
     this->lastDepth = model.hydroModel.getDepth(*point);
     this->lastFlowSpeed_old = lastFlowSpeed_node_old;
     this->lastFlowVelocity = model.hydroModel.getScaledFlowVelocityAt(*point);;
@@ -566,6 +569,7 @@ void Fish::addHistoryBuffers() {
     this->pmaxHistory = new std::vector<float>();
     this->mortalityHistory = new std::vector<float>();
     this->tempHistory = new std::vector<float>();
+    this->salinityHistory = new std::vector<float>();
     this->depthHistory = new std::vector<float>();
     this->flowSpeedHistory_old = new std::vector<float>();
     this->flowVelocityHistory = new std::vector<FlowVelocity>();
@@ -603,6 +607,7 @@ void Fish::trackHistory() const {
     this->pmaxHistory->push_back(this->lastPmax);
     this->mortalityHistory->push_back(this->lastMortality);
     this->tempHistory->push_back(this->lastTemp);
+    this->salinityHistory->push_back(this->lastSalinity);
     this->depthHistory->push_back(this->lastDepth);
     this->flowSpeedHistory_old->push_back(this->lastFlowSpeed_old);
     this->flowVelocityHistory->push_back(this->lastFlowVelocity);

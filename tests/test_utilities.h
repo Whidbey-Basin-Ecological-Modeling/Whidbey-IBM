@@ -15,23 +15,26 @@
 
 class MockHydroModel : public HydroModel {
 public:
-    MockHydroModel() : HydroModel(empty_nodes_, empty_depths_, empty_temps_, 0.0) {}
+    MockHydroModel() : HydroModel(empty_nodes_, empty_depths_, empty_temps_, empty_salinities_, 0.0) {}
 
     float getCurrentU(const MapNode& node) const override { return uValue; }
     float getCurrentV(const MapNode& node) const override { return vValue; }
     float getDepth(MapNode& node) override { return depthValue; }
     float getTemp(MapNode& node) override { return tempValue; }
+    float getSalinity(MapNode& node) override { return salinityValue; }
 
     // Values to be set in tests
     float uValue = 0.0f;
     float vValue = 0.0f;
     float depthValue = 1.0f;
     float tempValue = 10.0f;
+    float salinityValue = 0.0f;
 
 private:
     std::vector<MapNode *> empty_nodes_;
     std::vector<std::vector<float>> empty_depths_;
     std::vector<std::vector<float>> empty_temps_;
+    std::vector<std::vector<float>> empty_salinities_;
 };
 
 // Helper function to create MapNodes for testing

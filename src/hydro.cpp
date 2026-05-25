@@ -31,14 +31,16 @@ HydroModel::HydroModel(
     std::vector<MapNode *> &map,
     std::vector<std::vector<float>> &depths,
     std::vector<std::vector<float>> &temps,
+    std::vector<std::vector<float>> &salinities,
     float distFlow
 ) :
-    useSimData(true), simDepths(), simTemps(), simDistFlow(distFlow), hydroTimeIntercept(0)
+    useSimData(true), simDepths(), simTemps(), simSalinities(), simDistFlow(distFlow), hydroTimeIntercept(0)
 {
     this->updateTime(0L);
     for (size_t i = 0; i < map.size(); ++i) {
         this->simDepths[map[i]] = depths[i];
         this->simTemps[map[i]] = temps[i];
+        this->simSalinities[map[i]] = salinities[i];
     }
 }
 
@@ -142,6 +144,15 @@ float HydroModel::getTemp(MapNode &node) {
 
     const float hydroTemp = this->hydroNodes[node.nearestHydroNodeID].temps[this->getTime()];
     return limitWaterTemp(hydroTemp, node.type);
+}
+
+// Get the current salinity (psu) at the given node
+float HydroModel::getSalinity(MapNode &node) {
+    if (this->useSimData) {
+        return this->simSalinities[&node][this->getTime()];
+    }
+
+    return this->hydroNodes[node.nearestHydroNodeID].salinity[this->getTime()];
 }
 
 float limitDepth(const float depth, const HabitatType nodeType) {

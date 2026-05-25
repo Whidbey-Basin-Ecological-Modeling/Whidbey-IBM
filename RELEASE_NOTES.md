@@ -4,6 +4,11 @@ This file records major feature changes. It goes back in time to 11.19.2024. "Re
 when the completed feature was merged to the main branch. Functional parts of a feature may have been merged earlier.
 Minor updates are not recorded.
 
+## 05.25.2026
+- new hydro data for Whidbey Basin
+- added salinity data to `DistribHydroNode` and `HydroModel`.
+- salinity is now included in state snapshots, summaries, and tagged history output files.
+
 ## 01.12.2026
 - new configurable float input parameters for `growthSlopeNearshore`, `pmaxUpperLimit`, `pmaxUpperLimitNearshore`, and `pmaxLowerLimit`
 

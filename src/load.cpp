@@ -46,6 +46,7 @@ void loadDistribHydro(std::string &flowPath, std::string &wseTempPath, std::vect
     netCDF::NcVar vVar = flowSourceFile.getVar("v");
     netCDF::NcVar wseVar = wseTempSourceFile.getVar("wse");
     netCDF::NcVar tempVar = wseTempSourceFile.getVar("temp");
+    netCDF::NcVar salinityVar = wseTempSourceFile.getVar("salinity");
 
     std::vector<float> all_x(nodeCount);
     std::vector<float> all_y(nodeCount);
@@ -90,6 +91,7 @@ void loadDistribHydro(std::string &flowPath, std::string &wseTempPath, std::vect
     processVar(vVar, "v (hydro v velocity)", [](DistribHydroNode &n) -> std::vector<float>& { return n.vs; });
     processVar(wseVar, "wse (water surface elevation)", [](DistribHydroNode &n) -> std::vector<float>& { return n.wses; });
     processVar(tempVar, "temp (hydro temperature)", [](DistribHydroNode &n) -> std::vector<float>& { return n.temps; });
+    processVar(salinityVar, "salinity", [](DistribHydroNode &n) -> std::vector<float>& { return n.salinity; });
 
     std::cout << "done loading hydro" << std::endl;
     if (error_log.size() > 0) {
@@ -114,6 +116,7 @@ void loadDistribHydro2(std::string &flowPath, std::string &wseTempPath, std::vec
     netCDF::NcVar vVar = flowSourceFile.getVar("v");
     netCDF::NcVar wseVar = wseTempSourceFile.getVar("wse");
     netCDF::NcVar tempVar = flowSourceFile.getVar("temperature");
+    netCDF::NcVar salinityVar = flowSourceFile.getVar("salinity");
 
     std::vector<float> all_x(nodeCount);
     std::vector<float> all_y(nodeCount);
@@ -164,6 +167,7 @@ void loadDistribHydro2(std::string &flowPath, std::string &wseTempPath, std::vec
     processVar(vVar, "v (hydro v velocity)", [](DistribHydroNode &n) -> std::vector<float>& { return n.vs; });
     processVar(wseVar, "wse (water surface elevation)", [](DistribHydroNode &n) -> std::vector<float>& { return n.wses; });
     processVar(tempVar, "temp (hydro temperature)", [](DistribHydroNode &n) -> std::vector<float>& { return n.temps; });
+    processVar(salinityVar, "salinity", [](DistribHydroNode &n) -> std::vector<float>& { return n.salinity; });
 
     std::cout << "done loading hydro" << std::endl;
     if (error_log.size() > 0) {

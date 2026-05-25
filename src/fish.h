@@ -68,6 +68,7 @@ public:
     // last timestep's mortality (probability value), and various geographic factors
     float lastMortality;
     float lastTemp;
+    float lastSalinity;
     float lastDepth;
     float lastFlowSpeed_old; // deprecated
     FlowVelocity lastFlowVelocity;
@@ -87,6 +88,7 @@ public:
     // mortality history (only present if tagged)
     std::vector<float> *mortalityHistory;
     std::vector<float> *tempHistory;
+    std::vector<float> *salinityHistory;
     std::vector<float> *depthHistory;
     std::vector<float> *flowSpeedHistory_old;
     std::vector<FlowVelocity> *flowVelocityHistory;
