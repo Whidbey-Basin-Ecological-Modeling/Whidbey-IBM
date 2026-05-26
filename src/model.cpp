@@ -56,10 +56,8 @@ Model::Model(
     std::string cresTideFilename,
     // Path of the flow speed data (netCDF)
     std::string flowSpeedFilename,
-    // Path of the distributary WSE/temp data (netCDF)
-    std::string distribWseTempFilename,
     const ModelConfigMap &config
-) : defaultHydroModel(std::make_unique<HydroModel>(cresTideFilename, flowSpeedFilename, distribWseTempFilename, hydroTimeIntercept)),
+) : defaultHydroModel(std::make_unique<HydroModel>(cresTideFilename, flowSpeedFilename, hydroTimeIntercept)),
     hydroModel(*defaultHydroModel),
     initialPopulations(std::move(allInitialPopulations)),
     recTimeIntercept(recTimeIntercept),
@@ -1177,6 +1175,12 @@ Model *modelFromConfig(std::string configPath) {
     }
     size_t maxThreads = std::max(1U, std::min(hwThreads, (unsigned int) desiredThreads));
     std::cout << maxThreads << " thread(s) enabled" << std::endl;
+
+    if (d.HasMember("distribWseTempFile")) {
+        // This field is deprecated but still allowed in the config
+        std::string deprecatedWseFile = d["distribWseTempFile"].GetString();
+    }
+
     Model *m;
     if (envDataType == "file") {
         // Get model params from JSON config object
@@ -1206,7 +1210,6 @@ Model *modelFromConfig(std::string configPath) {
                 : 0.0f,
             std::string(d["tideFile"].GetString()),
             std::string(d["flowSpeedFile"].GetString()),
-            std::string(d["distribWseTempFile"].GetString()),
             config
         );
     } else {

@@ -21,7 +21,6 @@
   "mapGeometryFile": "data/maps_dec/Skagit2000_geometry_new.csv",
   "tideFile": "data/cresTide.csv",
   "flowSpeedFile": "data/WhidbeyBasin_Compiled_Full.nc",
-  "distribWseTempFile": "data/wse.temp.full.nc",
   "blindChannelSimplificationRadius": 0.0,
   "habitatTypeExitConditionHours": 48,
   "mortMin": 0.0005,

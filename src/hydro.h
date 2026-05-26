@@ -18,7 +18,6 @@ public:
     HydroModel(
         std::string cresTideFilename,
         std::string flowSpeedFilename,
-        std::string distribWseTempFilename,
         int hydroTimeIntercept // Timesteps between midnight on Jan 1 and the start of the cresTide data
     );
 

@@ -63,31 +63,20 @@ Parameters:
         - `flowVolFile`: name of an ASCII file where each line is a flow volume (m^3/s), measured every 15 minutes upstream from the recruitment site
         - `airTempFile`: name of an ASCII file where each line is an air temperature, in degrees C, measured every 15 minutes
         - `flowSpeedFile`: name of a NetCDF-3 or NetCDF-4 file where the following variables are present:
-
             - `x`, `y`: the horizontal and vertical locations where flow velocity is given, in UTM Zone 10N coordinates
-
                 dimensions: node (arbitrary number of locations)
-            
             - `u`, `v`: the horizontal and vertical flow velocity (m/s)
-
                 dimensions: time (1hr increments, starting at midnight on January 1st), node
-        
-        - `distribWseTempFile`: name of a NetCDF-3 or NetCDF-4 file where the following variables are present:
-
-            - `x`, `y`: the horizontal and vertical locations where flow velocity is given, in UTM Zone 10N coordinates
-
-                dimensions: node (arbitrary number of locations)
-            
-            - `wse`: the water surface elevation (in meters, from NAVD88 datum)
-
-                dimensions: time (1hr increments, starting at midnight on January 1st), node
-
+            - `zeta`: the water surface elevation (in meters, from NAVD88 datum)
+              dimensions: time (1hr increments, starting at midnight on January 1st), node
             - `temp`: the water temperature (in degrees C)
+              dimensions: time (1hr increments, starting at midnight on January 1st), node
+            - `salinity`: the water salinity (in ...)
+              dimensions: time (1hr increments, starting at midnight on January 1st), node
 
-                dimensions: time (1hr increments, starting at midnight on January 1st), node
-
-            Distributary nodes retrieve flow speed, depth, and temperature from their nearest hydro node, so these nodes should be relatively dense spatially in distributary regions
-
+          Distributary nodes retrieve flow speed, depth, and temperature from their nearest hydro node, so these nodes should be relatively dense spatially in distributary regions
+      
+        - `distribWseTempFile`: DEPRECATED (data formerly in this file is now in `flowSpeedFile`)
         - `blindChannelSimplificationRadius`: float; the maximum distance between blind channel nodes that will result in them being merged when the map data is loaded (to speed up model prediction).
         - `directionlessEdges`: *deprecated*; directionless edges are always enabled
         - `virtualNodes`: int; optional; default 1; boolean determining whether to allow the creation of virtual nearshore nodes 

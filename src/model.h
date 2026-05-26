@@ -112,7 +112,6 @@ public:
         float blindChannelSimplificationRadius,
         std::string cresTideFilename,
         std::string flowSpeedFilename,
-        std::string distribWseTempFilename,
         const ModelConfigMap& config
     );
 

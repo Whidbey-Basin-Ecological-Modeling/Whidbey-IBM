@@ -15,7 +15,6 @@
 HydroModel::HydroModel(
     std::string cresTideFilename,
     std::string flowSpeedFilename,
-    std::string distribWseTempFilename,
     int hydroTimeIntercept
 ) :
     cresTideData(loadFloatListInterleaved(cresTideFilename, 4)),
@@ -23,7 +22,7 @@ HydroModel::HydroModel(
     useSimData(false),
     hydroTimeIntercept(hydroTimeIntercept)
 {
-    loadDistribHydro(flowSpeedFilename, distribWseTempFilename, this->hydroNodes);
+    loadDistribHydro(flowSpeedFilename, this->hydroNodes);
     this->updateTime(0L);
 }
 
