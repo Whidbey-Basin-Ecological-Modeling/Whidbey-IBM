@@ -114,7 +114,7 @@ void loadDistribHydro(std::string &flowPath, std::string &wseTempPath, std::vect
     netCDF::NcVar yVar = flowSourceFile.getVar("y");
     netCDF::NcVar uVar = flowSourceFile.getVar("u");
     netCDF::NcVar vVar = flowSourceFile.getVar("v");
-    netCDF::NcVar wseVar = wseTempSourceFile.getVar("wse");
+    netCDF::NcVar wseVar = flowSourceFile.getVar("zeta");
     netCDF::NcVar tempVar = flowSourceFile.getVar("temperature");
     netCDF::NcVar salinityVar = flowSourceFile.getVar("salinity");
 
@@ -151,13 +151,7 @@ void loadDistribHydro(std::string &flowPath, std::string &wseTempPath, std::vect
             auto &vec = accessor(node);
             vec.resize(timeCount);
             for (size_t t = 0; t < timeCount; ++t) {
-                // vec[t] = buffer[t * nodeCount + i];
-                // TODO: put the above back; the lines that follow are a temporary hack
-                auto idx = t * nodeCount + i;
-                if (idx >= buffer.size()) {
-                    idx = buffer.size() - 1;
-                }
-                vec[t] = buffer[idx];
+                vec[t] = buffer[t * nodeCount + i];
             }
             fix_all_missing_values(timeCount, NetCDFVarFillAdapter(var), vec, name + ", node: " + std::to_string(i+1), &error_log);
         }
