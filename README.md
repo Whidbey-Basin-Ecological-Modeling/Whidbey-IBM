@@ -61,7 +61,7 @@ Compilation of the GUI also requires a recent (>=3.0) version of [wxWidgets](htt
         git clone https://github.com/catchorg/Catch2.git
         cd ..
 
-1. Configure the build. This assumes you are in the root of the repository (probably named `Whidbey-IBM`. For a release build (the default):
+1. Configure the build. This assumes you are in the root of the repository (probably named `Whidbey-IBM`). For a release build (the default):
 
         mkdir build
         cmake -S . -B ./build/cmake-release
