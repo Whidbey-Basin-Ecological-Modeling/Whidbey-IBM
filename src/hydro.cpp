@@ -23,7 +23,7 @@ HydroModel::HydroModel(
     useSimData(false),
     hydroTimeIntercept(hydroTimeIntercept)
 {
-    loadDistribHydro2(flowSpeedFilename, distribWseTempFilename, this->hydroNodes);
+    loadDistribHydro(flowSpeedFilename, distribWseTempFilename, this->hydroNodes);
     this->updateTime(0L);
 }
 
