@@ -154,6 +154,14 @@ float HydroModel::getSalinity(MapNode &node) {
     return this->hydroNodes[node.nearestHydroNodeID].salinity[this->getTime()];
 }
 
+bool HydroModel::isDry(MapNode &node) {
+    if (this->useSimData) {
+        return false;
+    }
+
+    return this->hydroNodes[node.nearestHydroNodeID].is_wet[this->getTime()] == 0.0f;
+}
+
 float limitDepth(const float depth, const HabitatType nodeType) {
     const float min_depth = isDistributaryOrHarbor(nodeType) ? MIN_DEPTH_DISTRIBUTARY : MIN_DEPTH;
     return (depth < min_depth) ? min_depth : depth;
