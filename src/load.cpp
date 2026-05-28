@@ -41,6 +41,7 @@ void loadDistribHydro(std::string &flowPath, std::vector<DistribHydroNode> &node
     netCDF::NcVar wseVar = flowSourceFile.getVar("zeta");
     netCDF::NcVar tempVar = flowSourceFile.getVar("temperature");
     netCDF::NcVar salinityVar = flowSourceFile.getVar("salinity");
+    netCDF::NcVar wetVar = flowSourceFile.getVar("wet_n");
 
     std::vector<float> all_x(nodeCount);
     std::vector<float> all_y(nodeCount);
@@ -86,6 +87,7 @@ void loadDistribHydro(std::string &flowPath, std::vector<DistribHydroNode> &node
     processVar(wseVar, "wse (water surface elevation)", [](DistribHydroNode &n) -> std::vector<float>& { return n.wses; });
     processVar(tempVar, "temp (hydro temperature)", [](DistribHydroNode &n) -> std::vector<float>& { return n.temps; });
     processVar(salinityVar, "salinity", [](DistribHydroNode &n) -> std::vector<float>& { return n.salinity; });
+    processVar(wetVar, "wet_n", [](DistribHydroNode &n) -> std::vector<float>& { return n.is_wet; });
 
     std::cout << "done loading hydro" << std::endl;
     if (error_log.size() > 0) {
