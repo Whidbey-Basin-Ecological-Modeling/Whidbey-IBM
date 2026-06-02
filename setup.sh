@@ -68,4 +68,4 @@ make install
 
 # get the large hydro data file
 @echo "Fetching hydro datafile from Zenodo..."
-curl -L -o data/WhidbeyBasin_Compiled_Full.nc "https://zenodo.org/records/20402605/files/WhidbeyBasin_Compiled_Full.nc?download=1"
+curl -L -o data/WhidbeyBasin_Compiled_Full.nc "https://zenodo.org/records/20434822/files/WhidbeyBasin_Compiled_Full.nc?download=1"

@@ -56,7 +56,7 @@ Compilation of the GUI also requires a recent (>=3.0) version of [wxWidgets](htt
         ./setup.sh
 
    Note: at the end of this setup script the hydrologic data input file is downloaded. This file is large (about 2.2GB) and may take a while to download. If you encounter 
-   issues, you can manually download the file from [here](https://zenodo.org/records/20402605) and place it in the `data` directory.
+   issues, you can manually download the file from [here](https://zenodo.org/records/20434822) and place it in the `data` directory.
    
 1. Install the Catch2 automated testing framework:
 
