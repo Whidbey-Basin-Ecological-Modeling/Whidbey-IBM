@@ -1260,7 +1260,7 @@ void loadMap(
     //assignCrossChannelEdges(dest); // OBSOLETE
     checkDisjointDistributariesAndOtherMapErrors(dest, recruitPoints, protectedNodes);
     assignNearestHydroNodes(dest, hydroNodes);
-    fixElevations(dest, hydroNodes);
+    // fixElevations(dest, hydroNodes);
 
     validateAllEdgeConsistency(dest);
     outputNodeCounts(dest, "Map");

@@ -1,3 +1,30 @@
+NO ELEVATION FIX, WET/DRY INSTEAD OF DEPTH:
+Sample data will be saved to run32/map2000d2014/output_0.nc
+Step 25: 17382 living fish; 0 exited; 4249 (1428,0,2821) dead (mort,strand,starve)
+Step 50: 34650 living fish; 0 exited; 11619 (5562,32,6025) dead (mort,strand,starve)
+Step 75: 50232 living fish; 0 exited; 23052 (12621,857,9574) dead (mort,strand,starve)
+Step 100: 70111 living fish; 0 exited; 40686 (22512,3636,14538) dead (mort,strand,starve)
+Step 125: 95641 living fish; 4 exited; 66128 (36878,7850,21400) dead (mort,strand,starve)
+Step 150: 114745 living fish; 12 exited; 96284 (55160,13123,28001) dead (mort,strand,starve)
+Step 175: 121913 living fish; 29 exited; 128654 (75101,20303,33250) dead (mort,strand,starve)
+Step 200: 121862 living fish; 66 exited; 165317 (95558,31083,38676) dead (mort,strand,starve)
+Step 225: 119452 living fish; 146 exited; 201950 (115628,42720,43602) dead (mort,strand,starve)
+Step 250: 109730 living fish; 262 exited; 237061 (134279,55553,47229) dead (mort,strand,starve)
+
+------
+NO ELEVATION FIX, ORIGINAL DEPTH USAGE:
+Sample data will be saved to run32/map2000d2014/output_0.nc
+Step 25: 17363 living fish; 0 exited; 4270 (1454,0,2816) dead (mort,strand,starve)
+Step 50: 34523 living fish; 0 exited; 11752 (5697,1,6054) dead (mort,strand,starve)
+Step 75: 50720 living fish; 0 exited; 22580 (12832,127,9621) dead (mort,strand,starve)
+Step 100: 71411 living fish; 0 exited; 39335 (23341,1438,14556) dead (mort,strand,starve)
+Step 125: 98732 living fish; 0 exited; 63144 (38010,3971,21163) dead (mort,strand,starve)
+Step 150: 118674 living fish; 0 exited; 92441 (57159,7582,27700) dead (mort,strand,starve)
+Step 175: 126816 living fish; 0 exited; 123789 (78453,12253,33083) dead (mort,strand,starve)
+Step 200: 128457 living fish; 0 exited; 158610 (100909,19457,38244) dead (mort,strand,starve)
+
+--------
+NO ELEVATION FIX, ORIGINAL DEPTH USAGE:
 (base) troy.frever@NWCLM04787437 Whidbey-IBM % ./run_debug.sh
 [  0%] Building CXX object CMakeFiles/headless.dir/src/load.cpp.o
 [  0%] Linking CXX executable /Users/troy.frever/code/Whidbey-IBM/bin/Debug/headless
@@ -210,3 +237,16 @@ N: 1427,   T: 3985
 
 Finished loading all tracks
 Mon Jun  8 18:15:12 PDT 2026
+
+ELEVATION FIX, ORIGINAL DEPTH USAGE:
+Sample data will be saved to run32/map2000d2014/output_0.nc
+Step 25: 17358 living fish; 0 exited; 4270 (1437,2,2831) dead (mort,strand,starve)
+Step 50: 34440 living fish; 0 exited; 11748 (5595,4,6149) dead (mort,strand,starve)
+Step 75: 50696 living fish; 0 exited; 22622 (12751,98,9773) dead (mort,strand,starve)
+Step 100: 73110 living fish; 1 exited; 37735 (22982,113,14640) dead (mort,strand,starve)
+Step 125: 102436 living fish; 5 exited; 59278 (37828,138,21312) dead (mort,strand,starve)
+Step 150: 125513 living fish; 46 exited; 85584 (57440,271,27873) dead (mort,strand,starve)
+Step 175: 137107 living fish; 125 exited; 113122 (79617,281,33224) dead (mort,strand,starve)
+Step 200: 144579 living fish; 400 exited; 142289 (103424,285,38580) dead (mort,strand,starve)
+Step 225: 148230 living fish; 911 exited; 172466 (128555,304,43607) dead (mort,strand,starve)
+Step 250: 144525 living fish; 1635 exited; 200947 (153277,317,47353) dead (mort,strand,starve)

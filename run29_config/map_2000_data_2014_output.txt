@@ -1,5 +1,57 @@
 latest debug build
 
+Tue Jun  9 14:47:10 PDT 2026
+Configuring model...
+8 hardware threads available
+Forcing max threads to 1 due to non-zero RNG seed (42)
+1 thread(s) enabled
+Loading 17655 hydro nodes and 8760 timesteps...
+Loading bulk u (hydro u velocity) data...
+Loading bulk v (hydro v velocity) data...
+Loading bulk wse (water surface elevation) data...
+Loading bulk temp (hydro temperature) data...
+Loading bulk salinity data...
+Loading bulk wet_n data...
+done loading hydro
+directionless edges!
+Found 0 duplicate edges
+Removing disconnected node 22158
+Removing disconnected node 22056
+Removing disconnected node 21724
+Nearshore connector nodes: 5 Distributary
+Nearshore connector nodes: 1 Low tide terrace
+Nearshore connector nodes: 5 Distributary edge
+Nearshore connector nodes: 31 Blind channel
+Nearshore connector nodes: 1 Impoundment
+Nearshore connector nodes: 377 Nearshore
+Created 420 new nearshore connector nodes
+Made  0 disconnected 'distributary' nodes into blind channels
+Found 0 disconnected nodes
+Found 0 orphaned nodes
+Found 0 orphaned protected nodes
+Reducing all node elevations by: 11.6711
+New minimum elevation: -15.5819
+Edge validation passed
+Map nodes: 6 Boat harbor
+Map nodes: 150 Low tide terrace
+Map nodes: 1322 Distributary edge
+Map nodes: 2126 Distributary
+Map nodes: 688 Nearshore
+Map nodes: 155 Impoundment
+Map nodes: 27661 Blind channel
+Selected run ID: 0
+Sample data will be saved to run32/map2000d2014/output_0.nc
+Step 25: 17358 living fish; 0 exited; 4270 (1437,2,2831) dead (mort,strand,starve)
+Step 50: 34440 living fish; 0 exited; 11748 (5595,4,6149) dead (mort,strand,starve)
+Step 75: 50696 living fish; 0 exited; 22622 (12751,98,9773) dead (mort,strand,starve)
+Step 100: 73110 living fish; 1 exited; 37735 (22982,113,14640) dead (mort,strand,starve)
+Step 125: 102436 living fish; 5 exited; 59278 (37828,138,21312) dead (mort,strand,starve)
+Step 150: 125513 living fish; 46 exited; 85584 (57440,271,27873) dead (mort,strand,starve)
+Step 175: 137107 living fish; 125 exited; 113122 (79617,281,33224) dead (mort,strand,starve)
+Step 200: 144579 living fish; 400 exited; 142289 (103424,285,38580) dead (mort,strand,starve)
+Step 225: 148230 living fish; 911 exited; 172466 (128555,304,43607) dead (mort,strand,starve)
+Step 250: 144525 living fish; 1635 exited; 200947 (153277,317,47353) dead (mort,strand,starve)
+------
 % cmake --build ./build/debug-hack --target headless --verbose; cp troy_run_listings_template.csv \
   troy_run_listings.csv; date; ./bin/Debug/headless "troy_run_listings.csv" "run32/map2000d2014" \
   "run29_config/config_map_2000_data_2014_deterministic.json"; date
