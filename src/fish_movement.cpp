@@ -151,6 +151,7 @@ std::vector<std::tuple<MapNode *, float, float> > FishMovement::getReachableNeig
         MapNode *endNode = edge.otherEnd(startPoint);
 
         if (model.hydroModel.getDepth(*endNode) < MOVEMENT_DEPTH_CUTOFF) continue;
+        // if (model.hydroModel.isDry(*endNode)) continue; // TODO: verify this
 
         float transitSpeed = (float) calculateTransitSpeed(edge, startPoint, swimSpeed);
         if (canMoveInDirectionOfEndNode(transitSpeed, swimSpeed)) {

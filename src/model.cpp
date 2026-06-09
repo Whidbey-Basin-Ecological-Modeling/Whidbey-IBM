@@ -65,6 +65,9 @@ Model::Model(
     firstHighTide(false),
     time(0UL),
     deadCount(0),
+    mortCount(0),
+    strandCount(0),
+    starveCount(0),
     exitedCount(0),
     mortConstA(MORT_CONST_A),
     mortConstC(MORT_CONST_C),
@@ -108,6 +111,9 @@ Model::Model(HydroModel *hydroModel)
       firstHighTide(false),
       time(0UL),
       deadCount(0),
+    mortCount(0),
+    strandCount(0),
+    starveCount(0),
       exitedCount(0),
       mortConstA(MORT_CONST_A),
       mortConstC(MORT_CONST_C),
@@ -183,6 +189,34 @@ void moveThread(
 }
 
 
+void Model::repackLivingIndividualsVector() {
+    // Tracker for where to put living fish in the list (start at the start)
+    auto targetIt = this->livingIndividuals.begin();
+    for (auto sourceIt = this->livingIndividuals.begin(); sourceIt != this->livingIndividuals.end(); ++sourceIt) {
+        Fish &f = this->individuals[*sourceIt];
+        // If a fish is alive, move it to the target tracker, then shift the target position over 1
+        if (f.status == FishStatus::Alive) {
+            *targetIt = *sourceIt;
+            ++targetIt;
+        } else if (f.status == FishStatus::Exited) {
+            ++this->exitedCount;
+        } else {
+            ++this->deadCount;
+            if (f.status == FishStatus::DeadMortality) {
+                ++this->mortCount;
+            } else if (f.status == FishStatus::DeadStranding) {
+                ++this->strandCount;
+            } else if (f.status == FishStatus::DeadStarvation) {
+                ++this->starveCount;
+            }
+        }
+    }
+    // Erase remaining (dead) fish
+    if (targetIt != this->livingIndividuals.end()) {
+        this->livingIndividuals.erase(targetIt, this->livingIndividuals.end());
+    }
+}
+
 // Handles launching of movement threads
 void Model::moveAll() {
     // Each thread should handle at minimum 4096 fish
@@ -211,25 +245,7 @@ void Model::moveAll() {
     }
     // Free the thread storage (it was allocated on the heap)
     delete[] threads;
-
-    // Re-pack the living fish into the first part of the living fish list
-
-    // Tracker for where to put living fish in the list (start at the start)
-    auto targetIt = this->livingIndividuals.begin();
-    for (auto sourceIt = this->livingIndividuals.begin(); sourceIt != this->livingIndividuals.end(); ++sourceIt) {
-        Fish &f = this->individuals[*sourceIt];
-        // If a fish is alive, move it to the target tracker, then shift the target position over 1
-        if (f.status == FishStatus::Alive) {
-            *targetIt = *sourceIt;
-            ++targetIt;
-        } else if (f.status == FishStatus::Exited) {
-            ++this->exitedCount;
-        }
-    }
-    // Erase remaining (dead) fish
-    if (targetIt != this->livingIndividuals.end()) {
-        this->livingIndividuals.erase(targetIt, this->livingIndividuals.end());
-    }
+    repackLivingIndividualsVector();
 }
 
 // Run in each growth+death thread, processes growth and death for a subset of fish
@@ -271,27 +287,7 @@ void Model::growAndDieAll() {
     }
     // Free thread storage
     delete[] threads;
-
-    // Re-pack the living fish into the first part of the living fish list, remove dead fish
-
-    // Tracker for where to put living fish in the list (start at the start)
-    auto targetIt = this->livingIndividuals.begin();
-    for (auto sourceIt = this->livingIndividuals.begin(); sourceIt != this->livingIndividuals.end(); ++sourceIt) {
-        Fish &f = this->individuals[*sourceIt];
-        // If a fish is alive, move it to the target tracker, then shift the target position over 1
-        if (f.status == FishStatus::Alive) {
-            *targetIt = *sourceIt;
-            ++targetIt;
-        } else if (f.status == FishStatus::Exited) {
-            ++this->exitedCount;
-        } else {
-            ++this->deadCount;
-        }
-    }
-    // Erase remaining (dead) fish
-    if (targetIt != this->livingIndividuals.end()) {
-        this->livingIndividuals.erase(targetIt, this->livingIndividuals.end());
-    }
+    repackLivingIndividualsVector();
 }
 
 struct FishSortDummy {
@@ -409,6 +405,9 @@ void Model::reset() {
     this->individuals.clear();
     this->livingIndividuals.clear();
     this->deadCount = 0;
+    this->mortCount = 0;
+    this->strandCount = 0;
+    this->starveCount = 0;
     this->exitedCount = 0;
     this->populationHistory.clear();
     this->sampleHistory.clear();

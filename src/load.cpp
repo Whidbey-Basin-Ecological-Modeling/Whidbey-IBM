@@ -212,9 +212,15 @@ void fixElevations(std::vector<MapNode *> &map, std::vector<DistribHydroNode> &h
         }
     }
     float correction = cutoffDepth - minDistribDepth;
+    float minElev = 100.0;
+    std::cout << "Reducing all node elevations by: " << correction << std::endl;
     for (MapNode *node : map) {
         node->elev -= correction;
+        if (node->elev < minElev) {
+            minElev = node->elev;
+        }
     }
+    std::cout << "New minimum elevation: " << minElev << std::endl;
 }
 
 // Split a string into a list of strings delimited by the character given in argument "c"
@@ -466,8 +472,6 @@ void simplifyBlindChannels(std::vector<MapNode *> &map, float radius,
             continue;
         }
 
-        bool merged = false;
-
         // Unified edges: just iterate neighbors via Edge::otherEnd(node)
         for (const Edge &e: node->edges) {
             MapNode *neighbor = e.otherEnd(node);
@@ -482,7 +486,6 @@ void simplifyBlindChannels(std::vector<MapNode *> &map, float radius,
                 toAdd.insert(mergeNodes(node, neighbor));
                 toRemove.insert(node);
                 toRemove.insert(neighbor);
-                merged = true;
                 break;
             }
         }

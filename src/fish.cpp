@@ -414,8 +414,8 @@ bool Fish::move(Model &model) {
     } 
     */
     
-    if (model.hydroModel.getDepth(*this->location) <= 0.0f) {
-        // Die from stranding if depth less than 0 (TODO re-evaluate this condition)
+    if (model.hydroModel.getDepth(*this->location) <= 0.0f) { // TODO: CHOOSE!
+    // if (model.hydroModel.isDry(*this->location)) {
         this->dieStranding(model);
         return false;
     }

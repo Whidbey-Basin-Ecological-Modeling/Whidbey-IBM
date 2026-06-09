@@ -1,0 +1,212 @@
+(base) troy.frever@NWCLM04787437 Whidbey-IBM % ./run_debug.sh
+[  0%] Building CXX object CMakeFiles/headless.dir/src/load.cpp.o
+[  0%] Linking CXX executable /Users/troy.frever/code/Whidbey-IBM/bin/Debug/headless
+[100%] Built target headless
+Mon Jun  8 14:57:02 PDT 2026
+Configuring model...
+8 hardware threads available
+Forcing max threads to 1 due to non-zero RNG seed (42)
+1 thread(s) enabled
+Loading 17655 hydro nodes and 8760 timesteps...
+Loading bulk u (hydro u velocity) data...
+Loading bulk v (hydro v velocity) data...
+Loading bulk wse (water surface elevation) data...
+Loading bulk temp (hydro temperature) data...
+Loading bulk salinity data...
+Loading bulk wet_n data...
+done loading hydro
+directionless edges!
+Found 0 duplicate edges
+Removing disconnected node 22158
+Removing disconnected node 22056
+Removing disconnected node 21724
+Nearshore connector nodes: 1 Impoundment
+Nearshore connector nodes: 5 Distributary
+Nearshore connector nodes: 1 Low tide terrace
+Nearshore connector nodes: 5 Distributary edge
+Nearshore connector nodes: 31 Blind channel
+Nearshore connector nodes: 377 Nearshore
+Created 420 new nearshore connector nodes
+Made  0 disconnected 'distributary' nodes into blind channels
+Found 0 disconnected nodes
+Found 0 orphaned nodes
+Found 0 orphaned protected nodes
+Edge validation passed
+Map nodes: 6 Boat harbor
+Map nodes: 150 Low tide terrace
+Map nodes: 1322 Distributary edge
+Map nodes: 2126 Distributary
+Map nodes: 688 Nearshore
+Map nodes: 155 Impoundment
+Map nodes: 27661 Blind channel
+Selected run ID: 0
+Sample data will be saved to run32/map2000d2014/output_0.nc
+Step 25: 17363 living fish; 0 exited; 4270 dead
+Step 50: 34523 living fish; 0 exited; 11751 dead
+Step 75: 50680 living fish; 0 exited; 22514 dead
+Step 100: 71430 living fish; 0 exited; 37878 dead
+Step 125: 98863 living fish; 0 exited; 59146 dead
+Step 150: 118947 living fish; 0 exited; 84680 dead
+Step 175: 127001 living fish; 0 exited; 111300 dead
+Step 200: 128767 living fish; 0 exited; 139001 dead
+Step 225: 126983 living fish; 0 exited; 166369 dead
+Step 250: 118771 living fish; 0 exited; 190839 dead
+Step 275: 110140 living fish; 0 exited; 212802 dead
+Step 300: 105333 living fish; 0 exited; 233647 dead
+Step 325: 110439 living fish; 1 exited; 255392 dead
+Step 350: 118786 living fish; 1 exited; 278576 dead
+Step 375: 138244 living fish; 2 exited; 304775 dead
+Step 400: 158083 living fish; 2 exited; 335634 dead
+Step 425: 170450 living fish; 2 exited; 369000 dead
+Step 450: 212903 living fish; 3 exited; 410714 dead
+Step 475: 237519 living fish; 3 exited; 458238 dead
+Step 500: 233525 living fish; 3 exited; 504975 dead
+Step 525: 224981 living fish; 4 exited; 550929 dead
+Step 550: 226942 living fish; 4 exited; 596346 dead
+Step 575: 237486 living fish; 4 exited; 643243 dead
+Step 600: 249146 living fish; 5 exited; 692874 dead
+Step 625: 283967 living fish; 7 exited; 750717 dead
+Step 650: 238506 living fish; 7 exited; 797246 dead
+Step 675: 206359 living fish; 7 exited; 838032 dead
+Step 700: 172354 living fish; 9 exited; 871704 dead
+Step 725: 162286 living fish; 10 exited; 901634 dead
+Step 750: 174279 living fish; 17 exited; 934599 dead
+Step 775: 218230 living fish; 27 exited; 976198 dead
+Step 800: 282606 living fish; 29 exited; 1034300 dead
+Step 825: 304539 living fish; 33 exited; 1095303 dead
+Step 850: 326032 living fish; 35 exited; 1159268 dead
+Step 875: 342969 living fish; 36 exited; 1223053 dead
+Step 900: 353874 living fish; 40 exited; 1289151 dead
+Step 925: 361411 living fish; 41 exited; 1356892 dead
+Step 950: 371336 living fish; 43 exited; 1426245 dead
+Step 975: 360687 living fish; 45 exited; 1493453 dead
+Step 1000: 330588 living fish; 48 exited; 1555942 dead
+Step 1025: 306511 living fish; 49 exited; 1611922 dead
+Step 1050: 266242 living fish; 54 exited; 1662470 dead
+Step 1075: 243160 living fish; 62 exited; 1705973 dead
+Step 1100: 220758 living fish; 67 exited; 1744580 dead
+Step 1125: 196027 living fish; 73 exited; 1778561 dead
+Step 1150: 175260 living fish; 78 exited; 1808587 dead
+Step 1175: 163047 living fish; 79 exited; 1835932 dead
+Step 1200: 155686 living fish; 80 exited; 1861898 dead
+Step 1225: 148633 living fish; 81 exited; 1886765 dead
+Step 1250: 139007 living fish; 82 exited; 1909296 dead
+Step 1275: 132905 living fish; 83 exited; 1931690 dead
+Step 1300: 129425 living fish; 85 exited; 1953401 dead
+Step 1325: 127723 living fish; 86 exited; 1974948 dead
+Step 1350: 122889 living fish; 87 exited; 1995605 dead
+Step 1375: 129875 living fish; 88 exited; 2017477 dead
+Step 1400: 147981 living fish; 89 exited; 2042886 dead
+Step 1425: 150683 living fish; 91 exited; 2069134 dead
+Step 1450: 139287 living fish; 92 exited; 2092979 dead
+Step 1475: 125207 living fish; 95 exited; 2114660 dead
+Step 1500: 108392 living fish; 97 exited; 2133579 dead
+Step 1525: 94121 living fish; 97 exited; 2149183 dead
+Step 1550: 85884 living fish; 97 exited; 2163181 dead
+Step 1575: 80853 living fish; 97 exited; 2176346 dead
+Step 1600: 76604 living fish; 98 exited; 2188614 dead
+Step 1625: 78140 living fish; 99 exited; 2201183 dead
+Step 1650: 85993 living fish; 102 exited; 2215544 dead
+Step 1675: 84874 living fish; 103 exited; 2230086 dead
+Step 1700: 75432 living fish; 105 exited; 2242979 dead
+Step 1725: 69214 living fish; 106 exited; 2254337 dead
+Step 1750: 75244 living fish; 110 exited; 2266064 dead
+Step 1775: 76223 living fish; 110 exited; 2277647 dead
+Step 1800: 73183 living fish; 110 exited; 2288818 dead
+Step 1825: 88976 living fish; 110 exited; 2302396 dead
+Step 1850: 100895 living fish; 110 exited; 2317630 dead
+Step 1875: 118269 living fish; 111 exited; 2337524 dead
+Step 1900: 115391 living fish; 111 exited; 2356214 dead
+Step 1925: 107742 living fish; 111 exited; 2373611 dead
+Step 1950: 96164 living fish; 111 exited; 2389166 dead
+Step 1975: 84282 living fish; 112 exited; 2402288 dead
+Step 2000: 78418 living fish; 112 exited; 2414135 dead
+Step 2025: 78845 living fish; 112 exited; 2426386 dead
+Step 2050: 72623 living fish; 113 exited; 2436874 dead
+Step 2075: 66491 living fish; 113 exited; 2446260 dead
+Step 2100: 60669 living fish; 114 exited; 2454713 dead
+Step 2125: 58916 living fish; 114 exited; 2462721 dead
+Step 2150: 58407 living fish; 144 exited; 2470406 dead
+Step 2175: 58397 living fish; 158 exited; 2478023 dead
+Step 2200: 66318 living fish; 165 exited; 2485940 dead
+Step 2225: 80974 living fish; 172 exited; 2495236 dead
+Step 2250: 91143 living fish; 186 exited; 2506192 dead
+Step 2275: 91383 living fish; 193 exited; 2517670 dead
+Step 2300: 86520 living fish; 208 exited; 2528284 dead
+Step 2325: 74020 living fish; 227 exited; 2537509 dead
+Step 2350: 70116 living fish; 228 exited; 2545502 dead
+Step 2375: 69532 living fish; 228 exited; 2552911 dead
+Step 2400: 64743 living fish; 229 exited; 2559588 dead
+Step 2425: 60281 living fish; 230 exited; 2565595 dead
+Step 2450: 55974 living fish; 230 exited; 2571120 dead
+Step 2475: 55061 living fish; 230 exited; 2576100 dead
+Step 2500: 60920 living fish; 237 exited; 2581279 dead
+Step 2525: 66561 living fish; 248 exited; 2586959 dead
+Step 2550: 73823 living fish; 262 exited; 2593186 dead
+Step 2575: 81589 living fish; 283 exited; 2600050 dead
+Step 2600: 85231 living fish; 304 exited; 2607196 dead
+Step 2625: 89561 living fish; 346 exited; 2614517 dead
+Step 2650: 93897 living fish; 395 exited; 2622246 dead
+Step 2675: 92515 living fish; 486 exited; 2630033 dead
+Step 2700: 87652 living fish; 562 exited; 2637332 dead
+Step 2725: 76580 living fish; 562 exited; 2643930 dead
+Step 2750: 71801 living fish; 562 exited; 2649844 dead
+Step 2775: 69719 living fish; 563 exited; 2655313 dead
+Step 2800: 67299 living fish; 564 exited; 2660499 dead
+Step 2825: 63971 living fish; 588 exited; 2665470 dead
+Step 2850: 59605 living fish; 600 exited; 2670055 dead
+Step 2875: 55752 living fish; 601 exited; 2674402 dead
+Step 2900: 52295 living fish; 601 exited; 2678299 dead
+Step 2925: 50113 living fish; 603 exited; 2681972 dead
+Step 2950: 48469 living fish; 603 exited; 2685353 dead
+Step 2975: 47850 living fish; 603 exited; 2688696 dead
+Step 3000: 45566 living fish; 603 exited; 2691871 dead
+Step 3025: 42278 living fish; 603 exited; 2694826 dead
+Step 3050: 38619 living fish; 604 exited; 2697541 dead
+Step 3075: 36422 living fish; 604 exited; 2700032 dead
+Step 3100: 32830 living fish; 604 exited; 2702272 dead
+Step 3125: 30008 living fish; 606 exited; 2704425 dead
+Step 3150: 27925 living fish; 606 exited; 2706224 dead
+Step 3175: 25770 living fish; 606 exited; 2707894 dead
+Step 3200: 24526 living fish; 607 exited; 2709442 dead
+Step 3225: 23650 living fish; 607 exited; 2710880 dead
+Step 3250: 22559 living fish; 607 exited; 2712258 dead
+Step 3275: 21447 living fish; 608 exited; 2713512 dead
+Step 3300: 20379 living fish; 608 exited; 2714778 dead
+Step 3325: 19078 living fish; 608 exited; 2715858 dead
+Step 3350: 18003 living fish; 609 exited; 2716876 dead
+Step 3375: 17058 living fish; 609 exited; 2717876 dead
+Step 3400: 16129 living fish; 609 exited; 2718795 dead
+Step 3425: 15411 living fish; 609 exited; 2719668 dead
+Step 3450: 14742 living fish; 609 exited; 2720451 dead
+Step 3475: 14294 living fish; 609 exited; 2721196 dead
+Step 3500: 14634 living fish; 611 exited; 2721911 dead
+Step 3525: 15085 living fish; 613 exited; 2722623 dead
+Step 3550: 16097 living fish; 613 exited; 2723430 dead
+Step 3575: 17057 living fish; 614 exited; 2724336 dead
+Step 3600: 17913 living fish; 614 exited; 2725287 dead
+Step 3625: 17728 living fish; 614 exited; 2726231 dead
+Step 3650: 17073 living fish; 614 exited; 2727102 dead
+Step 3675: 15713 living fish; 614 exited; 2727993 dead
+Step 3700: 14418 living fish; 614 exited; 2728786 dead
+Step 3725: 13249 living fish; 614 exited; 2729460 dead
+Step 3750: 12184 living fish; 614 exited; 2730057 dead
+Step 3775: 11391 living fish; 614 exited; 2730586 dead
+Step 3800: 10781 living fish; 614 exited; 2731122 dead
+Step 3825: 10299 living fish; 614 exited; 2731587 dead
+Step 3850: 10021 living fish; 614 exited; 2731982 dead
+Step 3875: 9666 living fish; 614 exited; 2732408 dead
+Step 3900: 9415 living fish; 614 exited; 2732822 dead
+Step 3925: 9321 living fish; 614 exited; 2733234 dead
+Step 3950: 9510 living fish; 614 exited; 2733644 dead
+Step 3975: 10030 living fish; 614 exited; 2734082 dead
+
+Finished at step 3984
+In saveTaggedHistories
+
+Values for N: 1427, and T: 3985
+
+N: 1427,   T: 3985
+
+Finished loading all tracks
+Mon Jun  8 18:15:12 PDT 2026

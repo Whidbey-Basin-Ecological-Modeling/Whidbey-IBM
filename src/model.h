@@ -81,6 +81,9 @@ public:
     std::vector<size_t> livingIndividuals;
     // The number of fish that have died so far
     int deadCount;
+    int mortCount; // included in deadCount
+    int strandCount; // included in deadCount
+    int starveCount; // included in deadCount
     // The number of fish that have left the model without dying so far
     int exitedCount;
     // The per-timestep record of living population
@@ -137,6 +140,7 @@ public:
     void update1h();
     // Wraps update procedures that happen daily
     void update24h();
+    void repackLivingIndividualsVector();
     // Calls Fish::move for every living fish and removes fish that die during this procedure from livingIndividuals
     void moveAll();
     // Computes local population statistics, including density, median and mean mass for each location

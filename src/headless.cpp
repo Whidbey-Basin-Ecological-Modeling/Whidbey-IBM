@@ -254,7 +254,10 @@ int main(int argc, char **argv) {
 #else
         if (m->time % 330 == 0) {
 #endif
-            std::cout << "\rStep " << m->time << ": " << m->livingIndividuals.size() << " living fish; " << m->exitedCount << " exited; " << m->deadCount << " dead" << std::endl;
+            std::cout << "\rStep " << m->time << ": " << m->livingIndividuals.size() << " living fish; " <<
+                    m->exitedCount << " exited; " << m->deadCount << " (" << m->mortCount << "," << m->strandCount <<
+                    ","
+                    << m->starveCount << ") dead (mort,strand,starve)" << std::endl;
             std::cout.flush();
 
 #if !defined(QUICK_DEBUG_HACK) || defined(NDEBUG)
