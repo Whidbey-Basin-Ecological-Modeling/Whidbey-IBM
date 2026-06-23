@@ -68,8 +68,6 @@ public:
     int recTimeIntercept;
     // Timesteps between midnight on Jan 1 and the timestep considered by the model to be timestep 0
     int globalTimeIntercept;
-    // Whether or not a high tide has already occurred since the start of the current day
-    bool firstHighTide;
 
     static constexpr int TIMESTEPS_PER_DAY = 24;
 

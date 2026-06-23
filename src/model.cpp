@@ -60,7 +60,6 @@ Model::Model(
     initialPopulations(std::move(allInitialPopulations)),
     recTimeIntercept(recTimeIntercept),
     globalTimeIntercept(globalTimeIntercept),
-    firstHighTide(false),
     time(0UL),
     deadCount(0),
     mortCount(0),
@@ -106,7 +105,6 @@ Model::Model(HydroModel *hydroModel)
       hydroModel(*hydroModel),
       recTimeIntercept(0),
       globalTimeIntercept(0),
-      firstHighTide(false),
       time(0UL),
       deadCount(0),
     mortCount(0),
@@ -169,7 +167,6 @@ void Model::update1h() {
 void Model::update24h() {
     // Generate the per-timestep recruit counts for the day
     this->planRecruitment();
-    this->firstHighTide = true;
 }
 
 // Alias for an iterator of a list of fish IDs (position in the list)

@@ -17,7 +17,7 @@ class HydroModel {
 public:
     HydroModel(
         std::string flowSpeedFilename,
-        int hydroTimeIntercept // Timesteps between midnight on Jan 1 and the start of the cresTide data
+        int hydroTimeIntercept // Timesteps between midnight on Jan 1 and the start of the hydro data
     );
 
     HydroModel(
@@ -46,7 +46,6 @@ public:
     virtual float getDepth(MapNode &node);
     // Return true if the location is dry at the current timestep
     virtual bool isDry(MapNode &node);
-    // Check if the current timestep is a high tide
 
     // Set the hydro model's timestep to a given timestep
     void updateTime(long newTime);
@@ -61,7 +60,6 @@ protected:
     float getCurrentV(const DistribHydroNode &hydroNode) const; // Get the current timestep's vertical flow speed component (in m/s) at a given DistribHydroNode
 
 public:
-    // The loaded crescent tide data, in m
     // The loaded flow data, as DistribHydroNodes (see map.h)
     std::vector<DistribHydroNode> hydroNodes;
 
