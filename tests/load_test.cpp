@@ -452,3 +452,90 @@ TEST_CASE("readNodes functionality", "[load]") {
         for (auto node : dest) delete node;
     }
 }
+
+TEST_CASE("readGeometry functionality", "[load]") {
+    SECTION("Valid geometry updates areas") {
+        std::vector<MapNode*> dest;
+        dest.push_back(new MapNode(-1, 0, 0)); // Dummy
+        dest.push_back(new MapNode(1, 100.0f, 200.0f));
+        dest.push_back(new MapNode(2, 300.0f, 400.0f));
+        
+        dest[1]->area = 0.0f;
+        dest[2]->area = 0.0f;
+
+        std::string csvData = "node,x,y,area\n"
+                              "1,100.0,200.0,50.5\n"
+                              "2,300.0,400.0,75.2\n";
+        std::stringstream ss(csvData);
+
+        bool success = readGeometry(dest, ss);
+
+        REQUIRE(success == true);
+        CHECK(dest[1]->area == Catch::Approx(50.5f));
+        CHECK(dest[2]->area == Catch::Approx(75.2f));
+
+        for (auto node : dest) delete node;
+    }
+
+    SECTION("Empty geometry file error check") {
+        std::vector<MapNode*> dest;
+        dest.push_back(new MapNode(-1, 0, 0));
+        
+        std::string csvData = "";
+        std::stringstream ss(csvData);
+
+        bool success = readGeometry(dest, ss);
+
+        REQUIRE(success == false);
+
+        for (auto node : dest) delete node;
+    }
+
+    SECTION("Bad geometry data (too few columns)") {
+        std::vector<MapNode*> dest;
+        dest.push_back(new MapNode(-1, 0, 0));
+        dest.push_back(new MapNode(1, 100.0, 200.0));
+        
+        std::string csvData = "node,x,y,area\n"
+                              "1,100.0,200.0\n"; // Missing area
+        std::stringstream ss(csvData);
+
+        bool success = readGeometry(dest, ss);
+
+        REQUIRE(success == false);
+
+        for (auto node : dest) delete node;
+    }
+
+    SECTION("Node ID out of range") {
+        std::vector<MapNode*> dest;
+        dest.push_back(new MapNode(-1, 0, 0));
+        dest.push_back(new MapNode(1, 100.0, 200.0));
+        
+        std::string csvData = "node,x,y,area\n"
+                              "2,200.0,300.0,50.0\n"; // ID 2 is out of range (max 1)
+        std::stringstream ss(csvData);
+
+        bool success = readGeometry(dest, ss);
+
+        REQUIRE(success == false);
+
+        for (auto node : dest) delete node;
+    }
+
+    SECTION("Coordinate mismatch error check") {
+        std::vector<MapNode*> dest;
+        dest.push_back(new MapNode(-1, 0, 0));
+        dest.push_back(new MapNode(1, 100.0, 200.0));
+        
+        std::string csvData = "node,x,y,area\n"
+                              "1,101.0,200.0,50.0\n"; // x is 101, but node 1 has x=100
+        std::stringstream ss(csvData);
+
+        bool success = readGeometry(dest, ss);
+
+        REQUIRE(success == false);
+
+        for (auto node : dest) delete node;
+    }
+}

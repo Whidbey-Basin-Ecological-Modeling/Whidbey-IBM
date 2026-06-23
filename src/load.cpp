@@ -1312,6 +1312,45 @@ bool readNodes(std::vector<MapNode *> &dest, std::istream &locationFile) {
     return true;
 }
 
+bool readGeometry(const std::vector<MapNode *> &dest, std::istream &geometryFile) {
+    std::string line;
+    if (!std::getline(geometryFile, line)) {
+        std::cerr << "Error: Geometry file is empty." << std::endl;
+        return false;
+    }
+    while (std::getline(geometryFile, line)) {
+        if (line.empty()) continue;
+
+        std::vector<std::string> chunks = split(line, ',');
+
+        if (chunks.size() < 4) {
+            std::cerr << "Error: Bad geometry file line: " << line << std::endl;
+            return false;
+        }
+
+        int nodeId = std::stoi(chunks[0]);
+        float x = std::stof(chunks[1]);
+        float y = std::stof(chunks[2]);
+        float area = std::stof(chunks[3]);
+
+        if (nodeId < 1 || nodeId > dest.size()-1) {
+            std::cerr << "Error: Geometry (area) node ID " << nodeId << " out of range. Expected range 1-" << dest.size
+            ()-1
+            << std::endl;
+            return false;
+        }
+        if (static_cast<int>(x) != static_cast<int>(dest[nodeId]->x)
+            || static_cast<int>(y) != static_cast<int>(dest[nodeId]->y)) {
+            std::cerr << "Error: Geometry (area) file x or y coords don't match node file data for node ID " <<
+                nodeId << std::endl;
+            return false;
+        }
+
+        dest[nodeId]->area = area;
+    }
+    return true;
+}
+
 void loadMap2(
     std::vector<MapNode *> &dest,
     std::string &locationFilePath,
@@ -1324,15 +1363,24 @@ void loadMap2(
     float blindChannelSimplificationRadius,
     const ModelConfigMap &configMap
 ) {
-    return;
+    // return;
 
-    
+
     std::ifstream locationFile;
     locationFile.open(locationFilePath);
 
     bool result = readNodes(dest, locationFile);
     if (!result) {
-        std::cerr << "Error: Failed to read nodes from location file." << std::endl;
+        std::cerr << "Error: Failed to read nodes from " << locationFilePath << " file." << std::endl;
+        exit(1);
+    }
+
+    std::ifstream geometryFile;
+    geometryFile.open(geometryFilePath);
+
+    result = readGeometry(dest, geometryFile);
+    if (!result) {
+        std::cerr << "Error: Failed to read areas from " << geometryFilePath << " file." << std::endl;
         exit(1);
     }
 }

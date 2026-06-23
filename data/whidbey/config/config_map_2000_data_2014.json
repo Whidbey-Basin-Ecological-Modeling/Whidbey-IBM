@@ -19,7 +19,7 @@
   "samplingSitesFile": "data/sampling_sites.csv",
   "mapNodesFile": "data/whidbey/nodes/geo2023.csv",
   "mapEdgesFile": "data/maps_dec/Skagit2000_edges_new.csv",
-  "mapGeometryFile": "data/maps_dec/Skagit2000_geometry_new.csv",
+  "mapGeometryFile": "data/whidbey/nodes/area.csv",
   "flowSpeedFile": "data/whidbey/hydro/WhidbeyBasin_Compiled_Full.nc",
   "blindChannelSimplificationRadius": 0.0,
   "habitatTypeExitConditionHours": 48,
