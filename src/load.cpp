@@ -1115,6 +1115,19 @@ void initializeAllRecruitPoints(std::vector<InitialPopulation> &initialPopulatio
     }
 }
 
+void loadMap2(
+    std::vector<MapNode *> &dest,
+    std::string &locationFilePath,
+    std::string &edgeFilePath,
+    std::string &geometryFilePath,
+    std::vector<DistribHydroNode> &hydroNodes,
+    std::vector<InitialPopulation> &initialPopulations,
+    std::vector<MapNode *> &monitoringPoints,
+    std::vector<SamplingSite *> &samplingSites,
+    float blindChannelSimplificationRadius,
+    const ModelConfigMap &configMap
+);
+
 // Load a map from vertex, edge, and geometry files
 // (additionally runs cleanup on the resulting map graph)
 void loadMap(
@@ -1129,6 +1142,9 @@ void loadMap(
     float blindChannelSimplificationRadius,
     const ModelConfigMap& configMap
 ) {
+    loadMap2(dest, locationFilePath, edgeFilePath, geometryFilePath, hydroNodes, initialPopulations, monitoringPoints, samplingSites, blindChannelSimplificationRadius, configMap);
+    dest.clear();
+
     std::ifstream locationFile;
     locationFile.open(locationFilePath);
     std::ifstream edgeFile;
@@ -1264,4 +1280,59 @@ void loadMap(
 
     validateAllEdgeConsistency(dest);
     outputNodeCounts(dest, "Map");
+}
+
+bool readNodes(std::vector<MapNode *> &dest, std::istream &locationFile) {
+    std::string line;
+    if (!std::getline(locationFile, line)) {
+        std::cerr << "Error: Location file is empty." << std::endl;
+        return false;
+    }
+
+    dest.push_back(new MapNode(-1, -1.0, -1.0));
+
+    int expectedId = 1;
+    while (std::getline(locationFile, line)) {
+        if (line.empty()) continue;
+        std::vector<std::string> chunks = split(line, ',');
+        if (chunks.size() < 3) continue;
+
+        int nodeId = std::stoi(chunks[0]);
+        float x = std::stof(chunks[1]);
+        float y = std::stof(chunks[2]);
+
+        if (nodeId != expectedId) {
+            std::cerr << "Error: Node IDs do not start with 1 and increment sequentially. Expected " << expectedId << " but got " << nodeId << std::endl;
+            return false;
+        }
+
+        dest.push_back(new MapNode(nodeId, x, y));
+        expectedId++;
+    }
+    return true;
+}
+
+void loadMap2(
+    std::vector<MapNode *> &dest,
+    std::string &locationFilePath,
+    std::string &edgeFilePath,
+    std::string &geometryFilePath,
+    std::vector<DistribHydroNode> &hydroNodes,
+    std::vector<InitialPopulation> &initialPopulations,
+    std::vector<MapNode *> &monitoringPoints,
+    std::vector<SamplingSite *> &samplingSites,
+    float blindChannelSimplificationRadius,
+    const ModelConfigMap &configMap
+) {
+    return;
+
+    
+    std::ifstream locationFile;
+    locationFile.open(locationFilePath);
+
+    bool result = readNodes(dest, locationFile);
+    if (!result) {
+        std::cerr << "Error: Failed to read nodes from location file." << std::endl;
+        exit(1);
+    }
 }

@@ -103,6 +103,7 @@ public:
     float maxMass;
 
     MapNode(HabitatType type, float area, float elev, float pathDist);
+    MapNode(int id, float x, float y);
 };
 
 float getDistance(MapNode *a, MapNode *b);

@@ -1,23 +1,31 @@
 {
   "envDataType": "file",
-  "recStartTimestep": 744,
-  "hydroStartTimestep": 0,
-  "recruitEntryNodes": [29331,29346,29401],
-  "recruitCountsFile": "data/skagit_migrants_2014_feb_start.csv",
-  "recruitSizesFile": "data/skagit_weekly_lengths_2014_ed.csv",
-  "samplingSitesFile": "data/sampling_sites.csv",
-  "mapNodesFile": "data/maps_dec/Skagit2000_vertices_2019_elev.csv",
-  "mapEdgesFile": "data/maps_dec/Skagit2000_edges_new.csv",
-  "mapGeometryFile": "data/maps_dec/Skagit2000_geometry_new.csv",
-  "tideFile": "data/cresTide.csv",
-  "flowVolFile": "data/flowM3ps.csv",
-  "airTempFile": "data/airTempC.csv",
-  "flowSpeedFile": "data/mod_flow_condensed.nc",
-  "distribWseTempFile": "data/wse.temp.full.nc",
-  "blindChannelSimplificationRadius": 0.0,
-  "habitatTypeExitConditionHours": 48,
-  "threadCount": 24,
+  "threadCount": 6,
   "rng_seed" : 0,
   "directionlessEdges": 1,
+  "virtualNodes": 1,
+  "recStartTimestep": 744,
+  "hydroStartTimestep": 0,
+
+  "initialPopulations": [
+    {
+      "name": "Skagit Recruits",
+      "entryNodes": [29331, 29346, 29401],
+      "countsFile": "data/skagit_migrants_2014_feb_start.csv",
+      "sizesFile": "data/skagit_weekly_lengths_2014_ed.csv"
+    }
+  ],
+
+  "samplingSitesFile": "data/sampling_sites.csv",
+  "mapNodesFile": "data/whidbey/nodes/geo2023.csv",
+  "mapEdgesFile": "data/maps_dec/Skagit2000_edges_new.csv",
+  "mapGeometryFile": "data/maps_dec/Skagit2000_geometry_new.csv",
+  "flowSpeedFile": "data/whidbey/hydro/WhidbeyBasin_Compiled_Full.nc",
+  "blindChannelSimplificationRadius": 0.0,
+  "habitatTypeExitConditionHours": 48,
+  "mortMin": 0.0005,
+  "mortMax": 0.002,
+  "growthSlope": 0.0007,
+  "mortalityInflectionPoint": 500.0,
   "agentAwareness": "medium"
 }

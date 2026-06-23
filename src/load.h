@@ -40,6 +40,8 @@ MapNode *mergeNodes(MapNode *a, MapNode *b);
 // Loads a list of sampling sites from a CSV file into a vector of SamplingSites (defined in map.h)
 //void loadSamplingSites(std::string &filePath, std::vector<MapNode *> &map, std::vector<SamplingSite> &out);
 
+bool readNodes(std::vector<MapNode *> &dest, std::istream &locationFile);
+
 // Loads the map from a CSV location file, a CSV edge file, and a CSV geometry file
 // The resulting heap-allocatd MapNodes are placed in the vector 'dest'
 // See CONFIG_README for a description of file formats

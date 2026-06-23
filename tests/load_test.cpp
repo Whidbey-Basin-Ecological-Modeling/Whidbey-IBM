@@ -4,6 +4,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
+#include <sstream>
 #include "load.h"
 #include "map.h"
 #include "catch2/catch_approx.hpp"
@@ -361,5 +362,93 @@ TEST_CASE("mergeNodes functionality (unified edges)", "[merge]") {
         }
 
         delete newNode;
+    }
+}
+
+TEST_CASE("readNodes functionality", "[load]") {
+    SECTION("Valid sequential nodes") {
+        std::string csvData = "node,xcoord,ycoord\n"
+                              "1,524938.0,5361074.0\n"
+                              "2,524942.7,5361856.0\n"
+                              "3,524952.8,5362025.5\n";
+        std::stringstream ss(csvData);
+        std::vector<MapNode*> dest;
+
+        bool success = readNodes(dest, ss);
+
+        REQUIRE(success == true);
+        REQUIRE(dest.size() == 4);
+        CHECK(dest[0]->id == -1);
+        CHECK(dest[1]->id == 1);
+        CHECK(dest[1]->x == Catch::Approx(524938.0));
+        CHECK(dest[1]->y == Catch::Approx(5361074.0));
+        CHECK(dest[2]->id == 2);
+        CHECK(dest[2]->x == Catch::Approx(524942.7));
+        CHECK(dest[2]->y == Catch::Approx(5361856.0));
+        CHECK(dest[3]->id == 3);
+        CHECK(dest[3]->x == Catch::Approx(524952.8));
+        CHECK(dest[3]->y == Catch::Approx(5362025.5));
+
+        for (auto node : dest) delete node;
+    }
+
+    SECTION("Non-sequential IDs error check") {
+        std::string csvData = "node,xcoord,ycoord\n"
+                              "1,10.0,20.0\n"
+                              "3,30.0,40.0\n";
+        std::stringstream ss(csvData);
+        std::vector<MapNode*> dest;
+
+        bool success = readNodes(dest, ss);
+
+        REQUIRE(success == false);
+
+        for (auto node : dest) delete node;
+    }
+
+    SECTION("IDs not starting with 1 error check") {
+        std::string csvData = "node,xcoord,ycoord\n"
+                              "2,10.0,20.0\n";
+        std::stringstream ss(csvData);
+        std::vector<MapNode*> dest;
+
+        bool success = readNodes(dest, ss);
+
+        REQUIRE(success == false);
+
+        for (auto node : dest) delete node;
+    }
+
+    SECTION("Empty file error check") {
+        std::string csvData = "";
+        std::stringstream ss(csvData);
+        std::vector<MapNode*> dest;
+
+        bool success = readNodes(dest, ss);
+
+        REQUIRE(success == false);
+        REQUIRE(dest.empty());
+    }
+
+    SECTION("Dummy node and index matching") {
+        std::string csvData = "node,xcoord,ycoord\n"
+                              "1,10.0,20.0\n"
+                              "2,30.0,40.0\n"
+                              "3,50.0,60.0\n";
+        std::stringstream ss(csvData);
+        std::vector<MapNode*> dest;
+
+        bool success = readNodes(dest, ss);
+
+        REQUIRE(success == true);
+        REQUIRE(dest.size() == 4);
+        CHECK(dest[0]->id == -1);
+
+        // Verify that node ids match the node index after the dummy
+        for (size_t i = 1; i < dest.size(); ++i) {
+            CHECK(dest[i]->id == static_cast<int>(i));
+        }
+
+        for (auto node : dest) delete node;
     }
 }
