@@ -173,7 +173,7 @@ TEST_CASE("FishMovementHighAwareness constraints and logic safety net", "[fish_m
         connectNodes(nodeA.get(), nodeB.get(), 5.0f);
         connectNodes(nodeB.get(), nodeC.get(), 5.0f);
 
-        hydroModel->depthValue = MOVEMENT_DEPTH_CUTOFF - 0.1f;
+        hydroModel->dryValue = true;
 
         auto results = mover.getReachableNeighbors(nodeA.get(), 0.0f, nodeA.get());
 

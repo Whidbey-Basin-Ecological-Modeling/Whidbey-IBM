@@ -140,8 +140,7 @@ TEST_CASE("getReachableNeighbors basic functionality") {
         connectNodes(startNode.get(), neighbor1.get(), 1.0f);
         connectNodes(neighbor2.get(), startNode.get(), 1.0f);
 
-        // Set depth below MOVEMENT_DEPTH_CUTOFF (0.2f)
-        hydroModel->depthValue = 0.1f;
+        hydroModel->dryValue = true;
 
         auto result = fishMover.getReachableNeighbors(
             startNode.get(), 0.0f,

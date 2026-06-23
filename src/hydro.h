@@ -46,7 +46,7 @@ public:
     // Return the water depth in meters at a given location
     virtual float getDepth(MapNode &node);
     // Return true if the location is dry at the current timestep
-    bool isDry(MapNode &node);
+    virtual bool isDry(MapNode &node);
     // Check if the current timestep is a high tide
     bool isHighTide();
 
