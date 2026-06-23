@@ -13,11 +13,9 @@
 
 // Initialize a hydro model from datafiles at the provided paths and a timestep offset into the data
 HydroModel::HydroModel(
-    std::string cresTideFilename,
     std::string flowSpeedFilename,
     int hydroTimeIntercept
 ) :
-    cresTideData(loadFloatListInterleaved(cresTideFilename, 4)),
     hydroNodes(),
     useSimData(false),
     hydroTimeIntercept(hydroTimeIntercept)
@@ -49,16 +47,8 @@ long HydroModel::getTime() const {
 
 void HydroModel::updateTime(long newTime) {
     this->currTimestep = newTime;
-    if (!this->useSimData) {
-        this->currCresTide = this->cresTideData[getTime()];
-    }
 }
 
-bool HydroModel::isHighTide() {
-    return this->getTime() - 1 > 0 && this->getTime() + 1 < (long) this->cresTideData.size()
-        && this->currCresTide > this->cresTideData[this->getTime() - 1]
-        && this->currCresTide > this->cresTideData[this->getTime() + 1];
-}
 
 // Get the current horizontal (E/W) flow velocity in m/s at the given node
 float HydroModel::getCurrentU(const MapNode &node) const {

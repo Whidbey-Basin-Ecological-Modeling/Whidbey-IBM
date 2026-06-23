@@ -16,7 +16,6 @@ typedef struct HydroNode {
 class HydroModel {
 public:
     HydroModel(
-        std::string cresTideFilename,
         std::string flowSpeedFilename,
         int hydroTimeIntercept // Timesteps between midnight on Jan 1 and the start of the cresTide data
     );
@@ -48,7 +47,6 @@ public:
     // Return true if the location is dry at the current timestep
     virtual bool isDry(MapNode &node);
     // Check if the current timestep is a high tide
-    bool isHighTide();
 
     // Set the hydro model's timestep to a given timestep
     void updateTime(long newTime);
@@ -64,7 +62,6 @@ protected:
 
 public:
     // The loaded crescent tide data, in m
-    std::vector<float> cresTideData;
     // The loaded flow data, as DistribHydroNodes (see map.h)
     std::vector<DistribHydroNode> hydroNodes;
 
@@ -76,7 +73,6 @@ private:
     float simDistFlow;
 
     int hydroTimeIntercept;
-    float currCresTide;
     long currTimestep;
 
 };

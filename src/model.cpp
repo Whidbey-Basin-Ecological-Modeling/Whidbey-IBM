@@ -52,12 +52,10 @@ Model::Model(
     std::string mapGeometryFilename,
     // Radius within which blind channel nodes should be merged (in meters)
     float blindChannelSimplificationRadius,
-    // Path of the crescent tide data (1 row per timestep)
-    std::string cresTideFilename,
     // Path of the flow speed data (netCDF)
     std::string flowSpeedFilename,
     const ModelConfigMap &config
-) : defaultHydroModel(std::make_unique<HydroModel>(cresTideFilename, flowSpeedFilename, hydroTimeIntercept)),
+) : defaultHydroModel(std::make_unique<HydroModel>(flowSpeedFilename, hydroTimeIntercept)),
     hydroModel(*defaultHydroModel),
     initialPopulations(std::move(allInitialPopulations)),
     recTimeIntercept(recTimeIntercept),
@@ -1207,7 +1205,6 @@ Model *modelFromConfig(std::string configPath) {
             d.HasMember("blindChannelSimplificationRadius")
                 ? d["blindChannelSimplificationRadius"].GetFloat()
                 : 0.0f,
-            std::string(d["tideFile"].GetString()),
             std::string(d["flowSpeedFile"].GetString()),
             config
         );

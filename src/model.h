@@ -113,7 +113,6 @@ public:
         std::string mapEdgeFilename,
         std::string mapGeometryFilename,
         float blindChannelSimplificationRadius,
-        std::string cresTideFilename,
         std::string flowSpeedFilename,
         const ModelConfigMap& config
     );
