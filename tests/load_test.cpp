@@ -539,3 +539,98 @@ TEST_CASE("readGeometry functionality", "[load]") {
         for (auto node : dest) delete node;
     }
 }
+
+TEST_CASE("readEdges functionality", "[load][edges]") {
+    std::vector<MapNode*> nodes;
+    // dummy at 0
+    nodes.push_back(new MapNode(-1, 0.0f, 0.0f));
+    nodes.push_back(new MapNode(1, 10.0f, 20.0f));
+    nodes.push_back(new MapNode(2, 30.0f, 40.0f));
+    nodes.push_back(new MapNode(3, 50.0f, 60.0f));
+
+    SECTION("Valid edges file") {
+        std::stringstream ss;
+        ss << "node_a,node_b,distance" << std::endl;
+        ss << "1,2,100.0" << std::endl;
+        ss << "2,3,200.0" << std::endl;
+
+        bool result = readEdges(nodes, ss);
+        REQUIRE(result == true);
+        REQUIRE(nodes[1]->edges.size() == 1);
+        REQUIRE(nodes[2]->edges.size() == 2);
+        REQUIRE(nodes[3]->edges.size() == 1);
+
+        CHECK(nodes[1]->edges[0].length == Catch::Approx(100.0f));
+        CHECK(nodes[3]->edges[0].length == Catch::Approx(200.0f));
+        CHECK(nodes[1]->edges[0].otherEnd(nodes[1]) == nodes[2]);
+        CHECK(nodes[3]->edges[0].otherEnd(nodes[3]) == nodes[2]);
+    }
+
+    SECTION("Duplicate edges") {
+        std::stringstream ss;
+        ss << "node_a,node_b,distance" << std::endl;
+        ss << "1,2,100.0" << std::endl;
+        ss << "1,2,100.0" << std::endl; // Duplicate
+
+        bool result = readEdges(nodes, ss);
+        REQUIRE(result == true);
+        REQUIRE(nodes[1]->edges.size() == 1);
+        REQUIRE(nodes[2]->edges.size() == 1);
+    }
+
+    SECTION("Effective duplicate edges") {
+        std::stringstream ss;
+        ss << "node_a,node_b,distance" << std::endl;
+        ss << "1,2,100.0" << std::endl;
+        ss << "2,1,100.0" << std::endl; // Effective Duplicate
+
+        bool result = readEdges(nodes, ss);
+        REQUIRE(result == true);
+        REQUIRE(nodes[1]->edges.size() == 1);
+        REQUIRE(nodes[2]->edges.size() == 1);
+    }
+
+    SECTION("Inconsistent edge state (Manual simulation)") {
+        // Manually inject an edge into node 2 only
+        MapNode* node1 = nodes[1];
+        MapNode* node2 = nodes[2];
+        Edge e(node1, node2, 100.0f);
+        node2->edges.push_back(e);
+
+        std::stringstream ss;
+        ss << "node_a,node_b,distance" << std::endl;
+        ss << "1,2,100.0" << std::endl; // Should be rejected because node 2 already has it
+
+        bool result = readEdges(nodes, ss);
+        REQUIRE(result == true);
+        // node 1 should still be empty if validation worked for both nodes
+        CHECK(node1->edges.empty());
+        // node 2 should still have only the manual one
+        REQUIRE(node2->edges.size() == 1);
+    }
+
+    SECTION("Self-loop edge") {
+        std::stringstream ss;
+        ss << "node_a,node_b,distance" << std::endl;
+        ss << "1,1,100.0" << std::endl;
+
+        bool result = readEdges(nodes, ss);
+        REQUIRE(result == true);
+        REQUIRE(nodes[1]->edges.empty());
+    }
+
+    SECTION("Out of range node IDs") {
+        std::stringstream ss;
+        ss << "node_a,node_b,distance" << std::endl;
+        ss << "1,4,100.0" << std::endl;
+
+        bool result = readEdges(nodes, ss);
+        REQUIRE(result == true);
+        REQUIRE(nodes[1]->edges.empty());
+    }
+
+    // Cleanup
+    for (auto node : nodes) {
+        delete node;
+    }
+}

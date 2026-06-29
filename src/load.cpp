@@ -1142,7 +1142,8 @@ void loadMap(
     float blindChannelSimplificationRadius,
     const ModelConfigMap& configMap
 ) {
-    loadMap2(dest, locationFilePath, edgeFilePath, geometryFilePath, hydroNodes, initialPopulations, monitoringPoints, samplingSites, blindChannelSimplificationRadius, configMap);
+    // loadMap2(dest, locationFilePath, edgeFilePath, geometryFilePath, hydroNodes, initialPopulations, monitoringPoints, samplingSites, blindChannelSimplificationRadius, configMap);
+    // validateAllEdgeConsistency(dest);
     dest.clear();
 
     std::ifstream locationFile;
@@ -1351,6 +1352,68 @@ bool readGeometry(const std::vector<MapNode *> &dest, std::istream &geometryFile
     return true;
 }
 
+bool hasExactDuplicate(const MapNode* node, int idA, int idB) {
+    return std::any_of(node->edges.begin(), node->edges.end(), [&](const Edge& e) {
+        return e.source->id == idA && e.target->id == idB;
+    });
+}
+
+bool hasAnyMatchingEdge(const MapNode* node, int idA, int idB) {
+    return std::any_of(node->edges.begin(), node->edges.end(), [&](const Edge& e) {
+        return (e.source->id == idA && e.target->id == idB) ||
+               (e.source->id == idB && e.target->id == idA);
+    });
+}
+
+bool readEdges(const std::vector<MapNode *> & dest, std::istream & edgesFile) {
+    std::string line;
+    if (!std::getline(edgesFile, line)) {
+        std::cerr << "Error: Edges file is empty." << std::endl;
+        return false;
+    }
+
+    while (std::getline(edgesFile, line)) {
+        if (line.empty()) continue;
+        std::vector<std::string> chunks = split(line, ',');
+        if (chunks.size() < 3) {
+            std::cerr << "Error: Bad edges file line: " << line << std::endl;
+            continue;
+        }
+
+        int idA = std::stoi(chunks[0]);
+        int idB = std::stoi(chunks[1]);
+        float distance = std::stof(chunks[2]);
+
+        if (idA < 1 || idA >= (int)dest.size() || idB < 1 || idB >= (int)dest.size()) {
+            std::cerr << "Error: Edge node ID out of range: " << idA << ", " << idB << std::endl;
+            continue;
+        }
+
+        MapNode* nodeA = dest[idA];
+        MapNode* nodeB = dest[idB];
+
+        if (idA == idB) {
+            std::cerr << "Error: Self-loop edge discarded for node " << idA << std::endl;
+            continue;
+        }
+
+        if (hasAnyMatchingEdge(nodeA, idA, idB) || hasAnyMatchingEdge(nodeB, idA, idB)) {
+            if (hasExactDuplicate(nodeA, idA, idB) || hasExactDuplicate(nodeB, idA, idB)) {
+                std::cerr << "Error: Duplicate edge " << idA << "->" << idB << " discarded." << std::endl;
+            } else {
+                std::cerr << "Error: Effective duplicate edge " << idA << "->" << idB << " (matches " << idB << "->" << idA << ") discarded." << std::endl;
+            }
+            continue;
+        }
+
+        Edge e(nodeA, nodeB, distance);
+        nodeA->edges.push_back(e);
+        nodeB->edges.push_back(e);
+    }
+    return true;
+}
+
+
 void loadMap2(
     std::vector<MapNode *> &dest,
     std::string &locationFilePath,
@@ -1381,6 +1444,15 @@ void loadMap2(
     result = readGeometry(dest, geometryFile);
     if (!result) {
         std::cerr << "Error: Failed to read areas from " << geometryFilePath << " file." << std::endl;
+        exit(1);
+    }
+
+    std::ifstream edgeFile;
+    edgeFile.open(edgeFilePath);
+
+    result = readEdges(dest, edgeFile);
+    if (!result) {
+        std::cerr << "Error: Failed to read edges from " << edgeFilePath << " file." << std::endl;
         exit(1);
     }
 }
