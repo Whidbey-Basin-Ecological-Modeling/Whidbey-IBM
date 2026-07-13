@@ -1,5 +1,61 @@
 latest debug build
 
+Mon Jul 13 09:54:40 PDT 2026
+Configuring model...
+8 hardware threads available
+Forcing max threads to 1 due to non-zero RNG seed (42)
+1 thread(s) enabled
+Loading 17655 hydro nodes and 8760 timesteps...
+Loading bulk u (hydro u velocity) data...
+Loading bulk v (hydro v velocity) data...
+Loading bulk wse (water surface elevation) data...
+Loading bulk temp (hydro temperature) data...
+Loading bulk salinity data...
+Loading bulk wet_n data...
+done loading hydro
+directionless edges!
+Found 0 duplicate edges
+Removing disconnected node 22158
+Removing disconnected node 22056
+Removing disconnected node 21724
+Nearshore connector nodes: 5 Distributary
+Nearshore connector nodes: 1 Low tide terrace
+Nearshore connector nodes: 5 Distributary edge
+Nearshore connector nodes: 31 Blind channel
+Nearshore connector nodes: 1 Impoundment
+Nearshore connector nodes: 377 Nearshore
+Created 420 new nearshore connector nodes
+Made  0 disconnected 'distributary' nodes into blind channels
+Found 0 disconnected nodes
+Found 0 orphaned nodes
+Found 0 orphaned protected nodes
+Edge validation passed
+Map nodes: 6 Boat harbor
+Map nodes: 150 Low tide terrace
+Map nodes: 1322 Distributary edge
+Map nodes: 2126 Distributary
+Map nodes: 688 Nearshore
+Map nodes: 155 Impoundment
+Map nodes: 27661 Blind channel
+Selected run ID: 0
+Sample data will be saved to data/whidbey/output/output_0.nc
+Step 25: 17382 living fish; 0 exited; 4249 (1428,0,2821) dead (mort,strand,starve)
+Step 50: 34650 living fish; 0 exited; 11619 (5562,32,6025) dead (mort,strand,starve)
+Step 75: 50258 living fish; 0 exited; 23033 (12562,850,9621) dead (mort,strand,starve)
+Step 100: 69980 living fish; 0 exited; 40829 (22566,3670,14593) dead (mort,strand,starve)
+Step 125: 95690 living fish; 1 exited; 66085 (36764,7904,21417) dead (mort,strand,starve)
+Step 150: 114754 living fish; 12 exited; 96260 (55118,13205,27937) dead (mort,strand,starve)
+Step 175: 121815 living fish; 32 exited; 128743 (75016,20486,33241) dead (mort,strand,starve)
+Step 200: 121695 living fish; 67 exited; 165471 (95471,31293,38707) dead (mort,strand,starve)
+Step 225: 119240 living fish; 138 exited; 202218 (115405,43107,43706) dead (mort,strand,starve)
+Step 250: 109416 living fish; 241 exited; 237344 (134055,55980,47309) dead (mort,strand,starve)
+Step 275: 98536 living fish; 345 exited; 267762 (150496,67142,50124) dead (mort,strand,starve)
+Step 300: 94202 living fish; 411 exited; 293220 (165673,74347,53200) dead (mort,strand,starve)
+Step 325: 98384 living fish; 460 exited; 319773 (180476,81541,57756) dead (mort,strand,starve)
+Step 350: 107758 living fish; 646 exited; 347137 (196376,88583,62178) dead (mort,strand,starve)
+Step 375: 128351 living fish; 744 exited; 377043 (214668,95038,67337) dead (mort,strand,starve)
+
+-----
 Tue Jun  9 14:47:10 PDT 2026
 Configuring model...
 8 hardware threads available

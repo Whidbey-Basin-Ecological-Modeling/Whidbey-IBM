@@ -1120,6 +1120,7 @@ void loadMap2(
     std::string &locationFilePath,
     std::string &edgeFilePath,
     std::string &geometryFilePath,
+    std::string &nodeHabitatsFilePath,
     std::vector<DistribHydroNode> &hydroNodes,
     std::vector<InitialPopulation> &initialPopulations,
     std::vector<MapNode *> &monitoringPoints,
@@ -1135,6 +1136,7 @@ void loadMap(
     std::string& locationFilePath,
     std::string& edgeFilePath,
     std::string& geometryFilePath,
+    std::string& nodeHabitatsFilePath,
     std::vector<DistribHydroNode> &hydroNodes,
     std::vector<InitialPopulation> &initialPopulations,
     std::vector<MapNode *> &monitoringPoints,
@@ -1142,8 +1144,8 @@ void loadMap(
     float blindChannelSimplificationRadius,
     const ModelConfigMap& configMap
 ) {
-    // loadMap2(dest, locationFilePath, edgeFilePath, geometryFilePath, hydroNodes, initialPopulations, monitoringPoints, samplingSites, blindChannelSimplificationRadius, configMap);
-    // validateAllEdgeConsistency(dest);
+    loadMap2(dest, locationFilePath, edgeFilePath, geometryFilePath, nodeHabitatsFilePath, hydroNodes, initialPopulations, monitoringPoints, samplingSites, blindChannelSimplificationRadius, configMap);
+    validateAllEdgeConsistency(dest);
     dest.clear();
 
     std::ifstream locationFile;
@@ -1414,11 +1416,17 @@ bool readEdges(const std::vector<MapNode *> & dest, std::istream & edgesFile) {
 }
 
 
+bool readNodeHabitatTypes(const std::vector<MapNode *> &dest, std::istream &habitatFile) {
+    return true;
+}
+
+
 void loadMap2(
     std::vector<MapNode *> &dest,
     std::string &locationFilePath,
     std::string &edgeFilePath,
     std::string &geometryFilePath,
+    std::string &nodeHabitatsFilePath,
     std::vector<DistribHydroNode> &hydroNodes,
     std::vector<InitialPopulation> &initialPopulations,
     std::vector<MapNode *> &monitoringPoints,
@@ -1454,5 +1462,15 @@ void loadMap2(
     if (!result) {
         std::cerr << "Error: Failed to read edges from " << edgeFilePath << " file." << std::endl;
         exit(1);
+    }
+
+    if (!nodeHabitatsFilePath.empty()) {
+        std::ifstream nodeHabitatsFile;
+        nodeHabitatsFile.open(nodeHabitatsFilePath);
+        result = readNodeHabitatTypes(dest, nodeHabitatsFile);
+        if (!result) {
+            std::cerr << "Error: Failed to read node habitat types from " << nodeHabitatsFilePath << " file." << std::endl;
+            exit(1);
+        }
     }
 }

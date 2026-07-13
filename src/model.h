@@ -110,6 +110,7 @@ public:
         std::string mapLocationFilename,
         std::string mapEdgeFilename,
         std::string mapGeometryFilename,
+        std::string nodeHabitatsFilePath,
         float blindChannelSimplificationRadius,
         std::string flowSpeedFilename,
         const ModelConfigMap& config

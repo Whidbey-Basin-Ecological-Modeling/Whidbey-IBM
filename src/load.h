@@ -43,6 +43,7 @@ MapNode *mergeNodes(MapNode *a, MapNode *b);
 bool readNodes(std::vector<MapNode *> &dest, std::istream &locationFile);
 bool readGeometry(const std::vector<MapNode *> &dest, std::istream &geometryFile);
 bool readEdges(const std::vector<MapNode *> & dest, std::istream & edgesFile);
+bool readNodeHabitatTypes(const std::vector<MapNode *> &dest, std::istream &habitatFile);
 
 // Loads the map from a CSV location file, a CSV edge file, and a CSV geometry file
 // The resulting heap-allocatd MapNodes are placed in the vector 'dest'
@@ -52,6 +53,7 @@ void loadMap(
     std::string& locationFilePath,
     std::string& edgeFilePath,
     std::string& geometryFilePath,
+    std::string& nodeHabitatsFilePath,
     std::vector<DistribHydroNode> &hydroNodes,
     std::vector<InitialPopulation> &initialPopulations,
     std::vector<MapNode *> &monitoringPoints,

@@ -50,6 +50,7 @@ Model::Model(
     std::string mapEdgeFilename,
     // Path of the file containing mapping from node IDs to X/Y coords (in UTM zone 10N projection, if real map data; 1.0f = 1m)
     std::string mapGeometryFilename,
+    std::string nodeHabitatsFilePath,
     // Radius within which blind channel nodes should be merged (in meters)
     float blindChannelSimplificationRadius,
     // Path of the flow speed data (netCDF)
@@ -83,6 +84,7 @@ Model::Model(
         mapLocationFilename,
         mapEdgeFilename,
         mapGeometryFilename,
+        nodeHabitatsFilePath,
         hydroModel.hydroNodes,
         initialPopulations,
         this->monitoringPoints,
@@ -1199,6 +1201,7 @@ Model *modelFromConfig(std::string configPath) {
             std::string(d["mapNodesFile"].GetString()),
             std::string(d["mapEdgesFile"].GetString()),
             std::string(d["mapGeometryFile"].GetString()),
+            d.HasMember("nodeHabitatsFile") ? std::string(d["nodeHabitatsFile"].GetString()) : "",
             d.HasMember("blindChannelSimplificationRadius")
                 ? d["blindChannelSimplificationRadius"].GetFloat()
                 : 0.0f,
