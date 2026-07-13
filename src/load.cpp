@@ -1430,11 +1430,14 @@ bool readNodeHabitatTypes(const std::vector<MapNode *> &dest, std::istream &node
         return false;
     }
 
+    bool success = true;
+
     while (std::getline(nodeHabitatFile, line)) {
         if (line.empty()) continue;
         std::vector<std::string> chunks = split(line, ',');
         if (chunks.size() < 2) {
             std::cerr << "Error: Bad node habitat file line: " << line << std::endl;
+            success = false;
             continue;
         }
 
@@ -1443,18 +1446,20 @@ bool readNodeHabitatTypes(const std::vector<MapNode *> &dest, std::istream &node
 
         if (id < 1 || id >= (int)dest.size()) {
             std::cerr << "Error: Node ID out of range in habitat file: " << id << std::endl;
+            success = false;
             continue;
         }
 
         auto it = habTypeByName.find(habitatName);
         if (it == habTypeByName.end()) {
             std::cerr << "Error: Unknown habitat type: " << habitatName << std::endl;
+            success = false;
             continue;
         }
 
         dest[id]->type = it->second;
     }
-    return true;
+    return success;
 }
 
 

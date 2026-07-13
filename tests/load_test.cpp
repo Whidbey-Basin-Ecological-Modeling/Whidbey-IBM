@@ -676,7 +676,7 @@ TEST_CASE("readNodeHabitatTypes functionality", "[load]") {
         ss << "1" << std::endl; // Missing second column
 
         bool result = readNodeHabitatTypes(nodes, ss);
-        REQUIRE(result == true);
+        REQUIRE(result == false);
         REQUIRE(nodes[1]->type == HabitatType::OpenWater); // Should remain unchanged
     }
 
@@ -687,7 +687,7 @@ TEST_CASE("readNodeHabitatTypes functionality", "[load]") {
         ss << "3,nearshore" << std::endl; // ID 3 is out of range (max index 2)
 
         bool result = readNodeHabitatTypes(nodes, ss);
-        REQUIRE(result == true);
+        REQUIRE(result == false);
         REQUIRE(nodes[1]->type == HabitatType::OpenWater);
     }
 
@@ -698,7 +698,7 @@ TEST_CASE("readNodeHabitatTypes functionality", "[load]") {
         ss << "1,magical forest" << std::endl;
 
         bool result = readNodeHabitatTypes(nodes, ss);
-        REQUIRE(result == true);
+        REQUIRE(result == false);
         REQUIRE(nodes[1]->type == HabitatType::OpenWater);
     }
 
