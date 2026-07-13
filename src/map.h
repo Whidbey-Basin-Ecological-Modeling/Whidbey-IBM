@@ -43,7 +43,14 @@ enum class HabitatType {
     Distributary,
     DistributaryEdge,
     Harbor,
-    Nearshore
+    Nearshore,
+
+    // new types
+    IntertidalMudFlat,
+    OpenWater,
+    Rock,
+    SubtidalFlat,
+    Exit
 };
 
 bool isDistributary(HabitatType t, bool includeDistributaryEdge = true);

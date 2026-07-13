@@ -315,9 +315,16 @@ const std::unordered_map<std::string, HabitatType> habTypeByName {
     {"impoundment", HabitatType::Impoundment},
     {"low tide terrace", HabitatType::LowTideTerrace},
     {"distributary channel", HabitatType::Distributary},
+    {"distributary", HabitatType::Distributary},
     {"boat harbor", HabitatType::Harbor},
+    {"harbor", HabitatType::Harbor},
     {"nearshore", HabitatType::Nearshore},
-    {"shoreline", HabitatType::Nearshore}
+    {"shoreline", HabitatType::Nearshore},
+    {"open water", HabitatType::OpenWater},
+    {"intertidal mud flat", HabitatType::IntertidalMudFlat},
+    {"rock", HabitatType::Rock},
+    {"sub-tidal flat", HabitatType::SubtidalFlat},
+    {"exit", HabitatType::Exit}
 };
 
 // Load sampling site structs from a sampling site CSV
@@ -1421,6 +1428,31 @@ bool readNodeHabitatTypes(const std::vector<MapNode *> &dest, std::istream &node
     if (!std::getline(nodeHabitatFile, line)) {
         std::cerr << "Error: Node habitats file is empty." << std::endl;
         return false;
+    }
+
+    while (std::getline(nodeHabitatFile, line)) {
+        if (line.empty()) continue;
+        std::vector<std::string> chunks = split(line, ',');
+        if (chunks.size() < 2) {
+            std::cerr << "Error: Bad node habitat file line: " << line << std::endl;
+            continue;
+        }
+
+        int id = std::stoi(chunks[0]);
+        std::string habitatName = chunks[1];
+
+        if (id < 1 || id >= (int)dest.size()) {
+            std::cerr << "Error: Node ID out of range in habitat file: " << id << std::endl;
+            continue;
+        }
+
+        auto it = habTypeByName.find(habitatName);
+        if (it == habTypeByName.end()) {
+            std::cerr << "Error: Unknown habitat type: " << habitatName << std::endl;
+            continue;
+        }
+
+        dest[id]->type = it->second;
     }
     return true;
 }

@@ -634,3 +634,76 @@ TEST_CASE("readEdges functionality", "[load][edges]") {
         delete node;
     }
 }
+
+TEST_CASE("readNodeHabitatTypes functionality", "[load]") {
+    std::vector<MapNode*> nodes;
+    // dummy at 0
+    nodes.push_back(new MapNode(-1, 0.0f, 0.0f));
+    nodes.push_back(new MapNode(1, 10.0f, 20.0f));
+    nodes.push_back(new MapNode(2, 30.0f, 40.0f));
+
+    SECTION("Valid habitat updates") {
+        nodes[1]->type = HabitatType::OpenWater;
+        nodes[2]->type = HabitatType::OpenWater;
+
+        std::stringstream ss;
+        ss << "node,habitat" << std::endl;
+        ss << "1,blind channel" << std::endl;
+        ss << "2,distributary" << std::endl;
+
+        bool result = readNodeHabitatTypes(nodes, ss);
+        REQUIRE(result == true);
+        REQUIRE(nodes[1]->type == HabitatType::BlindChannel);
+        REQUIRE(nodes[2]->type == HabitatType::Distributary);
+    }
+
+    SECTION("Empty habitat file") {
+        std::stringstream ss("");
+        bool result = readNodeHabitatTypes(nodes, ss);
+        REQUIRE(result == false);
+    }
+
+    SECTION("Only header in habitat file") {
+        std::stringstream ss("node,habitat\n");
+        bool result = readNodeHabitatTypes(nodes, ss);
+        REQUIRE(result == true);
+    }
+
+    SECTION("Bad habitat data (too few columns)") {
+        nodes[1]->type = HabitatType::OpenWater;
+        std::stringstream ss;
+        ss << "node,habitat" << std::endl;
+        ss << "1" << std::endl; // Missing second column
+
+        bool result = readNodeHabitatTypes(nodes, ss);
+        REQUIRE(result == true);
+        REQUIRE(nodes[1]->type == HabitatType::OpenWater); // Should remain unchanged
+    }
+
+    SECTION("Node ID out of range") {
+        nodes[1]->type = HabitatType::OpenWater;
+        std::stringstream ss;
+        ss << "node,habitat" << std::endl;
+        ss << "3,nearshore" << std::endl; // ID 3 is out of range (max index 2)
+
+        bool result = readNodeHabitatTypes(nodes, ss);
+        REQUIRE(result == true);
+        REQUIRE(nodes[1]->type == HabitatType::OpenWater);
+    }
+
+    SECTION("Unknown habitat type") {
+        nodes[1]->type = HabitatType::OpenWater;
+        std::stringstream ss;
+        ss << "node,habitat" << std::endl;
+        ss << "1,magical forest" << std::endl;
+
+        bool result = readNodeHabitatTypes(nodes, ss);
+        REQUIRE(result == true);
+        REQUIRE(nodes[1]->type == HabitatType::OpenWater);
+    }
+
+    // Cleanup
+    for (auto node : nodes) {
+        delete node;
+    }
+}
