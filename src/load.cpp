@@ -1416,7 +1416,12 @@ bool readEdges(const std::vector<MapNode *> & dest, std::istream & edgesFile) {
 }
 
 
-bool readNodeHabitatTypes(const std::vector<MapNode *> &dest, std::istream &habitatFile) {
+bool readNodeHabitatTypes(const std::vector<MapNode *> &dest, std::istream &nodeHabitatFile) {
+    std::string line;
+    if (!std::getline(nodeHabitatFile, line)) {
+        std::cerr << "Error: Node habitats file is empty." << std::endl;
+        return false;
+    }
     return true;
 }
 
@@ -1436,10 +1441,8 @@ void loadMap2(
 ) {
     // return;
 
-
     std::ifstream locationFile;
     locationFile.open(locationFilePath);
-
     bool result = readNodes(dest, locationFile);
     if (!result) {
         std::cerr << "Error: Failed to read nodes from " << locationFilePath << " file." << std::endl;
@@ -1448,7 +1451,6 @@ void loadMap2(
 
     std::ifstream geometryFile;
     geometryFile.open(geometryFilePath);
-
     result = readGeometry(dest, geometryFile);
     if (!result) {
         std::cerr << "Error: Failed to read areas from " << geometryFilePath << " file." << std::endl;
@@ -1457,20 +1459,17 @@ void loadMap2(
 
     std::ifstream edgeFile;
     edgeFile.open(edgeFilePath);
-
     result = readEdges(dest, edgeFile);
     if (!result) {
         std::cerr << "Error: Failed to read edges from " << edgeFilePath << " file." << std::endl;
         exit(1);
     }
 
-    if (!nodeHabitatsFilePath.empty()) {
-        std::ifstream nodeHabitatsFile;
-        nodeHabitatsFile.open(nodeHabitatsFilePath);
-        result = readNodeHabitatTypes(dest, nodeHabitatsFile);
-        if (!result) {
-            std::cerr << "Error: Failed to read node habitat types from " << nodeHabitatsFilePath << " file." << std::endl;
-            exit(1);
-        }
+    std::ifstream nodeHabitatsFile;
+    nodeHabitatsFile.open(nodeHabitatsFilePath);
+    result = readNodeHabitatTypes(dest, nodeHabitatsFile);
+    if (!result) {
+        std::cerr << "Error: Failed to read node habitat types from " << nodeHabitatsFilePath << " file." << std::endl;
+        exit(1);
     }
 }
