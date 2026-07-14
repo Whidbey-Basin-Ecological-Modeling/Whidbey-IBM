@@ -467,4 +467,22 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "InitialPopulation::setRecruitPoints",
 
         REQUIRE(ip.recPoints.empty());
     }
+
+    SECTION("uses id directly if csvIdToInternalIndex is empty") {
+        auto nodeA = createMapNode(1.0f, 2.0f);
+        auto nodeB = createMapNode(3.0f, 4.0f);
+        auto nodeC = createMapNode(5.0f, 6.0f);
+
+        std::vector<MapNode*> nodes = {nodeA.get(), nodeB.get(), nodeC.get()};
+        std::unordered_map<unsigned int, unsigned int> csvIdToInternalIndex = {};
+
+        InitialPopulation ip;
+        ip.entryNodeIds = {0, 2};
+
+        ip.setRecruitPoints(nodes, csvIdToInternalIndex);
+
+        REQUIRE(ip.recPoints.size() == 2UL);
+        REQUIRE(ip.recPoints[0] == nodeA.get());
+        REQUIRE(ip.recPoints[1] == nodeC.get());
+    }
 }

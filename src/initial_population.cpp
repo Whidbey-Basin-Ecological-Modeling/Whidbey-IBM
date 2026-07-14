@@ -93,6 +93,10 @@ void InitialPopulation::readAndInitializeData() {
 void InitialPopulation::setRecruitPoints(const std::vector<MapNode *> &dest,
     const std::unordered_map<unsigned int, unsigned int> &csvIdToInternalIndex) {
     for (unsigned id : entryNodeIds) {
+        if (csvIdToInternalIndex.empty()) {
+            recPoints.push_back(dest[id]);
+            continue;
+        }
         if (!csvIdToInternalIndex.count(id)) {
             std::cerr << "Error: Recruitment node " << id << " doesn't exist" << std::endl;
             continue;
