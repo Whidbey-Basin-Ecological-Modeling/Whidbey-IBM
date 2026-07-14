@@ -109,13 +109,16 @@ void initializeEachHydroNodeToNearestMapNode(const std::vector<MapNode *> & map,
         MapNode* closestNode = nullptr;
         float closestDistance = std::numeric_limits<float>::max();
         for (MapNode *node : map) {
-            if (!isDistributaryOrNearshore(node->type)) {
-                continue;;
-            }
+            // if (!isDistributaryOrNearshore(node->type)) {
+            //     continue;;
+            // }
             const float nodeDistance = distance(hydroNodes[hydroNodeIndex].x, hydroNodes[hydroNodeIndex].y, node->x, node->y);
             if (nodeDistance < closestDistance) {
                 closestDistance = nodeDistance;
                 closestNode = node;
+                if (closestDistance == 0.0f) {
+                    break;
+                }
             }
         }
         if (closestDistance < closestNode->hydroNodeDistance) {
@@ -1162,10 +1165,8 @@ void loadMap(
     const ModelConfigMap& configMap
 ) {
     loadMap2(dest, locationFilePath, edgeFilePath, geometryFilePath, nodeHabitatsFilePath, hydroNodes, initialPopulations, monitoringPoints, samplingSites, blindChannelSimplificationRadius, configMap);
-    validateAllEdgeConsistency(dest);
-    dest.clear();
 
-    std::ifstream locationFile;
+/*    std::ifstream locationFile;
     locationFile.open(locationFilePath);
     std::ifstream edgeFile;
     edgeFile.open(edgeFilePath);
@@ -1300,6 +1301,7 @@ void loadMap(
 
     validateAllEdgeConsistency(dest);
     outputNodeCounts(dest, "Map");
+*/
 }
 
 bool readNodes(std::vector<MapNode *> &dest, std::istream &locationFile) {
@@ -1512,6 +1514,7 @@ void loadMap2(
         exit(1);
     }
     validateAllEdgeConsistency(dest);
+    reportDuplicateEdges(dest);
 
     std::ifstream nodeHabitatsFile;
     nodeHabitatsFile.open(nodeHabitatsFilePath);
@@ -1524,12 +1527,21 @@ void loadMap2(
     std::unordered_map<unsigned int, unsigned int> csvIdToLocalIndex;
     initializeAllRecruitPoints(initialPopulations, dest, csvIdToLocalIndex);
 
-    outputNodeCounts(dest, "Map");
     std::vector<MapNode *> recruitPoints;
-    std::unordered_set<MapNode *> protectedNodes;
-    checkDisjointDistributariesAndOtherMapErrors(dest, recruitPoints, protectedNodes);
-    assignNearestHydroNodes(dest, hydroNodes);
+    for (auto initialPopulation : initialPopulations) {
+        recruitPoints.insert(recruitPoints.end(), initialPopulation.recPoints.begin(), initialPopulation.recPoints.end());
+    }
 
-    std::cerr << "Finished loading, exiting program." << std::endl;
-    exit(1);
+    std::unordered_map<MapNode *, SamplingSite *> samplingSitesByNode;
+    auto zeroBasedDest = std::vector<MapNode *>(dest.begin() + 1, dest.end());
+    std::unordered_set<MapNode *> disconnectedNodes = identifyDisconnectedNodes(zeroBasedDest, recruitPoints);
+    removeDisconnectedNodes(disconnectedNodes, zeroBasedDest, recruitPoints, monitoringPoints, samplingSites, samplingSitesByNode);
+
+    std::unordered_set<MapNode *> protectedNodes;
+    checkDisjointDistributariesAndOtherMapErrors(zeroBasedDest, recruitPoints, protectedNodes);
+
+    assignNearestHydroNodes(zeroBasedDest, hydroNodes);
+
+    outputNodeCounts(zeroBasedDest, "Map");
+    std::cout << "Finished loading map" << std::endl;
 }
