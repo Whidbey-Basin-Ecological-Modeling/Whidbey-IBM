@@ -642,6 +642,16 @@ std::string getHabitatTypeName(HabitatType t) {
             return "Nearshore";
         case HabitatType::Harbor:
             return "Boat harbor";
+        case HabitatType::OpenWater:
+            return "Open water";
+        case HabitatType::IntertidalMudFlat:
+            return "Intertidal mud flat";
+        case HabitatType::Rock:
+            return "Rock";
+        case HabitatType::SubtidalFlat:
+            return "Sub-tidal flat";
+        case HabitatType::Exit:
+            return "Exit";
     }
 }
 
@@ -1501,6 +1511,7 @@ void loadMap2(
         std::cerr << "Error: Failed to read edges from " << edgeFilePath << " file." << std::endl;
         exit(1);
     }
+    validateAllEdgeConsistency(dest);
 
     std::ifstream nodeHabitatsFile;
     nodeHabitatsFile.open(nodeHabitatsFilePath);
@@ -1509,4 +1520,16 @@ void loadMap2(
         std::cerr << "Error: Failed to read node habitat types from " << nodeHabitatsFilePath << " file." << std::endl;
         exit(1);
     }
+
+    std::unordered_map<unsigned int, unsigned int> csvIdToLocalIndex;
+    initializeAllRecruitPoints(initialPopulations, dest, csvIdToLocalIndex);
+
+    outputNodeCounts(dest, "Map");
+    std::vector<MapNode *> recruitPoints;
+    std::unordered_set<MapNode *> protectedNodes;
+    checkDisjointDistributariesAndOtherMapErrors(dest, recruitPoints, protectedNodes);
+    assignNearestHydroNodes(dest, hydroNodes);
+
+    std::cerr << "Finished loading, exiting program." << std::endl;
+    exit(1);
 }

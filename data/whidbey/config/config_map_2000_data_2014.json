@@ -3,14 +3,44 @@
   "threadCount": 6,
   "rng_seed" : 0,
   "directionlessEdges": 1,
-  "virtualNodes": 1,
+  "virtualNodes": 0,
   "recStartTimestep": 744,
   "hydroStartTimestep": 0,
 
   "initialPopulations": [
     {
-      "name": "Skagit Recruits",
-      "entryNodes": [29331, 29346, 29401],
+      "name": "Skagit N",
+      "entryNodes": [15635],
+      "countsFile": "data/skagit_migrants_2014_feb_start.csv",
+      "sizesFile": "data/skagit_weekly_lengths_2014_ed.csv"
+    },
+    {
+      "name": "Skagit S",
+      "entryNodes": [15636],
+      "countsFile": "data/skagit_migrants_2014_feb_start.csv",
+      "sizesFile": "data/skagit_weekly_lengths_2014_ed.csv"
+    },
+    {
+      "name": "Stilliguamish N",
+      "entryNodes": [16223],
+      "countsFile": "data/skagit_migrants_2014_feb_start.csv",
+      "sizesFile": "data/skagit_weekly_lengths_2014_ed.csv"
+    },
+    {
+      "name": "Stilliguamish S",
+      "entryNodes": [16222],
+      "countsFile": "data/skagit_migrants_2014_feb_start.csv",
+      "sizesFile": "data/skagit_weekly_lengths_2014_ed.csv"
+    },
+    {
+      "name": "Snohomish N",
+      "entryNodes": [17654],
+      "countsFile": "data/skagit_migrants_2014_feb_start.csv",
+      "sizesFile": "data/skagit_weekly_lengths_2014_ed.csv"
+    },
+    {
+      "name": "Snohomish S",
+      "entryNodes": [17655],
       "countsFile": "data/skagit_migrants_2014_feb_start.csv",
       "sizesFile": "data/skagit_weekly_lengths_2014_ed.csv"
     }

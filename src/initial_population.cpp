@@ -94,7 +94,7 @@ void InitialPopulation::setRecruitPoints(const std::vector<MapNode *> &dest,
     const std::unordered_map<unsigned int, unsigned int> &csvIdToInternalIndex) {
     for (unsigned id : entryNodeIds) {
         if (!csvIdToInternalIndex.count(id)) {
-            std::cerr << "Recruitment node " << id << " doesn't exist" << std::endl;
+            std::cerr << "Error: Recruitment node " << id << " doesn't exist" << std::endl;
             continue;
         }
         recPoints.push_back(dest[csvIdToInternalIndex.at(id)]);

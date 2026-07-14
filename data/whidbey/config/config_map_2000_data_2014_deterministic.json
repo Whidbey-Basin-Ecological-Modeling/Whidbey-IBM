@@ -3,7 +3,7 @@
   "threadCount": 1,
   "rng_seed" : 42,
   "directionlessEdges": 1,
-  "virtualNodes": 1,
+  "virtualNodes": 0,
   "recStartTimestep": 744,
   "hydroStartTimestep": 0,
 

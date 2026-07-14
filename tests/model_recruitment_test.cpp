@@ -416,3 +416,55 @@ TEST_CASE_METHOD(ModelRecruitmentFixture, "Model::recruit", "[model][recruitment
         REQUIRE(model.livingIndividuals.size() == 5UL);
     }
 }
+
+TEST_CASE_METHOD(ModelRecruitmentFixture, "InitialPopulation::setRecruitPoints", "[model][recruitment]") {
+    SECTION("maps entryNodeIds to recPoints using the provided index") {
+        auto nodeA = createMapNode(1.0f, 2.0f);
+        auto nodeB = createMapNode(3.0f, 4.0f);
+        auto nodeC = createMapNode(5.0f, 6.0f);
+
+        std::vector<MapNode*> nodes = {nodeA.get(), nodeB.get(), nodeC.get()};
+        std::unordered_map<unsigned int, unsigned int> csvIdToInternalIndex = {
+            {10, 0},
+            {20, 1},
+            {30, 2}
+        };
+
+        InitialPopulation ip;
+        ip.entryNodeIds = {10, 30};
+
+        ip.setRecruitPoints(nodes, csvIdToInternalIndex);
+
+        REQUIRE(ip.recPoints.size() == 2UL);
+        REQUIRE(ip.recPoints[0] == nodeA.get());
+        REQUIRE(ip.recPoints[1] == nodeC.get());
+    }
+
+    SECTION("skips entryNodeIds that are not in the index map") {
+        auto nodeA = createMapNode(1.0f, 2.0f);
+        std::vector<MapNode*> nodes = {nodeA.get()};
+        std::unordered_map<unsigned int, unsigned int> csvIdToInternalIndex = {
+            {10, 0}
+        };
+
+        InitialPopulation ip;
+        ip.entryNodeIds = {10, 999}; // 999 is missing
+
+        ip.setRecruitPoints(nodes, csvIdToInternalIndex);
+
+        REQUIRE(ip.recPoints.size() == 1UL);
+        REQUIRE(ip.recPoints[0] == nodeA.get());
+    }
+
+    SECTION("handles empty entryNodeIds") {
+        std::vector<MapNode*> nodes;
+        std::unordered_map<unsigned int, unsigned int> csvIdToInternalIndex;
+
+        InitialPopulation ip;
+        ip.entryNodeIds = {};
+
+        ip.setRecruitPoints(nodes, csvIdToInternalIndex);
+
+        REQUIRE(ip.recPoints.empty());
+    }
+}
