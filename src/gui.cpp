@@ -45,21 +45,23 @@ wxPen downstreamHighlightPen(wxColour(0, 0, 255, 64), 2);
 wxColour reachableOnlyColor(0, 64, 255, 128);
 
 wxColour *getHabitatColor(HabitatType t) {
-    switch(t) {
-    case HabitatType::Impoundment:
-        return &IMPOUNDMENT_COLOUR;
-    case HabitatType::Distributary:
-        return &DISTRIBUTARY_COLOUR;
-    case HabitatType::DistributaryEdge:
-        return &DISTRIBUTARY_EDGE_COLOUR;
-    case HabitatType::BlindChannel:
-        return &BLIND_CHANNEL_COLOUR;
-    case HabitatType::LowTideTerrace:
-        return &LOW_TIDE_TERRACE_COLOUR;
-    case HabitatType::Nearshore:
-        return &NEARSHORE_COLOUR;
-    case HabitatType::Harbor:
-        return &BOAT_HARBOR_COLOUR;
+    switch (t) {
+        case HabitatType::Impoundment:
+            return &IMPOUNDMENT_COLOUR;
+        case HabitatType::Distributary:
+            return &DISTRIBUTARY_COLOUR;
+        case HabitatType::DistributaryEdge:
+            return &DISTRIBUTARY_EDGE_COLOUR;
+        case HabitatType::BlindChannel:
+            return &BLIND_CHANNEL_COLOUR;
+        case HabitatType::LowTideTerrace:
+            return &LOW_TIDE_TERRACE_COLOUR;
+        case HabitatType::Nearshore:
+            return &NEARSHORE_COLOUR;
+        case HabitatType::Harbor:
+            return &BOAT_HARBOR_COLOUR;
+        default: //TODO add more habitat colors
+            return &DISTRIBUTARY_COLOUR;
     }
 }
 
@@ -475,6 +477,9 @@ void MapView::OnPaint(wxPaintEvent &evt) {
 
 void MapView::redraw(wxDC &dc, float centerX, float centerY, float viewW, float viewH) {
     for (MapNode *n : this->model->map) {
+        if (n->id == -1) {
+            continue;
+        }
         int x0 = (int) zoom(n->x, centerX, viewW/2.0f, this->viewZoom);
         int y0 = (int) zoom(n->y, centerY, viewH/2.0f, -this->viewZoom);
         if (x0 < 0 || x0 > ((int) viewW) || y0 < 0 || y0 > ((int) viewH)) {
