@@ -99,8 +99,9 @@ void loadDistribHydro(std::string &flowPath, std::vector<DistribHydroNode> &node
     }
 }
 
-void assignHydroNodeToMapNodeWithDistance(const unsigned hydroNodeIndex, MapNode *mapNode, const float distance) {
+void assignHydroNodeToMapNodeWithDistance(const unsigned hydroNodeIndex, MapNode *mapNode, const float distance, std::vector<DistribHydroNode> &hydroNodes) {
     mapNode->nearestHydroNodeIndex = hydroNodeIndex;
+    mapNode->nearestHydroNode = &hydroNodes[hydroNodeIndex];
     mapNode->hydroNodeDistance = distance;
 }
 
@@ -122,7 +123,7 @@ void initializeEachHydroNodeToNearestMapNode(const std::vector<MapNode *> & map,
             }
         }
         if (closestDistance < closestNode->hydroNodeDistance) {
-            assignHydroNodeToMapNodeWithDistance(hydroNodeIndex, closestNode, closestNode->hydroNodeDistance);
+            assignHydroNodeToMapNodeWithDistance(hydroNodeIndex, closestNode, closestNode->hydroNodeDistance, const_cast<std::vector<DistribHydroNode> &>(hydroNodes));
             assignedNodes.emplace(closestNode);
         }
     }
@@ -177,6 +178,7 @@ void assignRemainingMapNodesToHydroNodes(DijkstraMinQueue &dijkstraMinQueue) {
             if (neighborDistance < neighborNode->hydroNodeDistance) {
                 neighborNode->hydroNodeDistance = neighborDistance;
                 neighborNode->nearestHydroNodeIndex = node->nearestHydroNodeIndex;
+                neighborNode->nearestHydroNode = node->nearestHydroNode;
                 dijkstraMinQueue.emplace(neighborDistance, neighborNode);
             }
         }
@@ -206,7 +208,7 @@ void fixElevations(std::vector<MapNode *> &map, std::vector<DistribHydroNode> &h
     float minDistribDepth = cutoffDepth;
     for (MapNode *node : map) {
         if (isDistributary(node->type)) {
-            for (float wse : hydroNodes[node->nearestHydroNodeIndex].wses) {
+            for (float wse : node->nearestHydroNode->wses) {
                 float depth = wse - node->elev;
                 if (depth < minDistribDepth) {
                     minDistribDepth = depth;

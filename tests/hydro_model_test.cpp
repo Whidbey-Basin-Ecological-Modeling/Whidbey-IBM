@@ -34,6 +34,7 @@ TEST_CASE("HydroModel::getScaledFlowVelocityAt tests", "[hydro]") {
     SECTION("Normal node (non-blind, non-impoundment)") {
         MapNode node(HabitatType::Distributary, 100.0f, 0.0f, 0.0f);
         node.nearestHydroNodeIndex = 0;
+        node.nearestHydroNode = &hydro_model.hydroNodes[0];
 
         FlowVelocity result = hydro_model.getScaledFlowVelocityAt(node);
 
@@ -46,6 +47,7 @@ TEST_CASE("HydroModel::getScaledFlowVelocityAt tests", "[hydro]") {
         MapNode node(HabitatType::BlindChannel, node_area, 0.0f, 0.0f);
         node.area = node_area;
         node.nearestHydroNodeIndex = 0;
+        node.nearestHydroNode = &hydro_model.hydroNodes[0];
 
         FlowVelocity result_blind_channel = hydro_model.getScaledFlowVelocityAt(node);
 
@@ -79,6 +81,7 @@ TEST_CASE("HydroModel::calculateFlowSpeedScalar tests", "[hydro]") {
     SECTION("Normal node returns 1.0") {
         MapNode node(HabitatType::Distributary, 100.0f, 0.0f, 0.0f);
         node.nearestHydroNodeIndex = 0;
+        node.nearestHydroNode = &hydro_model.hydroNodes[0];
 
         double scalar = hydro_model.calculateFlowSpeedScalar(node);
         REQUIRE_THAT(scalar, Catch::Matchers::WithinRel(1.0, 0.001));
@@ -88,6 +91,7 @@ TEST_CASE("HydroModel::calculateFlowSpeedScalar tests", "[hydro]") {
         MapNode node(HabitatType::BlindChannel, 25.0f, 0.0f, 0.0f);
         node.area = 25.0f;
         node.nearestHydroNodeIndex = 0;
+        node.nearestHydroNode = &hydro_model.hydroNodes[0];
 
         double scalar = hydro_model.calculateFlowSpeedScalar(node);
         REQUIRE(scalar <= 1.0);
@@ -98,6 +102,7 @@ TEST_CASE("HydroModel::calculateFlowSpeedScalar tests", "[hydro]") {
         MapNode node(HabitatType::BlindChannel, 100.0f, 0.0f, 0.0f);
         node.area = 100.0f;
         node.nearestHydroNodeIndex = 0;
+        node.nearestHydroNode = &hydro_model.hydroNodes[0];
 
         double bc_scalar = hydro_model.calculateFlowSpeedScalar(node);
         REQUIRE(bc_scalar <= 1.0);
@@ -113,6 +118,7 @@ TEST_CASE("HydroModel::calculateFlowSpeedScalar tests", "[hydro]") {
     SECTION("Large blind channel area is capped at 1.0") {
         MapNode node(HabitatType::BlindChannel, 10000.0f, 0.0f, 0.0f);
         node.nearestHydroNodeIndex = 0;
+        node.nearestHydroNode = &hydro_model.hydroNodes[0];
         node.area = std::pow(1000000.0f, 2.0f);
 
         double scalar = hydro_model.calculateFlowSpeedScalar(node);

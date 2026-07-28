@@ -1,9 +1,10 @@
 latest debug build
 
-Mon Jul 27 16:54:32 PDT 2026
+Tue Jul 28 10:45:58 PDT 2026
 Configuring model...
 8 hardware threads available
-6 thread(s) enabled
+Forcing max threads to 1 due to non-zero RNG seed (42)
+1 thread(s) enabled
 Loading 17655 hydro nodes and 8760 timesteps...
 Loading bulk u (hydro u velocity) data...
 Loading bulk v (hydro v velocity) data...
@@ -31,11 +32,14 @@ Map nodes: 107 Exit
 Finished loading map
 Selected run ID: 0
 Sample data will be saved to data/whidbey/output/output_0.nc
-Step 25: 98524 living fish; 0 exited; 30905 (13617,1,17287) dead (mort,strand,starve)
-Step 50: 188226 living fish; 0 exited; 89367 (51345,976,37046) dead (mort,strand,starve)
-Step 75: 267188 living fish; 0 exited; 173052 (108483,5908,58661) dead (mort,strand,starve)
-Step 100: 374101 living fish; 0 exited; 291303 (187051,15894,88358) dead (mort,strand,starve)
-Step 125: 516774 living fish; 0 exited; 454338 (296678,28665,128995) dead (mort,strand,starve)
+Step 25: 98280 living fish; 0 exited; 30997 (13782,0,17215) dead (mort,strand,starve)
+Step 50: 188116 living fish; 0 exited; 89201 (51443,992,36766) dead (mort,strand,starve)
+Step 75: 267045 living fish; 0 exited; 173295 (108832,6011,58452) dead (mort,strand,starve)
+Step 100: 373080 living fish; 0 exited; 292376 (188131,16052,88193) dead (mort,strand,starve)
+Step 125: 514639 living fish; 0 exited; 456559 (299032,28717,128810) dead (mort,strand,starve)
+Step 150: 609891 living fish; 0 exited; 657408 (438564,50517,168327) dead (mort,strand,starve)
+Step 175: 632788 living fish; 0 exited; 870556 (587789,81592,201175) dead (mort,strand,starve)
+Step 200: 638752 living fish; 0 exited; 1085012 (737077,113878,234057) dead (mort,strand,starve)
 ---------
 Mon Jul 13 09:54:40 PDT 2026
 Configuring model...

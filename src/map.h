@@ -97,7 +97,8 @@ public:
     Edge *crossChannelA;
     // If this node is part of a multi-node distributary segment, this edge leads to one of the lateral neighbors
     Edge *crossChannelB;
-    // DistribHydroNode::id of the nearest DistribHydroNode
+
+    DistribHydroNode *nearestHydroNode;
     unsigned nearestHydroNodeIndex;
     float hydroNodeDistance;
     // List of Fish::id of living fish such that Fish::location == this -- updated in Model::countAll
