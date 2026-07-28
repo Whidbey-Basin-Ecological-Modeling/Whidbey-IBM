@@ -100,7 +100,7 @@ void loadDistribHydro(std::string &flowPath, std::vector<DistribHydroNode> &node
 }
 
 void assignHydroNodeToMapNodeWithDistance(const unsigned hydroNodeIndex, MapNode *mapNode, const float distance) {
-    mapNode->nearestHydroNodeID = hydroNodeIndex;
+    mapNode->nearestHydroNodeIndex = hydroNodeIndex;
     mapNode->hydroNodeDistance = distance;
 }
 
@@ -176,7 +176,7 @@ void assignRemainingMapNodesToHydroNodes(DijkstraMinQueue &dijkstraMinQueue) {
             float neighborDistance = distance + edgeLength;
             if (neighborDistance < neighborNode->hydroNodeDistance) {
                 neighborNode->hydroNodeDistance = neighborDistance;
-                neighborNode->nearestHydroNodeID = node->nearestHydroNodeID;
+                neighborNode->nearestHydroNodeIndex = node->nearestHydroNodeIndex;
                 dijkstraMinQueue.emplace(neighborDistance, neighborNode);
             }
         }
@@ -206,7 +206,7 @@ void fixElevations(std::vector<MapNode *> &map, std::vector<DistribHydroNode> &h
     float minDistribDepth = cutoffDepth;
     for (MapNode *node : map) {
         if (isDistributary(node->type)) {
-            for (float wse : hydroNodes[node->nearestHydroNodeID].wses) {
+            for (float wse : hydroNodes[node->nearestHydroNodeIndex].wses) {
                 float depth = wse - node->elev;
                 if (depth < minDistribDepth) {
                     minDistribDepth = depth;

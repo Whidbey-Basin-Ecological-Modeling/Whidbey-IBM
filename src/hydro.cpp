@@ -52,7 +52,7 @@ void HydroModel::updateTime(long newTime) {
 
 // Get the current horizontal (E/W) flow velocity in m/s at the given node
 float HydroModel::getCurrentU(const MapNode &node) const {
-    return this->getCurrentU(this->hydroNodes[node.nearestHydroNodeID]);
+    return this->getCurrentU(this->hydroNodes[node.nearestHydroNodeIndex]);
 }
 float HydroModel::getCurrentU(const DistribHydroNode &hydroNode) const {
     return hydroNode.us[this->getTime()];
@@ -60,7 +60,7 @@ float HydroModel::getCurrentU(const DistribHydroNode &hydroNode) const {
 
 // Get the current vertical (N/S) flow velocity in m/s at the given node
 float HydroModel::getCurrentV(const MapNode &node) const {
-    return this->getCurrentV(this->hydroNodes[node.nearestHydroNodeID]);
+    return this->getCurrentV(this->hydroNodes[node.nearestHydroNodeIndex]);
 }
 float HydroModel::getCurrentV(const DistribHydroNode &hydroNode) const {
     return hydroNode.vs[this->getTime()];
@@ -82,7 +82,7 @@ double HydroModel::calculateFlowSpeedScalar(const MapNode &node) {
     if (!isBlindChannel(node.type) && !isImpoundment(node.type)) {
         return 1.0;
     }
-    const double hydroFlowSpeed = this->getUnsignedFlowSpeedAtHydroNode(this->hydroNodes[node.nearestHydroNodeID]);
+    const double hydroFlowSpeed = this->getUnsignedFlowSpeedAtHydroNode(this->hydroNodes[node.nearestHydroNodeIndex]);
     const double hydroWidth = pow((hydroFlowSpeed / 0.04479583), (1.0 / 0.45896));
     const double blindChannelWidth = sqrt(node.area);
     double scalar = blindChannelWidth / hydroWidth;
@@ -108,7 +108,7 @@ float HydroModel::getUnsignedFlowSpeedAt(MapNode &node) {
     if (this->useSimData) {
         return isDistributary(node.type) ? this->simDistFlow / (this->getDepth(node) * sqrt(node.area)) : 0.0f;
     }
-    const float velocity = this->getUnsignedFlowSpeedAtHydroNode(this->hydroNodes[node.nearestHydroNodeID]);
+    const float velocity = this->getUnsignedFlowSpeedAtHydroNode(this->hydroNodes[node.nearestHydroNodeIndex]);
     return scaledFlowSpeed(velocity, node);
 }
 
@@ -131,7 +131,7 @@ float HydroModel::getTemp(MapNode &node) {
         return this->simTemps[&node][this->getTime()];
     }
 
-    const float hydroTemp = this->hydroNodes[node.nearestHydroNodeID].temps[this->getTime()];
+    const float hydroTemp = this->hydroNodes[node.nearestHydroNodeIndex].temps[this->getTime()];
     return limitWaterTemp(hydroTemp, node.type);
 }
 
@@ -141,7 +141,7 @@ float HydroModel::getSalinity(MapNode &node) {
         return this->simSalinities[&node][this->getTime()];
     }
 
-    return this->hydroNodes[node.nearestHydroNodeID].salinity[this->getTime()];
+    return this->hydroNodes[node.nearestHydroNodeIndex].salinity[this->getTime()];
 }
 
 bool HydroModel::isDry(MapNode &node) {
@@ -149,7 +149,7 @@ bool HydroModel::isDry(MapNode &node) {
         return false;
     }
 
-    return this->hydroNodes[node.nearestHydroNodeID].is_wet[this->getTime()] == 0.0f;
+    return this->hydroNodes[node.nearestHydroNodeIndex].is_wet[this->getTime()] == 0.0f;
 }
 
 float limitDepth(const float depth, const HabitatType nodeType) {
@@ -165,6 +165,6 @@ float HydroModel::getDepth(MapNode &node) {
         return this->simDepths[&node][this->getTime()];
     }
 
-    const float depth = this->hydroNodes[node.nearestHydroNodeID].wses[this->getTime()] - node.elev;
+    const float depth = this->hydroNodes[node.nearestHydroNodeIndex].wses[this->getTime()] - node.elev;
     return limitDepth(depth, node.type);
 }
