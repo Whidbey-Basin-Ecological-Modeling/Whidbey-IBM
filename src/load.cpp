@@ -34,6 +34,7 @@ void loadDistribHydro(std::string &flowPath, std::vector<DistribHydroNode> &node
     size_t timeCount = flowSourceFile.getDim("time").getSize();
     std::cout << "Loading " << nodeCount << " hydro nodes and " << timeCount << " timesteps..." << std::endl;
 
+    netCDF::NcVar nodeVar = flowSourceFile.getVar("node");
     netCDF::NcVar xVar = flowSourceFile.getVar("x");
     netCDF::NcVar yVar = flowSourceFile.getVar("y");
     netCDF::NcVar uVar = flowSourceFile.getVar("u");
@@ -43,19 +44,22 @@ void loadDistribHydro(std::string &flowPath, std::vector<DistribHydroNode> &node
     netCDF::NcVar salinityVar = flowSourceFile.getVar("salinity");
     netCDF::NcVar wetVar = flowSourceFile.getVar("wet_n");
 
+    std::vector<int> all_node(nodeCount);
     std::vector<float> all_x(nodeCount);
     std::vector<float> all_y(nodeCount);
+    nodeVar.getVar(all_node.data());
     xVar.getVar(all_x.data());
     yVar.getVar(all_y.data());
 
     std::vector<std::string> error_log;
 
     for (size_t i = 0; i < nodeCount; ++i) {
-        nodesOut.emplace_back(i);
+        nodesOut.emplace_back(all_node[i]);
         try {
             DistribHydroNode &node = nodesOut.back();
             node.x = all_x[i];
             node.y = all_y[i];
+            validate_required_value(NetCDFVarFillAdapter(nodeVar), (int)node.id, "Unrecoverable error: missing 'node' for hydro node: " + std::to_string(i+1));
             validate_required_value(NetCDFVarFillAdapter(xVar), node.x, "Unrecoverable error: missing geo 'x' for hydro node: " + std::to_string(i+1));
             validate_required_value(NetCDFVarFillAdapter(yVar), node.y, "Unrecoverable error: missing geo 'y' for hydro node: " + std::to_string(i+1));
         } catch (CustomExceptionWithMessage &e) {

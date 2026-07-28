@@ -93,7 +93,12 @@ public:
 
     void getFillModeParameters(bool &fillActive, float *fillValue) const override {
         fillActive = fillActive_;
-        *fillValue = fillValue_;
+        if (fillValue) *fillValue = fillValue_;
+    }
+
+    void getFillModeParameters(bool &fillActive, int *fillValue) const override {
+        fillActive = fillActive_;
+        if (fillValue) *fillValue = (int)fillValue_;
     }
 
 private:
