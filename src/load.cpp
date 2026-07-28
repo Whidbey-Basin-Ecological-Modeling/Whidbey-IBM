@@ -100,7 +100,6 @@ void loadDistribHydro(std::string &flowPath, std::vector<DistribHydroNode> &node
 }
 
 void assignHydroNodeToMapNodeWithDistance(const unsigned hydroNodeIndex, MapNode *mapNode, const float distance, std::vector<DistribHydroNode> &hydroNodes) {
-    mapNode->nearestHydroNodeIndex = hydroNodeIndex;
     mapNode->nearestHydroNode = &hydroNodes[hydroNodeIndex];
     mapNode->hydroNodeDistance = distance;
 }
@@ -177,7 +176,6 @@ void assignRemainingMapNodesToHydroNodes(DijkstraMinQueue &dijkstraMinQueue) {
             float neighborDistance = distance + edgeLength;
             if (neighborDistance < neighborNode->hydroNodeDistance) {
                 neighborNode->hydroNodeDistance = neighborDistance;
-                neighborNode->nearestHydroNodeIndex = node->nearestHydroNodeIndex;
                 neighborNode->nearestHydroNode = node->nearestHydroNode;
                 dijkstraMinQueue.emplace(neighborDistance, neighborNode);
             }

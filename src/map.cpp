@@ -50,14 +50,14 @@ Edge::Edge(MapNode *source, MapNode *target, float length)
 MapNode::MapNode(HabitatType type, float area, float elev, float pathDist)
         : id(-1), type(type), area(area), elev(elev), pathDist(pathDist),
         crossChannelA(nullptr), crossChannelB(nullptr),
-        nearestHydroNode(nullptr), nearestHydroNodeIndex(std::numeric_limits<unsigned>::max()), hydroNodeDistance(std::numeric_limits<float>::max()),
+        nearestHydroNode(nullptr), hydroNodeDistance(std::numeric_limits<float>::max()),
         popDensity(0.0f)
 {}
 
 MapNode::MapNode(int id, float x, float y)
         : id(id), x(x), y(y), type(HabitatType::Distributary), area(0.0f), elev(0.0f), pathDist(0.0f),
         crossChannelA(nullptr), crossChannelB(nullptr),
-        nearestHydroNode(nullptr), nearestHydroNodeIndex(std::numeric_limits<unsigned>::max()), hydroNodeDistance(std::numeric_limits<float>::max()),
+        nearestHydroNode(nullptr), hydroNodeDistance(std::numeric_limits<float>::max()),
         popDensity(0.0f)
 {}
 

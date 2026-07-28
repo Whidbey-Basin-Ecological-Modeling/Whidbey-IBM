@@ -99,7 +99,6 @@ public:
     Edge *crossChannelB;
 
     DistribHydroNode *nearestHydroNode;
-    unsigned nearestHydroNodeIndex;
     float hydroNodeDistance;
     // List of Fish::id of living fish such that Fish::location == this -- updated in Model::countAll
     std::vector<long> residentIds;
