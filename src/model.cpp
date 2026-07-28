@@ -858,7 +858,7 @@ void Model::saveHydroMapping(const std::string &hydroMappingCsvPath) const {
 
     for (const MapNode *node: map) {
         std::ostringstream lineStream;
-        lineStream << node->id << ", " << node->nearestHydroNodeIndex << ", " << node->hydroNodeDistance;
+        lineStream << node->id << ", " << node->nearestHydroNode->id << ", " << node->hydroNodeDistance;
         hydroMapOutFile << lineStream.str() << std::endl;
     }
 
