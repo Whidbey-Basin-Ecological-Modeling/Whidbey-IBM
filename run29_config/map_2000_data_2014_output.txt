@@ -1,5 +1,42 @@
 latest debug build
 
+Mon Jul 27 16:54:32 PDT 2026
+Configuring model...
+8 hardware threads available
+6 thread(s) enabled
+Loading 17655 hydro nodes and 8760 timesteps...
+Loading bulk u (hydro u velocity) data...
+Loading bulk v (hydro v velocity) data...
+Loading bulk wse (water surface elevation) data...
+Loading bulk temp (hydro temperature) data...
+Loading bulk salinity data...
+Loading bulk wet_n data...
+done loading hydro
+directionless edges!
+...
+Edge validation passed
+Found 0 duplicate edges
+Made  0 disconnected 'distributary' nodes into blind channels
+Found 0 disconnected nodes
+Found 0 orphaned nodes
+Found 0 orphaned protected nodes
+Map nodes: 248 Boat harbor
+Map nodes: 3240 Distributary
+Map nodes: 1605 Intertidal mud flat
+Map nodes: 451 Sub-tidal flat
+Map nodes: 1221 Rock
+Map nodes: 9280 Open water
+Map nodes: 1503 Blind channel
+Map nodes: 107 Exit
+Finished loading map
+Selected run ID: 0
+Sample data will be saved to data/whidbey/output/output_0.nc
+Step 25: 98524 living fish; 0 exited; 30905 (13617,1,17287) dead (mort,strand,starve)
+Step 50: 188226 living fish; 0 exited; 89367 (51345,976,37046) dead (mort,strand,starve)
+Step 75: 267188 living fish; 0 exited; 173052 (108483,5908,58661) dead (mort,strand,starve)
+Step 100: 374101 living fish; 0 exited; 291303 (187051,15894,88358) dead (mort,strand,starve)
+Step 125: 516774 living fish; 0 exited; 454338 (296678,28665,128995) dead (mort,strand,starve)
+---------
 Mon Jul 13 09:54:40 PDT 2026
 Configuring model...
 8 hardware threads available

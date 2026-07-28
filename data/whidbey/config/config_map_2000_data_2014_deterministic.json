@@ -9,16 +9,48 @@
 
   "initialPopulations": [
     {
-      "name": "Skagit Recruits",
-      "entryNodes": [29331, 29346, 29401],
+      "name": "Skagit N",
+      "entryNodes": [15635],
+      "countsFile": "data/skagit_migrants_2014_feb_start.csv",
+      "sizesFile": "data/skagit_weekly_lengths_2014_ed.csv"
+    },
+    {
+      "name": "Skagit S",
+      "entryNodes": [15636],
+      "countsFile": "data/skagit_migrants_2014_feb_start.csv",
+      "sizesFile": "data/skagit_weekly_lengths_2014_ed.csv"
+    },
+    {
+      "name": "Stilliguamish N",
+      "entryNodes": [16223],
+      "countsFile": "data/skagit_migrants_2014_feb_start.csv",
+      "sizesFile": "data/skagit_weekly_lengths_2014_ed.csv"
+    },
+    {
+      "name": "Stilliguamish S",
+      "entryNodes": [16222],
+      "countsFile": "data/skagit_migrants_2014_feb_start.csv",
+      "sizesFile": "data/skagit_weekly_lengths_2014_ed.csv"
+    },
+    {
+      "name": "Snohomish N",
+      "entryNodes": [17654],
+      "countsFile": "data/skagit_migrants_2014_feb_start.csv",
+      "sizesFile": "data/skagit_weekly_lengths_2014_ed.csv"
+    },
+    {
+      "name": "Snohomish S",
+      "entryNodes": [17655],
       "countsFile": "data/skagit_migrants_2014_feb_start.csv",
       "sizesFile": "data/skagit_weekly_lengths_2014_ed.csv"
     }
   ],
+
   "samplingSitesFile": "data/sampling_sites.csv",
-  "mapNodesFile": "data/maps_dec/Skagit2000_vertices_2019_elev.csv",
-  "mapEdgesFile": "data/maps_dec/Skagit2000_edges_new.csv",
-  "mapGeometryFile": "data/maps_dec/Skagit2000_geometry_new.csv",
+  "mapNodesFile": "data/whidbey/nodes/geo2023.csv",
+  "mapEdgesFile": "data/whidbey/nodes/final_mesh_edges.csv",
+  "mapGeometryFile": "data/whidbey/nodes/area.csv",
+  "nodeHabitatsFile": "data/whidbey/nodes/node_habitats.csv",
   "flowSpeedFile": "data/whidbey/hydro/WhidbeyBasin_Compiled_Full.nc",
   "blindChannelSimplificationRadius": 0.0,
   "habitatTypeExitConditionHours": 48,
