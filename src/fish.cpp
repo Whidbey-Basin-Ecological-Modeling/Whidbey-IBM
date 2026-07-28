@@ -396,23 +396,21 @@ bool Fish::move(Model &model) {
     this->lastDepth = model.hydroModel.getDepth(*point);
     this->lastFlowSpeed_old = lastFlowSpeed_node_old;
     this->lastFlowVelocity = model.hydroModel.getScaledFlowVelocityAt(*point);;
-    if (this->location->type == HabitatType::Nearshore) {
-        this->incrementExitHabitatHoursByOneTimestep();
-    } else {
-        this->numExitHabitatHours = 0;
-    }
-    if (this->numExitHabitatHours >= model.habitatTypeExitConditionHours) {
-        this->exit(model);
-        return false;
-    }
+    // if (this->location->type == HabitatType::Nearshore) {
+    //     this->incrementExitHabitatHoursByOneTimestep();
+    // } else {
+    //     this->numExitHabitatHours = 0;
+    // }
+    // if (this->numExitHabitatHours >= model.habitatTypeExitConditionHours) {
+    //     this->exit(model);
+    //     return false;
+    // }
 
-    /* 
-    // simplistic approach to exiting fish when they reach 75mm length or less than 30
-    if (this->forkLength >= 75 || this->forkLength < 30) {
+    // simplistic approach to exiting fish when they reach 75mm length in an exit habitat
+    if (this->location->type == HabitatType::Exit && this->forkLength >= 75) {
         this->exit(model);
         return false;
     } 
-    */
 
     // if (model.hydroModel.getDepth(*this->location) <= 0.0f) { // TODO: CHOOSE!
     if (model.hydroModel.isDry(*this->location)) {

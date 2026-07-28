@@ -188,7 +188,7 @@ void assignRemainingMapNodesToHydroNodes(DijkstraMinQueue &dijkstraMinQueue) {
 }
 
 // Identify single closest map node for each hydro node, and assign the hydro node to that map node. For each remaining
-// map nodes, use the Dijkstra algorithm to calculate the shortest total edge distance to one of the initially
+// map node, use the Dijkstra algorithm to calculate the shortest total edge distance to one of the initially
 // assigned nodes, and copy its hydro node association
 
 void assignNearestHydroNodesByEdgeDistance(std::vector<MapNode *> &map, const std::vector<DistribHydroNode> &hydroNodes) {
@@ -205,30 +205,30 @@ void assignNearestHydroNodes(std::vector<MapNode *> &map, std::vector<DistribHyd
 
 // Adjust the map's elevation values to make the minimum depth in distributary channels
 // at least a cutoff value (20cm)
-void fixElevations(std::vector<MapNode *> &map, std::vector<DistribHydroNode> &hydroNodes) {
-    const float cutoffDepth = 0.2f;
-    float minDistribDepth = cutoffDepth;
-    for (MapNode *node : map) {
-        if (isDistributary(node->type)) {
-            for (float wse : node->nearestHydroNode->wses) {
-                float depth = wse - node->elev;
-                if (depth < minDistribDepth) {
-                    minDistribDepth = depth;
-                }
-            }
-        }
-    }
-    float correction = cutoffDepth - minDistribDepth;
-    float minElev = 100.0;
-    std::cout << "Reducing all node elevations by: " << correction << std::endl;
-    for (MapNode *node : map) {
-        node->elev -= correction;
-        if (node->elev < minElev) {
-            minElev = node->elev;
-        }
-    }
-    std::cout << "New minimum elevation: " << minElev << std::endl;
-}
+// void fixElevations(std::vector<MapNode *> &map, std::vector<DistribHydroNode> &hydroNodes) {
+//     const float cutoffDepth = 0.2f;
+//     float minDistribDepth = cutoffDepth;
+//     for (MapNode *node : map) {
+//         if (isDistributary(node->type)) {
+//             for (float wse : node->nearestHydroNode->wses) {
+//                 float depth = wse - node->elev;
+//                 if (depth < minDistribDepth) {
+//                     minDistribDepth = depth;
+//                 }
+//             }
+//         }
+//     }
+//     float correction = cutoffDepth - minDistribDepth;
+//     float minElev = 100.0;
+//     std::cout << "Reducing all node elevations by: " << correction << std::endl;
+//     for (MapNode *node : map) {
+//         node->elev -= correction;
+//         if (node->elev < minElev) {
+//             minElev = node->elev;
+//         }
+//     }
+//     std::cout << "New minimum elevation: " << minElev << std::endl;
+// }
 
 // Split a string into a list of strings delimited by the character given in argument "c"
 std::vector<std::string> split(std::string &s, char c) {
@@ -397,141 +397,141 @@ void loadSamplingSites(std::string &filePath, std::vector<MapNode *> &map, std::
 
 // Remove an edge connecting a given node to a given neighbor
 // from that node's edge list
-void removeAllEdgesBetween(MapNode *node, MapNode *neighbor) {
-    auto& edges = node->edges;
-    edges.erase(
-        std::remove_if(edges.begin(), edges.end(),
-            [&](const Edge& edge) {
-                return (edge.source == neighbor || edge.target == neighbor);
-            }),
-        edges.end()
-    );
-}
+// void removeAllEdgesBetween(MapNode *node, MapNode *neighbor) {
+//     auto& edges = node->edges;
+//     edges.erase(
+//         std::remove_if(edges.begin(), edges.end(),
+//             [&](const Edge& edge) {
+//                 return (edge.source == neighbor || edge.target == neighbor);
+//             }),
+//         edges.end()
+//     );
+// }
 
 // Combine two nodes
-MapNode *mergeNodes(MapNode *a, MapNode *b) {
-    MapNode *newNode = new MapNode(
-        a->type,
-        a->area + b->area,
-        (a->elev + b->elev) * 0.5f,
-        (a->pathDist + b->pathDist) * 0.5f
-    );
-    newNode->id = a->id;
-
-    newNode->x = (a->x + b->x) / 2.0f;
-    newNode->y = (a->y + b->y) / 2.0f;
-
-    float extraLength = sqrt((a->x - b->x) * (a->x - b->x) + (a->y - b->y) * (a->y - b->y)) * 0.5f;
-
-    auto hasEdgeExact = [](const std::vector<Edge> &edges, MapNode *src, MapNode *dst) {
-        return std::any_of(edges.begin(), edges.end(), [&](const Edge &e) {
-            return e.source == src && e.target == dst;
-        });
-    };
-
-    auto addDirectedEdgeAllLists = [&](MapNode *src, MapNode *dst, float len) {
-        // Maintain unified edge lists (union of in+out) on both endpoints
-        if (!hasEdgeExact(src->edges, src, dst)) {
-            src->edges.emplace_back(src, dst, len);
-        }
-        if (!hasEdgeExact(dst->edges, src, dst)) {
-            dst->edges.emplace_back(src, dst, len);
-        }
-    };
-
-    auto rewireEndpoint = [&](MapNode *oldNode, MapNode *otherOldNode) {
-        for (const Edge &e: oldNode->edges) {
-            MapNode *neighbor = e.otherEnd(oldNode);
-
-            // Skip the edge between the two nodes being merged
-            if (neighbor == otherOldNode) {
-                continue;
-            }
-
-            // Remove any existing edges held by the neighbor that pointed to the old node
-            removeAllEdgesBetween(neighbor, oldNode);
-
-            // Preserve the original direction of the edge relative to oldNode
-            float newLen = e.length + extraLength;
-            if (e.source == oldNode) {
-                // oldNode -> neighbor becomes newNode -> neighbor
-                addDirectedEdgeAllLists(newNode, neighbor, newLen);
-            } else {
-                // neighbor -> oldNode becomes neighbor -> newNode
-                addDirectedEdgeAllLists(neighbor, newNode, newLen);
-            }
-        }
-    };
-
-    // Create updated edges and remove existing edges held by other nodes that pointed to the old nodes
-    rewireEndpoint(a, b);
-    rewireEndpoint(b, a);
-
-    return newNode;
-}
+// MapNode *mergeNodes(MapNode *a, MapNode *b) {
+//     MapNode *newNode = new MapNode(
+//         a->type,
+//         a->area + b->area,
+//         (a->elev + b->elev) * 0.5f,
+//         (a->pathDist + b->pathDist) * 0.5f
+//     );
+//     newNode->id = a->id;
+//
+//     newNode->x = (a->x + b->x) / 2.0f;
+//     newNode->y = (a->y + b->y) / 2.0f;
+//
+//     float extraLength = sqrt((a->x - b->x) * (a->x - b->x) + (a->y - b->y) * (a->y - b->y)) * 0.5f;
+//
+//     auto hasEdgeExact = [](const std::vector<Edge> &edges, MapNode *src, MapNode *dst) {
+//         return std::any_of(edges.begin(), edges.end(), [&](const Edge &e) {
+//             return e.source == src && e.target == dst;
+//         });
+//     };
+//
+//     auto addDirectedEdgeAllLists = [&](MapNode *src, MapNode *dst, float len) {
+//         // Maintain unified edge lists (union of in+out) on both endpoints
+//         if (!hasEdgeExact(src->edges, src, dst)) {
+//             src->edges.emplace_back(src, dst, len);
+//         }
+//         if (!hasEdgeExact(dst->edges, src, dst)) {
+//             dst->edges.emplace_back(src, dst, len);
+//         }
+//     };
+//
+//     auto rewireEndpoint = [&](MapNode *oldNode, MapNode *otherOldNode) {
+//         for (const Edge &e: oldNode->edges) {
+//             MapNode *neighbor = e.otherEnd(oldNode);
+//
+//             // Skip the edge between the two nodes being merged
+//             if (neighbor == otherOldNode) {
+//                 continue;
+//             }
+//
+//             // Remove any existing edges held by the neighbor that pointed to the old node
+//             removeAllEdgesBetween(neighbor, oldNode);
+//
+//             // Preserve the original direction of the edge relative to oldNode
+//             float newLen = e.length + extraLength;
+//             if (e.source == oldNode) {
+//                 // oldNode -> neighbor becomes newNode -> neighbor
+//                 addDirectedEdgeAllLists(newNode, neighbor, newLen);
+//             } else {
+//                 // neighbor -> oldNode becomes neighbor -> newNode
+//                 addDirectedEdgeAllLists(neighbor, newNode, newLen);
+//             }
+//         }
+//     };
+//
+//     // Create updated edges and remove existing edges held by other nodes that pointed to the old nodes
+//     rewireEndpoint(a, b);
+//     rewireEndpoint(b, a);
+//
+//     return newNode;
+// }
 
 // Merge nodes that are within a certain radius of each other
-void simplifyBlindChannels(std::vector<MapNode *> &map, float radius,
-                           const std::unordered_set<MapNode *> &protectedNodes) {
-    std::unordered_set<MapNode *> toRemove;
-    std::unordered_set<MapNode *> toAdd;
-
-    for (MapNode *node: map) {
-        // Avoid checking for merges with nodes that will already be merged
-        // Only merge blind channel nodes
-        // Don't touch sampling sites
-        if (toRemove.count(node)
-            || node->type != HabitatType::BlindChannel
-            || protectedNodes.count(node)) {
-            continue;
-        }
-
-        // Unified edges: just iterate neighbors via Edge::otherEnd(node)
-        for (const Edge &e: node->edges) {
-            MapNode *neighbor = e.otherEnd(node);
-
-            // Don't merge nodes that are already involved in merges or protected nodes
-            if (toAdd.count(neighbor) || protectedNodes.count(neighbor)) {
-                continue;
-            }
-
-            if (neighbor->type == HabitatType::BlindChannel && e.length <= radius) {
-                // Tests passed, merge current node with its neighbor
-                toAdd.insert(mergeNodes(node, neighbor));
-                toRemove.insert(node);
-                toRemove.insert(neighbor);
-                break;
-            }
-        }
-    }
-
-    // Condense map list to remove old nodes
-    // targetIt tracks where in the list to write "good" nodes to (nodes that are still in use)
-    auto targetIt = map.begin();
-    // sourceIt tracks where in the list we're examining
-    for (auto sourceIt = map.begin(); sourceIt != map.end(); ++sourceIt) {
-        // Check if the node we're looking at in the list is still good
-        if (toRemove.count(*sourceIt)) {
-            // It should be deleted
-            // Free its memory and wipe it from the list
-            delete *sourceIt;
-            *sourceIt = nullptr;
-        } else {
-            // It should be kept
-            // Shift it over into the target position and update the target position
-            *targetIt = *sourceIt;
-            ++targetIt;
-        }
-    }
-    // Chop off the unused space at the end of the list
-    if (targetIt != map.end()) {
-        map.erase(targetIt, map.end());
-    }
-    // Add the new nodes to the list
-    for (MapNode *newNode: toAdd) {
-        map.push_back(newNode);
-    }
-}
+// void simplifyBlindChannels(std::vector<MapNode *> &map, float radius,
+//                            const std::unordered_set<MapNode *> &protectedNodes) {
+//     std::unordered_set<MapNode *> toRemove;
+//     std::unordered_set<MapNode *> toAdd;
+//
+//     for (MapNode *node: map) {
+//         // Avoid checking for merges with nodes that will already be merged
+//         // Only merge blind channel nodes
+//         // Don't touch sampling sites
+//         if (toRemove.count(node)
+//             || node->type != HabitatType::BlindChannel
+//             || protectedNodes.count(node)) {
+//             continue;
+//         }
+//
+//         // Unified edges: just iterate neighbors via Edge::otherEnd(node)
+//         for (const Edge &e: node->edges) {
+//             MapNode *neighbor = e.otherEnd(node);
+//
+//             // Don't merge nodes that are already involved in merges or protected nodes
+//             if (toAdd.count(neighbor) || protectedNodes.count(neighbor)) {
+//                 continue;
+//             }
+//
+//             if (neighbor->type == HabitatType::BlindChannel && e.length <= radius) {
+//                 // Tests passed, merge current node with its neighbor
+//                 toAdd.insert(mergeNodes(node, neighbor));
+//                 toRemove.insert(node);
+//                 toRemove.insert(neighbor);
+//                 break;
+//             }
+//         }
+//     }
+//
+//     // Condense map list to remove old nodes
+//     // targetIt tracks where in the list to write "good" nodes to (nodes that are still in use)
+//     auto targetIt = map.begin();
+//     // sourceIt tracks where in the list we're examining
+//     for (auto sourceIt = map.begin(); sourceIt != map.end(); ++sourceIt) {
+//         // Check if the node we're looking at in the list is still good
+//         if (toRemove.count(*sourceIt)) {
+//             // It should be deleted
+//             // Free its memory and wipe it from the list
+//             delete *sourceIt;
+//             *sourceIt = nullptr;
+//         } else {
+//             // It should be kept
+//             // Shift it over into the target position and update the target position
+//             *targetIt = *sourceIt;
+//             ++targetIt;
+//         }
+//     }
+//     // Chop off the unused space at the end of the list
+//     if (targetIt != map.end()) {
+//         map.erase(targetIt, map.end());
+//     }
+//     // Add the new nodes to the list
+//     for (MapNode *newNode: toAdd) {
+//         map.push_back(newNode);
+//     }
+// }
 
 // void simplifyBlindChannels(std::vector<MapNode *> &map, float radius, const std::unordered_set<MapNode *> &protectedNodes) {
 //     std::unordered_set<MapNode *> toRemove;
@@ -612,25 +612,25 @@ void simplifyBlindChannels(std::vector<MapNode *> &map, float radius,
 // }
 
 // Create a new node at the halfway point of an edge and link it to the edge's endpoints
-MapNode *elaborateEdge(Edge e) {
-    removeAllEdgesBetween(e.source, e.target);
-    removeAllEdgesBetween(e.target, e.source);
-    float areaFromSource = e.source->area * 0.25f;
-    float areaFromTarget = e.target->area * 0.25f;
-    float newArea = areaFromSource + areaFromTarget;
-    e.source->area -= areaFromSource;
-    e.target->area -= areaFromTarget;
-    MapNode *newNode = new MapNode(e.target->type, newArea, (e.source->elev + e.target->elev)*0.5f, (e.source->pathDist + e.target->pathDist)*0.5f);
-    newNode->x = (e.source->x + e.target->x) * 0.5f;
-    newNode->y = (e.source->y + e.target->y) * 0.5f;
-
-    e.source->edges.emplace_back(e.source, newNode, e.length/2.0f);
-    newNode->edges.emplace_back(e.source, newNode, e.length/2.0f);
-    e.target->edges.emplace_back(newNode, e.target, e.length/2.0f);
-    newNode->edges.emplace_back(newNode, e.target, e.length/2.0f);
-
-    return newNode;
-}
+// MapNode *elaborateEdge(Edge e) {
+//     removeAllEdgesBetween(e.source, e.target);
+//     removeAllEdgesBetween(e.target, e.source);
+//     float areaFromSource = e.source->area * 0.25f;
+//     float areaFromTarget = e.target->area * 0.25f;
+//     float newArea = areaFromSource + areaFromTarget;
+//     e.source->area -= areaFromSource;
+//     e.target->area -= areaFromTarget;
+//     MapNode *newNode = new MapNode(e.target->type, newArea, (e.source->elev + e.target->elev)*0.5f, (e.source->pathDist + e.target->pathDist)*0.5f);
+//     newNode->x = (e.source->x + e.target->x) * 0.5f;
+//     newNode->y = (e.source->y + e.target->y) * 0.5f;
+//
+//     e.source->edges.emplace_back(e.source, newNode, e.length/2.0f);
+//     newNode->edges.emplace_back(e.source, newNode, e.length/2.0f);
+//     e.target->edges.emplace_back(newNode, e.target, e.length/2.0f);
+//     newNode->edges.emplace_back(newNode, e.target, e.length/2.0f);
+//
+//     return newNode;
+// }
 
 
 std::string getHabitatTypeName(HabitatType t) {
@@ -679,43 +679,43 @@ void outputNodeCounts(const std::vector<MapNode*> &nodes, const std::string &nod
 }
 
 // Elaborate all nearshore edges
-void expandNearshoreLinks(std::vector<MapNode *> &map) {
-    std::unordered_set<MapNode *> toAdd;
-
-    for (MapNode *node : map) {
-        bool updated = true;
-        while (updated) {
-            updated = false;
-            for (Edge &e : node->edges) {
-                if (node == e.target) continue;
-
-                if (((e.target->type == HabitatType::Nearshore) != (node->type == HabitatType::Nearshore)) && !toAdd.count(e.target)) {
-                    auto newNode = elaborateEdge(e);
-                    toAdd.insert(newNode);
-                    updated = true;
-                    break;
-                }
-            }
-        }
-    }
-
-    int smallestExistingID = std::numeric_limits<int>::max();
-    for (MapNode *node : map) {
-        if (node->id < smallestExistingID) {
-            smallestExistingID = node->id;
-        }
-    }
-    int newID = std::min(-1, smallestExistingID - 1);
-
-    for (MapNode *newNode : toAdd) {
-        newNode->id = newID;
-        map.push_back(newNode);
-        --newID;
-    }
-
-    outputNodeCounts(std::vector<MapNode*>(toAdd.begin(), toAdd.end()), "Nearshore connector");
-    std::cout << "Created " << toAdd.size() << " new nearshore connector nodes" << std::endl;
-}
+// void expandNearshoreLinks(std::vector<MapNode *> &map) {
+//     std::unordered_set<MapNode *> toAdd;
+//
+//     for (MapNode *node : map) {
+//         bool updated = true;
+//         while (updated) {
+//             updated = false;
+//             for (Edge &e : node->edges) {
+//                 if (node == e.target) continue;
+//
+//                 if (((e.target->type == HabitatType::Nearshore) != (node->type == HabitatType::Nearshore)) && !toAdd.count(e.target)) {
+//                     auto newNode = elaborateEdge(e);
+//                     toAdd.insert(newNode);
+//                     updated = true;
+//                     break;
+//                 }
+//             }
+//         }
+//     }
+//
+//     int smallestExistingID = std::numeric_limits<int>::max();
+//     for (MapNode *node : map) {
+//         if (node->id < smallestExistingID) {
+//             smallestExistingID = node->id;
+//         }
+//     }
+//     int newID = std::min(-1, smallestExistingID - 1);
+//
+//     for (MapNode *newNode : toAdd) {
+//         newNode->id = newID;
+//         map.push_back(newNode);
+//         --newID;
+//     }
+//
+//     outputNodeCounts(std::vector<MapNode*>(toAdd.begin(), toAdd.end()), "Nearshore connector");
+//     std::cout << "Created " << toAdd.size() << " new nearshore connector nodes" << std::endl;
+// }
 
 // Count all neighbors of a given node that are distributary nodes
 // unsigned countAdjacentDistributaryNodes(MapNode &node) {
@@ -1139,36 +1139,22 @@ void initializeAllRecruitPoints(std::vector<InitialPopulation> &initialPopulatio
     }
 }
 
-void loadMap2(
-    std::vector<MapNode *> &dest,
-    std::string &locationFilePath,
-    std::string &edgeFilePath,
-    std::string &geometryFilePath,
-    std::string &nodeHabitatsFilePath,
-    std::vector<DistribHydroNode> &hydroNodes,
-    std::vector<InitialPopulation> &initialPopulations,
-    std::vector<MapNode *> &monitoringPoints,
-    std::vector<SamplingSite *> &samplingSites,
-    float blindChannelSimplificationRadius,
-    const ModelConfigMap &configMap
-);
-
 // Load a map from vertex, edge, and geometry files
 // (additionally runs cleanup on the resulting map graph)
-void loadMap(
-    std::vector<MapNode *> &dest,
-    std::string& locationFilePath,
-    std::string& edgeFilePath,
-    std::string& geometryFilePath,
-    std::string& nodeHabitatsFilePath,
-    std::vector<DistribHydroNode> &hydroNodes,
-    std::vector<InitialPopulation> &initialPopulations,
-    std::vector<MapNode *> &monitoringPoints,
-    std::vector<SamplingSite *> &samplingSites,
-    float blindChannelSimplificationRadius,
-    const ModelConfigMap& configMap
-) {
-    loadMap2(dest, locationFilePath, edgeFilePath, geometryFilePath, nodeHabitatsFilePath, hydroNodes, initialPopulations, monitoringPoints, samplingSites, blindChannelSimplificationRadius, configMap);
+// void loadMap(
+//     std::vector<MapNode *> &dest,
+//     std::string& locationFilePath,
+//     std::string& edgeFilePath,
+//     std::string& geometryFilePath,
+//     std::string& nodeHabitatsFilePath,
+//     std::vector<DistribHydroNode> &hydroNodes,
+//     std::vector<InitialPopulation> &initialPopulations,
+//     std::vector<MapNode *> &monitoringPoints,
+//     std::vector<SamplingSite *> &samplingSites,
+//     float blindChannelSimplificationRadius,
+//     const ModelConfigMap& configMap
+// ) {
+//     loadMap2(dest, locationFilePath, edgeFilePath, geometryFilePath, nodeHabitatsFilePath, hydroNodes, initialPopulations, monitoringPoints, samplingSites, blindChannelSimplificationRadius, configMap);
 
 /*    std::ifstream locationFile;
     locationFile.open(locationFilePath);
@@ -1306,7 +1292,7 @@ void loadMap(
     validateAllEdgeConsistency(dest);
     outputNodeCounts(dest, "Map");
 */
-}
+// }
 
 bool readNodes(std::vector<MapNode *> &dest, std::istream &locationFile) {
     std::string line;
@@ -1479,7 +1465,7 @@ bool readNodeHabitatTypes(const std::vector<MapNode *> &dest, std::istream &node
 }
 
 
-void loadMap2(
+void loadMap(
     std::vector<MapNode *> &dest,
     std::string &locationFilePath,
     std::string &edgeFilePath,

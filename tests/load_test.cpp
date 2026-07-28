@@ -136,6 +136,7 @@ TEST_CASE("checkAndAddEdge functionality (unified edges)", "[edges]") {
     }
 }
 
+/*
 TEST_CASE("mergeNodes functionality (unified edges)", "[merge]") {
     auto nodeA = createTestNode(1, HabitatType::Distributary);
     auto nodeB = createTestNode(2, HabitatType::Distributary);
@@ -364,6 +365,7 @@ TEST_CASE("mergeNodes functionality (unified edges)", "[merge]") {
         delete newNode;
     }
 }
+*/
 
 TEST_CASE("readNodes functionality", "[load]") {
     SECTION("Valid sequential nodes") {
