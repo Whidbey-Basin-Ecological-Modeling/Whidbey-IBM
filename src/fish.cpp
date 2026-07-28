@@ -407,7 +407,7 @@ bool Fish::move(Model &model) {
     // }
 
     // simplistic approach to exiting fish when they reach 75mm length in an exit habitat
-    if (this->location->type == HabitatType::Exit && this->forkLength >= 75) {
+    if (this->location->type == HabitatType::Exit){ // && this->forkLength >= 75) {
         this->exit(model);
         return false;
     } 

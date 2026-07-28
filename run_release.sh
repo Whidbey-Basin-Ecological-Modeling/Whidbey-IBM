@@ -7,4 +7,8 @@ set -e
 # use --verbose on the build to see everything
 cmake --build ./build/cmake-release --target headless; cp troy_run_listings_template.csv \
   troy_run_listings.csv; date; ./bin/Release/headless "troy_run_listings.csv" "data/whidbey/output" \
-  "data/whidbey/config/config_map_2000_data_2014.json"; date
+  "data/whidbey/config/config_small.json"; date
+
+#cmake --build ./build/cmake-release --target headless; cp troy_run_listings_template.csv \
+#  troy_run_listings.csv; date; ./bin/Release/headless "troy_run_listings.csv" "data/whidbey/output" \
+#  "data/whidbey/config/config_map_2000_data_2014.json"; date
