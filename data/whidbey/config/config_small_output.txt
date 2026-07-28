@@ -1,5 +1,5 @@
 [100%] Built target headless
-Tue Jul 28 15:03:06 PDT 2026
+Tue Jul 28 15:08:18 PDT 2026
 Configuring model...
 8 hardware threads available
 6 thread(s) enabled
@@ -12,7 +12,9 @@ Loading bulk salinity data...
 Loading bulk wet_n data...
 done loading hydro
 directionless edges!
+Error: Duplicate edge 6525->6445 discarded.
 ...
+Error: Self-loop edge discarded for node 16223
 Edge validation passed
 Found 0 duplicate edges
 Made  0 disconnected 'distributary' nodes into blind channels
@@ -30,8 +32,25 @@ Map nodes: 107 Exit
 Finished loading map
 Selected run ID: 0
 Sample data will be saved to data/whidbey/output/output_0.nc
-Step 330: 86212 living fish; 0 exited; 339481 (262667,2688,74126) dead (mort,strand,starve)
-Step 660: 156327 living fish; 266 exited; 1062409 (800857,20100,241452) dead (mort,strand,starve)
-Step 990: 257947 living fish; 387 exited; 1980115 (1503828,41743,434544) dead (mort,strand,starve)
-Step 1320: 85154 living fish; 883 exited; 2535948 (1981050,66932,487966) dead (mort,strand,starve)
-Step 1650: 62411 living fish; 1243 exited; 2831922 (2232336,81201,518385) dead (mort,strand,starve)
+Step 330: 86267 living fish; 1 exited; 339589 (261971,2697,74921) dead (mort,strand,starve)
+Step 660: 157509 living fish; 279 exited; 1061323 (797037,20298,243988) dead (mort,strand,starve)
+Step 990: 258175 living fish; 413 exited; 1980014 (1501269,42282,436463) dead (mort,strand,starve)
+Step 1320: 85639 living fish; 907 exited; 2535439 (1977685,67397,490357) dead (mort,strand,starve)
+Step 1650: 62938 living fish; 1277 exited; 2831393 (2229040,81608,520745) dead (mort,strand,starve)
+Step 1980: 61673 living fish; 1415 exited; 3079903 (2427984,93906,558013) dead (mort,strand,starve)
+Step 2310: 61461 living fish; 3347 exited; 3248219 (2564917,108103,575199) dead (mort,strand,starve)
+Step 2640: 71042 living fish; 9901 exited; 3377121 (2668729,125971,582421) dead (mort,strand,starve)
+Step 2970: 31296 living fish; 16092 exited; 3478015 (2748473,146240,583302) dead (mort,strand,starve)
+Step 3300: 9162 living fish; 19899 exited; 3514138 (2772370,157804,583964) dead (mort,strand,starve)
+Step 3630: 10435 living fish; 20775 exited; 3526867 (2781507,161240,584120) dead (mort,strand,starve)
+Step 3960: 5756 living fish; 21217 exited; 3537084 (2789485,163333,584266) dead (mort,strand,starve)
+
+Finished at step 3984
+In saveTaggedHistories
+
+Values for N: 1427, and T: 3985
+
+N: 1427,   T: 3985
+
+Finished loading all tracks
+Tue Jul 28 15:15:39 PDT 2026
