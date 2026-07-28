@@ -79,7 +79,7 @@ Parameters:
         - `distribWseTempFile`: DEPRECATED (data formerly in this file is now in `flowSpeedFile`)
         - `blindChannelSimplificationRadius`: float; the maximum distance between blind channel nodes that will result in them being merged when the map data is loaded (to speed up model prediction).
         - `directionlessEdges`: *deprecated*; directionless edges are always enabled
-        - `virtualNodes`: int; optional; default 1; boolean determining whether to allow the creation of virtual nearshore nodes 
+        - `virtualNodes`: int; optional; default 0; *deprecated* (was: boolean determining whether to allow the creation of virtual nearshore nodes) 
     - if `envDataType` is "sim", the following entries are expected:
         - `mapParams`: A subgroup of parameters containing the following keys:
             - `m`: int, the number of distributary nodes per grid row/column

@@ -1,0 +1,37 @@
+[100%] Built target headless
+Tue Jul 28 15:03:06 PDT 2026
+Configuring model...
+8 hardware threads available
+6 thread(s) enabled
+Loading 17655 hydro nodes and 8760 timesteps...
+Loading bulk u (hydro u velocity) data...
+Loading bulk v (hydro v velocity) data...
+Loading bulk wse (water surface elevation) data...
+Loading bulk temp (hydro temperature) data...
+Loading bulk salinity data...
+Loading bulk wet_n data...
+done loading hydro
+directionless edges!
+...
+Edge validation passed
+Found 0 duplicate edges
+Made  0 disconnected 'distributary' nodes into blind channels
+Found 0 disconnected nodes
+Found 0 orphaned nodes
+Found 0 orphaned protected nodes
+Map nodes: 248 Boat harbor
+Map nodes: 3240 Distributary
+Map nodes: 1605 Intertidal mud flat
+Map nodes: 451 Sub-tidal flat
+Map nodes: 1221 Rock
+Map nodes: 9280 Open water
+Map nodes: 1503 Blind channel
+Map nodes: 107 Exit
+Finished loading map
+Selected run ID: 0
+Sample data will be saved to data/whidbey/output/output_0.nc
+Step 330: 86212 living fish; 0 exited; 339481 (262667,2688,74126) dead (mort,strand,starve)
+Step 660: 156327 living fish; 266 exited; 1062409 (800857,20100,241452) dead (mort,strand,starve)
+Step 990: 257947 living fish; 387 exited; 1980115 (1503828,41743,434544) dead (mort,strand,starve)
+Step 1320: 85154 living fish; 883 exited; 2535948 (1981050,66932,487966) dead (mort,strand,starve)
+Step 1650: 62411 living fish; 1243 exited; 2831922 (2232336,81201,518385) dead (mort,strand,starve)

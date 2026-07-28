@@ -2,8 +2,6 @@
   "envDataType": "file",
   "threadCount": 6,
   "rng_seed" : 0,
-  "directionlessEdges": 1,
-  "virtualNodes": 0,
   "recStartTimestep": 744,
   "hydroStartTimestep": 0,
 
