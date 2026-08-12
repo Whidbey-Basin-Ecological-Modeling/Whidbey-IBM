@@ -313,6 +313,7 @@ void Model::countAll(bool updateTracking) {
     std::vector<FishSortDummy> residentMasses;
     std::vector<FishSortDummy> residentArrivalTimes;
     for (MapNode *node: this->map) {
+        if (node->id == -1) continue; // Skip dummy node
         // Calculate population density (pop/area)
         node->popDensity = ((float) node->residentIds.size()) / node->area;
         // Calculate median mass

@@ -317,6 +317,7 @@ MapView::MapView(wxWindow *parent, Model *model, wxChoice *fishSelector, wxButto
 {
     bool first = true;
     for (MapNode *n : model->map) {
+        if (n->id == -1) continue; // Skip dummy node
         this->mapSet.insert(n);
         if (first) {
             this->minX = this->maxX = n->x;
@@ -577,6 +578,7 @@ void MapView::selectNode(wxMouseEvent &evt) {
     this->selectedNode = nullptr;
     float minDistance;
     for (MapNode *n : this->model->map) {
+        if (n->id == -1) continue; // Skip dummy node
         float dx = n->x - x;
         float dy = n->y - y;
         float distance = sqrt((dx*dx) + (dy*dy));
