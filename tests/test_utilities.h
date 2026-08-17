@@ -22,7 +22,10 @@ public:
     float getDepth(MapNode& node) override { return depthValue; }
     float getTemp(MapNode& node) override { return tempValue; }
     float getSalinity(MapNode& node) override { return salinityValue; }
-    bool isDry(MapNode &node) override { return dryValue; }
+    bool isDry(MapNode &node) override {
+        if (isDryFunc) return isDryFunc(node);
+        return dryValue;
+    }
 
     // Values to be set in tests
     float uValue = 0.0f;
@@ -31,6 +34,7 @@ public:
     float tempValue = 10.0f;
     float salinityValue = 0.0f;
     bool dryValue = false;
+    std::function<bool(const MapNode &)> isDryFunc;
 
 private:
     std::vector<MapNode *> empty_nodes_;

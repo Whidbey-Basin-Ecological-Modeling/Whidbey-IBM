@@ -238,6 +238,30 @@ TEST_CASE("getReachableNeighbors basic functionality") {
         REQUIRE(result.first == startNode.get());
     }
 
+    SECTION("determineNextLocation moves to neighbor when current location is dry but neighbor is wet") {
+        auto startNode = createMapNode(0.0, 0.0);
+        auto neighborNode = createMapNode(1.0, 0.0);
+        connectNodes(startNode.get(), neighborNode.get(), 2.0f);
+
+        hydroModel->isDryFunc = [&](const MapNode &node) {
+            return &node == startNode.get();
+        };
+
+        auto result = fishMover.determineNextLocation(startNode.get());
+        REQUIRE(result.first == neighborNode.get());
+    }
+
+    SECTION("determineNextLocation stays at current location when current location and all neighbors are dry") {
+        auto startNode = createMapNode(0.0, 0.0);
+        auto neighborNode = createMapNode(1.0, 0.0);
+        connectNodes(startNode.get(), neighborNode.get(), 2.0f);
+
+        hydroModel->dryValue = true;
+
+        auto result = fishMover.determineNextLocation(startNode.get());
+        REQUIRE(result.first == startNode.get());
+    }
+
     SECTION("addCurrentLocation does not add current location when dry") {
         auto startNode = createMapNode(0.0, 0.0);
         hydroModel->dryValue = true;
@@ -254,6 +278,32 @@ TEST_CASE("getReachableNeighbors basic functionality") {
 
         auto result = lowAwarenessMovement.determineNextLocation(startNode.get());
 
+        REQUIRE(result.first == startNode.get());
+    }
+
+    SECTION("low awareness determineNextLocation moves to neighbor when current location is dry but neighbor is wet") {
+        FishMovementDownstream lowAwarenessMovement(testModel, swimSpeed, swimRange);
+        auto startNode = createMapNode(0.0, 0.0);
+        auto neighborNode = createMapNode(1.0, 0.0);
+        connectNodes(startNode.get(), neighborNode.get(), 2.0f);
+
+        hydroModel->isDryFunc = [&](const MapNode &node) {
+            return &node == startNode.get();
+        };
+
+        auto result = lowAwarenessMovement.determineNextLocation(startNode.get());
+        REQUIRE(result.first == neighborNode.get());
+    }
+
+    SECTION("low awareness determineNextLocation stays at current location when current location and all neighbors are dry") {
+        FishMovementDownstream lowAwarenessMovement(testModel, swimSpeed, swimRange);
+        auto startNode = createMapNode(0.0, 0.0);
+        auto neighborNode = createMapNode(1.0, 0.0);
+        connectNodes(startNode.get(), neighborNode.get(), 2.0f);
+
+        hydroModel->dryValue = true;
+
+        auto result = lowAwarenessMovement.determineNextLocation(startNode.get());
         REQUIRE(result.first == startNode.get());
     }
 
@@ -276,6 +326,32 @@ TEST_CASE("getReachableNeighbors basic functionality") {
 
         REQUIRE(result.first == startNode.get());
         // todo grot: check correct cost
+    }
+
+    SECTION("high awareness determineNextLocation moves to neighbor when current location is dry but neighbor is wet") {
+        FishMovementHighAwareness highAwarenessMovement(testModel, swimSpeed, swimRange, fitnessCalculator);
+        auto startNode = createMapNode(0.0, 0.0);
+        auto neighborNode = createMapNode(1.0, 0.0);
+        connectNodes(startNode.get(), neighborNode.get(), 2.0f);
+
+        hydroModel->isDryFunc = [&](const MapNode &node) {
+            return &node == startNode.get();
+        };
+
+        auto result = highAwarenessMovement.determineNextLocation(startNode.get());
+        REQUIRE(result.first == neighborNode.get());
+    }
+
+    SECTION("high awareness determineNextLocation stays at current location when current location and all neighbors are dry") {
+        FishMovementHighAwareness highAwarenessMovement(testModel, swimSpeed, swimRange, fitnessCalculator);
+        auto startNode = createMapNode(0.0, 0.0);
+        auto neighborNode = createMapNode(1.0, 0.0);
+        connectNodes(startNode.get(), neighborNode.get(), 2.0f);
+
+        hydroModel->dryValue = true;
+
+        auto result = highAwarenessMovement.determineNextLocation(startNode.get());
+        REQUIRE(result.first == startNode.get());
     }
 }
 
