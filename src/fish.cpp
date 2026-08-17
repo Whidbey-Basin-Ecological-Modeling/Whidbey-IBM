@@ -403,7 +403,6 @@ bool Fish::move(Model &model) {
         return false;
     } 
 
-    // if (model.hydroModel.getDepth(*this->location) <= 0.0f) { // TODO: CHOOSE!
     if (model.hydroModel.isDry(*this->location)) {
         this->dieStranding(model);
         return false;

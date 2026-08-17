@@ -15,6 +15,8 @@ typedef struct HydroNode {
 
 class HydroModel {
 public:
+    HydroModel();
+
     HydroModel(
         std::string flowSpeedFilename,
         int hydroTimeIntercept // Timesteps between midnight on Jan 1 and the start of the hydro data

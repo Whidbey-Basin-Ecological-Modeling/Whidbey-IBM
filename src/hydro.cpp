@@ -11,6 +11,19 @@
 #define MIN_DEPTH 0.0f
 #define MIN_DEPTH_DISTRIBUTARY 0.2f
 
+HydroModel::HydroModel() :
+    hydroNodes(),
+    useSimData(false),
+    simDepths(),
+    simTemps(),
+    simSalinities(),
+    simDistFlow(0.0f),
+    hydroTimeIntercept(0),
+    currTimestep(0)
+{
+    this->updateTime(0L);
+}
+
 // Initialize a hydro model from datafiles at the provided paths and a timestep offset into the data
 HydroModel::HydroModel(
     std::string flowSpeedFilename,
@@ -148,6 +161,9 @@ bool HydroModel::isDry(MapNode &node) {
     if (this->useSimData) {
         return false;
     }
+
+    if (isDistributaryOrHarbor(node.type))
+        return false;
 
     return node.nearestHydroNode->is_wet[this->getTime()] == 0.0f;
 }

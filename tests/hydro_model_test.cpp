@@ -119,3 +119,52 @@ TEST_CASE("HydroModel::calculateFlowSpeedScalar tests", "[hydro]") {
         REQUIRE_THAT(scalar, Catch::Matchers::WithinRel(1.0, 0.0001));
     }
 }
+
+TEST_CASE("HydroModel::isDry tests", "[hydro]") {
+    HydroModel hydro_model;
+    hydro_model.hydroNodes.emplace_back(0);
+    // At timestep 0: dry (is_wet = 0.0f); at timestep 1: wet (is_wet = 1.0f)
+    hydro_model.hydroNodes[0].is_wet = {0.0f, 1.0f};
+
+    SECTION("Distributary and Harbor nodes return false even when hydro node is dry") {
+        MapNode dist_node(HabitatType::Distributary, 100.0f, 0.0f, 0.0f);
+        dist_node.nearestHydroNode = &hydro_model.hydroNodes[0];
+
+        MapNode dist_edge_node(HabitatType::DistributaryEdge, 100.0f, 0.0f, 0.0f);
+        dist_edge_node.nearestHydroNode = &hydro_model.hydroNodes[0];
+
+        MapNode harbor_node(HabitatType::Harbor, 100.0f, 0.0f, 0.0f);
+        harbor_node.nearestHydroNode = &hydro_model.hydroNodes[0];
+
+        hydro_model.updateTime(0); // hydro node is dry (is_wet == 0.0f)
+        REQUIRE_FALSE(hydro_model.isDry(dist_node));
+        REQUIRE_FALSE(hydro_model.isDry(dist_edge_node));
+        REQUIRE_FALSE(hydro_model.isDry(harbor_node));
+
+        hydro_model.updateTime(1); // hydro node is wet (is_wet == 1.0f)
+        REQUIRE_FALSE(hydro_model.isDry(dist_node));
+        REQUIRE_FALSE(hydro_model.isDry(dist_edge_node));
+        REQUIRE_FALSE(hydro_model.isDry(harbor_node));
+    }
+
+    SECTION("Other habitat types return true when dry and false when wet") {
+        MapNode bc_node(HabitatType::BlindChannel, 100.0f, 0.0f, 0.0f);
+        bc_node.nearestHydroNode = &hydro_model.hydroNodes[0];
+
+        MapNode nearshore_node(HabitatType::Nearshore, 100.0f, 0.0f, 0.0f);
+        nearshore_node.nearestHydroNode = &hydro_model.hydroNodes[0];
+
+        MapNode impoundment_node(HabitatType::Impoundment, 100.0f, 0.0f, 0.0f);
+        impoundment_node.nearestHydroNode = &hydro_model.hydroNodes[0];
+
+        hydro_model.updateTime(0); // hydro node is dry (is_wet == 0.0f)
+        REQUIRE(hydro_model.isDry(bc_node));
+        REQUIRE(hydro_model.isDry(nearshore_node));
+        REQUIRE(hydro_model.isDry(impoundment_node));
+
+        hydro_model.updateTime(1); // hydro node is wet (is_wet == 1.0f)
+        REQUIRE_FALSE(hydro_model.isDry(bc_node));
+        REQUIRE_FALSE(hydro_model.isDry(nearshore_node));
+        REQUIRE_FALSE(hydro_model.isDry(impoundment_node));
+    }
+}
