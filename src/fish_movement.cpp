@@ -13,6 +13,7 @@
 void FishMovement::addCurrentLocation(std::vector<std::tuple<MapNode *, float, float> > &neighbors, MapNode *point,
                                       float spentCost, float stayCost,
                                       float currentLocationFitness) const {
+    if (model.hydroModel.isDry(*point)) return;
     neighbors.emplace_back(point, spentCost + stayCost, currentLocationFitness);
 }
 
@@ -21,8 +22,8 @@ void FishMovement::addReachableNeighbors(std::vector<std::tuple<MapNode *, float
     auto reachableNeighbors = getReachableNeighbors(point, spentCost, map_node);
 
     allReachableNeighborsInTimestep.reserve(
-       allReachableNeighborsInTimestep.size() + reachableNeighbors.size()
-   );
+        allReachableNeighborsInTimestep.size() + reachableNeighbors.size()
+    );
     neighbors.reserve(neighbors.size() + reachableNeighbors.size());
 
     allReachableNeighborsInTimestep.insert(
@@ -150,8 +151,7 @@ std::vector<std::tuple<MapNode *, float, float> > FishMovement::getReachableNeig
     for (Edge &edge : startPoint->edges) {
         MapNode *endNode = edge.otherEnd(startPoint);
 
-        // if (model.hydroModel.getDepth(*endNode) < MOVEMENT_DEPTH_CUTOFF) continue;
-        if (model.hydroModel.isDry(*endNode)) continue; // TODO: verify this
+        if (model.hydroModel.isDry(*endNode)) continue;
 
         float transitSpeed = (float) calculateTransitSpeed(edge, startPoint, swimSpeed);
         if (canMoveInDirectionOfEndNode(transitSpeed, swimSpeed)) {

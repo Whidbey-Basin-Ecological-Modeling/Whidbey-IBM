@@ -396,15 +396,6 @@ bool Fish::move(Model &model) {
     this->lastDepth = model.hydroModel.getDepth(*point);
     this->lastFlowSpeed_old = lastFlowSpeed_node_old;
     this->lastFlowVelocity = model.hydroModel.getScaledFlowVelocityAt(*point);;
-    // if (this->location->type == HabitatType::Nearshore) {
-    //     this->incrementExitHabitatHoursByOneTimestep();
-    // } else {
-    //     this->numExitHabitatHours = 0;
-    // }
-    // if (this->numExitHabitatHours >= model.habitatTypeExitConditionHours) {
-    //     this->exit(model);
-    //     return false;
-    // }
 
     // simplistic approach to exiting fish when they reach 75mm length in an exit habitat
     if (this->location->type == HabitatType::Exit){ // && this->forkLength >= 75) {

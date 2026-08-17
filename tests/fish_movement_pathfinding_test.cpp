@@ -132,7 +132,7 @@ TEST_CASE("getReachableNeighbors basic functionality") {
         REQUIRE(std::find(resultNodes.begin(), resultNodes.end(), farInNeighbor.get()) == resultNodes.end());
     }
 
-    SECTION("All neighbors unreachable due to depth constraints") {
+    SECTION("All neighbors unreachable due to wet/dry constraints") {
         auto startNode = createMapNode(0.0, 0.0);
         auto neighbor1 = createMapNode(1.0, 0.0);
         auto neighbor2 = createMapNode(-1.0, 0.0);
@@ -238,6 +238,16 @@ TEST_CASE("getReachableNeighbors basic functionality") {
         REQUIRE(result.first == startNode.get());
     }
 
+    SECTION("addCurrentLocation does not add current location when dry") {
+        auto startNode = createMapNode(0.0, 0.0);
+        hydroModel->dryValue = true;
+
+        std::vector<std::tuple<MapNode *, float, float>> neighbors;
+        fishMover.addCurrentLocation(neighbors, startNode.get(), 0.0f, 0.0f, 1.0f);
+
+        REQUIRE(neighbors.empty());
+    }
+
     SECTION("low awareness determineNextLocation() adds current node") {
         FishMovementDownstream lowAwarenessMovement(testModel, swimSpeed, swimRange);
         auto startNode = createMapNode(0.0, 0.0);
@@ -245,6 +255,17 @@ TEST_CASE("getReachableNeighbors basic functionality") {
         auto result = lowAwarenessMovement.determineNextLocation(startNode.get());
 
         REQUIRE(result.first == startNode.get());
+    }
+
+    SECTION("low awareness addCurrentLocation does not add current location when dry") {
+        FishMovementDownstream lowAwarenessMovement(testModel, swimSpeed, swimRange);
+        auto startNode = createMapNode(0.0, 0.0);
+        hydroModel->dryValue = true;
+
+        std::vector<std::tuple<MapNode *, float, float>> neighbors;
+        lowAwarenessMovement.addCurrentLocation(neighbors, startNode.get(), 0.0f, 0.0f, 1.0f);
+
+        REQUIRE(neighbors.empty());
     }
 
     SECTION("high awareness determineNextLocation() adds current node") {
