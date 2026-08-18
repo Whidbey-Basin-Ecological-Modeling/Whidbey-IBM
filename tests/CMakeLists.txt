@@ -10,6 +10,7 @@ set(MODEL_SOURCES
         ../src/fish_movement_downstream.cpp
         ../src/fish_movement_factory.cpp
         ../src/fish_movement_high_awareness.cpp
+        ../src/fish_post_movement.cpp
         ../src/hydro.cpp
         ../src/initial_population.cpp
         ../src/load.cpp
@@ -32,6 +33,7 @@ set(TEST_SOURCES
         fish_move_test.cpp
         fish_movement_high_awareness_test.cpp
         edge_consistency_test.cpp
+        fish_post_movement_test.cpp
         model_recruitment_test.cpp
         model_test.cpp
 )
