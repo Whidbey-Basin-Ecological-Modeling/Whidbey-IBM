@@ -8,7 +8,7 @@ float FishPostMovement::calculateExitProbability(float forkLength) {
     return std::clamp(baseProb, 0.0f, 1.0f);
 }
 
-bool FishPostMovement::shouldExit(Fish& fish) {
+bool FishPostMovement::shouldExit(Fish& fish, float (*/*rand_func*/)()) {
     if (fish.location == nullptr || fish.location->type != HabitatType::Exit) {
         return false;
     }

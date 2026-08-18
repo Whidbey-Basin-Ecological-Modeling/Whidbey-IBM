@@ -90,3 +90,34 @@ TEST_CASE("FishPostMovement::shouldExit returns false if habitat is not Exit", "
         REQUIRE_FALSE(FishPostMovement::shouldExit(fish));
     }
 }
+
+TEST_CASE("FishPostMovement::shouldExit in Exit habitat uses exit probability and random generator", "[fish][exit][post_movement]") {
+    MapNode exitNode(HabitatType::Exit, 100.0f, 0.0f, 0.0f);
+
+    SECTION("returns true when random sample is strictly less than exit probability") {
+        // Fork length 75mm -> exit probability is 0.5
+        Fish fish(1, 0, 75.0f, &exitNode);
+        REQUIRE(FishPostMovement::shouldExit(fish, []() -> float { return 0.49f; }));
+        REQUIRE(FishPostMovement::shouldExit(fish, []() -> float { return 0.0f; }));
+    }
+
+    SECTION("returns false when random sample is greater than or equal to exit probability") {
+        // Fork length 75mm -> exit probability is 0.5
+        Fish fish(1, 0, 75.0f, &exitNode);
+        REQUIRE_FALSE(FishPostMovement::shouldExit(fish, []() -> float { return 0.50f; }));
+        REQUIRE_FALSE(FishPostMovement::shouldExit(fish, []() -> float { return 0.51f; }));
+        REQUIRE_FALSE(FishPostMovement::shouldExit(fish, []() -> float { return 1.0f; }));
+    }
+
+    SECTION("returns false when fork length <= 25mm even with random sample of 0.0") {
+        // Fork length 25mm -> exit probability is 0.0
+        Fish fish(1, 0, 25.0f, &exitNode);
+        REQUIRE_FALSE(FishPostMovement::shouldExit(fish, []() -> float { return 0.0f; }));
+    }
+
+    SECTION("returns true when fork length >= 125mm for any random sample < 1.0") {
+        // Fork length 125mm -> exit probability is 1.0
+        Fish fish(1, 0, 125.0f, &exitNode);
+        REQUIRE(FishPostMovement::shouldExit(fish, []() -> float { return 0.99f; }));
+    }
+}
