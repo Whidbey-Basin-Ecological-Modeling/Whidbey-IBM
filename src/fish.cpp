@@ -9,6 +9,7 @@
 
 #include "fish_movement_downstream.h"
 #include "fish_movement_factory.h"
+#include "fish_post_movement.h"
 #include "util.h"
 
 const float CA = 0.303;
@@ -397,8 +398,7 @@ bool Fish::move(Model &model) {
     this->lastFlowSpeed_old = lastFlowSpeed_node_old;
     this->lastFlowVelocity = model.hydroModel.getScaledFlowVelocityAt(*point);;
 
-    // simplistic approach to exiting fish when they reach 75mm length in an exit habitat
-    if (this->location->type == HabitatType::Exit){ // && this->forkLength >= 75) {
+    if (FishPostMovement::shouldExit(*this)) {
         this->exit(model);
         return false;
     } 
