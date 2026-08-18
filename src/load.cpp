@@ -1071,6 +1071,9 @@ void validateAllEdgeConsistency(const std::vector<MapNode *> &map) {
 
     for (MapNode *node : map) {
 
+        if (node->edges.empty() && node->id != -1) {
+            result.fail("Node " + std::to_string(node->id) + ": no edges");
+        }
         for (size_t i = 0; i < node->edges.size(); i++) {
             const Edge &e = node->edges[i];
             if (e.source != node && e.target != node) {
