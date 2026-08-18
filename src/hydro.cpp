@@ -13,11 +13,6 @@
 
 HydroModel::HydroModel() :
     hydroNodes(),
-    useSimData(false),
-    simDepths(),
-    simTemps(),
-    simSalinities(),
-    simDistFlow(0.0f),
     hydroTimeIntercept(0),
     currTimestep(0)
 {
@@ -30,28 +25,10 @@ HydroModel::HydroModel(
     int hydroTimeIntercept
 ) :
     hydroNodes(),
-    useSimData(false),
     hydroTimeIntercept(hydroTimeIntercept)
 {
     loadDistribHydro(flowSpeedFilename, this->hydroNodes);
     this->updateTime(0L);
-}
-
-HydroModel::HydroModel(
-    std::vector<MapNode *> &map,
-    std::vector<std::vector<float>> &depths,
-    std::vector<std::vector<float>> &temps,
-    std::vector<std::vector<float>> &salinities,
-    float distFlow
-) :
-    useSimData(true), simDepths(), simTemps(), simSalinities(), simDistFlow(distFlow), hydroTimeIntercept(0)
-{
-    this->updateTime(0L);
-    for (size_t i = 0; i < map.size(); ++i) {
-        this->simDepths[map[i]] = depths[i];
-        this->simTemps[map[i]] = temps[i];
-        this->simSalinities[map[i]] = salinities[i];
-    }
 }
 
 long HydroModel::getTime() const {
@@ -118,9 +95,6 @@ float HydroModel::scaledFlowSpeed(const float flowSpeed, const MapNode &node) {
 
 
 float HydroModel::getUnsignedFlowSpeedAt(MapNode &node) {
-    if (this->useSimData) {
-        return isDistributary(node.type) ? this->simDistFlow / (this->getDepth(node) * sqrt(node.area)) : 0.0f;
-    }
     const float velocity = this->getUnsignedFlowSpeedAtHydroNode(*node.nearestHydroNode);
     return scaledFlowSpeed(velocity, node);
 }
@@ -140,28 +114,16 @@ float limitWaterTemp(float waterTemp, HabitatType nodeType) {
 
 // Get the current temperature (C) at the given node
 float HydroModel::getTemp(MapNode &node) {
-    if (this->useSimData) {
-        return this->simTemps[&node][this->getTime()];
-    }
-
     const float hydroTemp = node.nearestHydroNode->temps[this->getTime()];
     return limitWaterTemp(hydroTemp, node.type);
 }
 
 // Get the current salinity (psu) at the given node
 float HydroModel::getSalinity(MapNode &node) {
-    if (this->useSimData) {
-        return this->simSalinities[&node][this->getTime()];
-    }
-
     return node.nearestHydroNode->salinity[this->getTime()];
 }
 
 bool HydroModel::isDry(MapNode &node) {
-    if (this->useSimData) {
-        return false;
-    }
-
     if (isDistributaryOrHarbor(node.type))
         return false;
 
@@ -177,10 +139,6 @@ float limitDepth(const float depth, const HabitatType nodeType) {
 // Depth is hacked to be 5m in distributary midchannel, 3m at distributary edges
 // (based on blind channel model everywhere else)
 float HydroModel::getDepth(MapNode &node) {
-    if (this->useSimData) {
-        return this->simDepths[&node][this->getTime()];
-    }
-
     const float depth = node.nearestHydroNode->wses[this->getTime()] - node.elev;
     return limitDepth(depth, node.type);
 }

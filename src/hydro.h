@@ -2,7 +2,6 @@
 #define __FISH_HYDRO_H
 
 #include <vector>
-#include <unordered_map>
 #include "map.h"
 
 // This struct stores cached hydrology model predictions for a single map location
@@ -22,18 +21,10 @@ public:
         int hydroTimeIntercept // Timesteps between midnight on Jan 1 and the start of the hydro data
     );
 
-    HydroModel(
-        std::vector<MapNode *> &map,
-        std::vector<std::vector<float>> &depths,
-        std::vector<std::vector<float>> &temps,
-        std::vector<std::vector<float>> &salinities,
-        float distFlow
-    );
-
     virtual ~HydroModel() = default;
 
     // Return the flow speed in m/s at a given location
-    float getUnsignedFlowSpeedAt(MapNode &node);
+    virtual float getUnsignedFlowSpeedAt(MapNode &node);
     float getUnsignedFlowSpeedAtHydroNode(DistribHydroNode &hydroNode);
     virtual FlowVelocity getScaledFlowVelocityAt(const MapNode &node);
 
@@ -66,12 +57,6 @@ public:
     std::vector<DistribHydroNode> hydroNodes;
 
 private:
-    bool useSimData;
-    std::unordered_map<MapNode *, std::vector<float>> simDepths;
-    std::unordered_map<MapNode *, std::vector<float>> simTemps;
-    std::unordered_map<MapNode *, std::vector<float>> simSalinities;
-    float simDistFlow;
-
     int hydroTimeIntercept;
     long currTimestep;
 
