@@ -1,6 +1,8 @@
 #include "fish_post_movement.h"
 
+#include <algorithm>
+
 float FishPostMovement::calculateExitProbability(float forkLength) {
-    (void)forkLength;
-    return 0.0f;
+    float baseProb = (forkLength - 25.0f) / 100.0f;
+    return std::clamp(baseProb, 0.0f, 1.0f);
 }
