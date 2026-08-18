@@ -50,7 +50,9 @@ enum class HabitatType {
     OpenWater,
     Rock,
     SubtidalFlat,
-    Exit
+    Exit,
+
+    HabitatTypeCountSentinel
 };
 
 bool isDistributary(HabitatType t, bool includeDistributaryEdge = true);

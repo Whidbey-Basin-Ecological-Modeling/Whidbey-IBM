@@ -1,7 +1,10 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
+#include <vector>
 
 #include "fish_post_movement.h"
+#include "fish.h"
+#include "map.h"
 
 TEST_CASE("FishPostMovement::calculateExitProbability returns 0.0 for fork length <= 25mm", "[fish][exit][post_movement]") {
     SECTION("fork length well below minimum threshold (fry)") {
@@ -65,5 +68,25 @@ TEST_CASE("FishPostMovement::calculateExitProbability returns 1.0 for fork lengt
         const float forkLength = 150.0f;
         const float prob = FishPostMovement::calculateExitProbability(forkLength);
         REQUIRE(prob == 1.0f);
+    }
+}
+
+TEST_CASE("FishPostMovement::shouldExit returns false if habitat is not Exit", "[fish][exit][post_movement]") {
+    for (int i = 0; i < static_cast<int>(HabitatType::HabitatTypeCountSentinel); ++i) {
+        auto habitat = static_cast<HabitatType>(i);
+        if (habitat == HabitatType::Exit) {
+            continue;
+        }
+
+        DYNAMIC_SECTION("returns false for habitat type " << static_cast<int>(habitat)) {
+            MapNode node(habitat, 100.0f, 0.0f, 0.0f);
+            Fish fish(1, 0, 100.0f, &node);
+            REQUIRE_FALSE(FishPostMovement::shouldExit(fish));
+        }
+    }
+
+    SECTION("returns false when fish location is null") {
+        Fish fish(1, 0, 100.0f, nullptr);
+        REQUIRE_FALSE(FishPostMovement::shouldExit(fish));
     }
 }
