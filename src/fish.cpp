@@ -399,39 +399,39 @@ bool Fish::move(Model &model) {
     this->lastFlowVelocity = model.hydroModel.getScaledFlowVelocityAt(*point);;
 
     if (FishPostMovement::shouldExit(*this)) {
-        this->exit(model);
+        this->exit(model.time);
         return false;
     } 
 
     if (model.hydroModel.isDry(*this->location)) {
-        this->dieStranding(model);
+        this->dieStranding(model.time);
         return false;
     }
     return true;
 }
 
 // Mark this fish as having exited the model
-void Fish::exit(Model &model) {
+void Fish::exit(long currentTime) {
     this->status = FishStatus::Exited;
-    this->exitTime = model.time;
+    this->exitTime = currentTime;
 }
 
 // Mark this fish as having died due to mortality risk
-void Fish::dieMortality(Model &model) {
+void Fish::dieMortality(long currentTime) {
     this->status = FishStatus::DeadMortality;
-    this->exitTime = model.time;
+    this->exitTime = currentTime;
 }
 
 // Mark this fish as having died due to stranding
-void Fish::dieStranding(Model &model) {
+void Fish::dieStranding(long currentTime) {
     this->status = FishStatus::DeadStranding;
-    this->exitTime = model.time;
+    this->exitTime = currentTime;
 }
 
 // Mark this fish as having died due to insufficient consumption
-void Fish::dieStarvation(Model &model) {
+void Fish::dieStarvation(long currentTime) {
     this->status = FishStatus::DeadStarvation;
-    this->exitTime = model.time;
+    this->exitTime = currentTime;
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
@@ -535,7 +535,7 @@ bool Fish::growAndDie(Model &model) {
     // check to make sure fish hasn't reached a critically low mass
     constexpr float MASS_MIN = 0.381;
     if (this->mass <= MASS_MIN) {
-        this->dieStarvation(model);
+        this->dieStarvation(model.time);
         return false;
     }
 
@@ -543,7 +543,7 @@ bool Fish::growAndDie(Model &model) {
     const float mortalityProbability = mortality;
     float sample = unit_rand();
     if (sample <= mortalityProbability) {
-        this->dieMortality(model);
+        this->dieMortality(model.time);
         return false;
     }
 

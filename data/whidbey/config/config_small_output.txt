@@ -1,5 +1,5 @@
 [100%] Built target headless
-Tue Jul 28 15:08:18 PDT 2026
+Tue Aug 18 14:27:53 PDT 2026
 Configuring model...
 8 hardware threads available
 6 thread(s) enabled
@@ -31,19 +31,19 @@ Map nodes: 1503 Blind channel
 Map nodes: 107 Exit
 Finished loading map
 Selected run ID: 0
-Sample data will be saved to data/whidbey/output/output_0.nc
-Step 330: 86267 living fish; 1 exited; 339589 (261971,2697,74921) dead (mort,strand,starve)
-Step 660: 157509 living fish; 279 exited; 1061323 (797037,20298,243988) dead (mort,strand,starve)
-Step 990: 258175 living fish; 413 exited; 1980014 (1501269,42282,436463) dead (mort,strand,starve)
-Step 1320: 85639 living fish; 907 exited; 2535439 (1977685,67397,490357) dead (mort,strand,starve)
-Step 1650: 62938 living fish; 1277 exited; 2831393 (2229040,81608,520745) dead (mort,strand,starve)
-Step 1980: 61673 living fish; 1415 exited; 3079903 (2427984,93906,558013) dead (mort,strand,starve)
-Step 2310: 61461 living fish; 3347 exited; 3248219 (2564917,108103,575199) dead (mort,strand,starve)
-Step 2640: 71042 living fish; 9901 exited; 3377121 (2668729,125971,582421) dead (mort,strand,starve)
-Step 2970: 31296 living fish; 16092 exited; 3478015 (2748473,146240,583302) dead (mort,strand,starve)
-Step 3300: 9162 living fish; 19899 exited; 3514138 (2772370,157804,583964) dead (mort,strand,starve)
-Step 3630: 10435 living fish; 20775 exited; 3526867 (2781507,161240,584120) dead (mort,strand,starve)
-Step 3960: 5756 living fish; 21217 exited; 3537084 (2789485,163333,584266) dead (mort,strand,starve)
+Sample data will be saved to /Users/troy.frever/code/Whidbey-IBM/data/whidbey/output/output_0.nc
+Step 330: 87633 living fish; 0 exited; 338285 (263335,563,74387) dead (mort,strand,starve)
+Step 660: 162034 living fish; 576 exited; 1056608 (807716,6812,242080) dead (mort,strand,starve)
+Step 990: 261745 living fish; 874 exited; 1976062 (1528286,14015,433761) dead (mort,strand,starve)
+Step 1320: 93823 living fish; 2122 exited; 2526040 (2014582,23571,487887) dead (mort,strand,starve)
+Step 1650: 69551 living fish; 3164 exited; 2822709 (2276367,28538,517804) dead (mort,strand,starve)
+Step 1980: 67498 living fish; 3538 exited; 3071955 (2483242,33435,555278) dead (mort,strand,starve)
+Step 2310: 69541 living fish; 7123 exited; 3236372 (2626557,37384,572431) dead (mort,strand,starve)
+Step 2640: 78791 living fish; 19605 exited; 3359668 (2736441,43543,579684) dead (mort,strand,starve)
+Step 2970: 40347 living fish; 31946 exited; 3453078 (2822050,50477,580551) dead (mort,strand,starve)
+Step 3300: 14321 living fish; 39906 exited; 3488970 (2849794,57968,581208) dead (mort,strand,starve)
+Step 3630: 12540 living fish; 43055 exited; 3502478 (2860979,60147,581352) dead (mort,strand,starve)
+Step 3960: 6844 living fish; 44870 exited; 3512343 (2869421,61435,581487) dead (mort,strand,starve)
 
 Finished at step 3984
 In saveTaggedHistories
@@ -53,4 +53,4 @@ Values for N: 1427, and T: 3985
 N: 1427,   T: 3985
 
 Finished loading all tracks
-Tue Jul 28 15:15:39 PDT 2026
+Tue Aug 18 14:32:33 PDT 2026

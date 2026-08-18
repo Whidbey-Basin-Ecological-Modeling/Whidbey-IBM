@@ -121,3 +121,35 @@ TEST_CASE("FishPostMovement::shouldExit in Exit habitat uses exit probability an
         REQUIRE(FishPostMovement::shouldExit(fish, []() -> float { return 0.99f; }));
     }
 }
+
+TEST_CASE("Fish lifecycle transition methods update status and exitTime using currentTime", "[fish][lifecycle]") {
+    MapNode node(HabitatType::Nearshore, 100.0f, 0.0f, 0.0f);
+
+    SECTION("exit updates status to Exited and sets exitTime") {
+        Fish fish(1, 0, 75.0f, &node);
+        fish.exit(42L);
+        REQUIRE(fish.status == FishStatus::Exited);
+        REQUIRE(fish.exitTime == 42L);
+    }
+
+    SECTION("dieMortality updates status to DeadMortality and sets exitTime") {
+        Fish fish(2, 10, 80.0f, &node);
+        fish.dieMortality(105L);
+        REQUIRE(fish.status == FishStatus::DeadMortality);
+        REQUIRE(fish.exitTime == 105L);
+    }
+
+    SECTION("dieStranding updates status to DeadStranding and sets exitTime") {
+        Fish fish(3, 5, 65.0f, &node);
+        fish.dieStranding(200L);
+        REQUIRE(fish.status == FishStatus::DeadStranding);
+        REQUIRE(fish.exitTime == 200L);
+    }
+
+    SECTION("dieStarvation updates status to DeadStarvation and sets exitTime") {
+        Fish fish(4, 0, 50.0f, &node);
+        fish.dieStarvation(350L);
+        REQUIRE(fish.status == FishStatus::DeadStarvation);
+        REQUIRE(fish.exitTime == 350L);
+    }
+}

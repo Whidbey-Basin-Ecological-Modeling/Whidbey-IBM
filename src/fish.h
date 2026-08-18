@@ -128,13 +128,13 @@ public:
     */
     bool move(Model &model);
     // Register this fish as exited
-    void exit(Model &model);
+    void exit(long currentTime);
     // Register this fish as dead due to mortality risk
-    void dieMortality(Model &model);
+    void dieMortality(long currentTime);
     // Register this fish as dead due to stranding
-    void dieStranding(Model &model);
+    void dieStranding(long currentTime);
     // Register this fish as dead due to starvation
-    void dieStarvation(Model &model);
+    void dieStarvation(long currentTime);
 
     float getPmax(const Model &model, const MapNode &loc);
     // Compute the growth (g) for a given location and movement cost (meters swum) and pmax
