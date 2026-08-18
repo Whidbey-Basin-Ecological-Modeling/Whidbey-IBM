@@ -820,34 +820,6 @@ void Model::saveSampleData(std::string savePath) {
     sampleMeanSpawnTime.putVar(sampleMeanSpawnTimeOut);
 }
 
-// void Model::saveNodeIdMapping(const std::string &nodeIdMappingPath) {
-//     try {
-//         netCDF::NcFile targetFile(nodeIdMappingPath, netCDF::NcFile::FileMode::replace);
-//
-//         std::vector<unsigned int> keys;
-//         std::vector<unsigned int> values;
-//
-//         keys.reserve(externalCsvIdToInternalId.size());
-//         values.reserve(externalCsvIdToInternalId.size());
-//
-//         for (const auto &pair: externalCsvIdToInternalId) {
-//             keys.push_back(pair.first);
-//             values.push_back(pair.second);
-//         }
-//
-//         netCDF::NcDim mapSizeDim = targetFile.addDim("map_size", keys.size());
-//
-//         netCDF::NcVar externalIds = targetFile.addVar("externalNodeIds", netCDF::ncUint, mapSizeDim);
-//         netCDF::NcVar internalIds = targetFile.addVar("internalNodeIds", netCDF::ncUint, mapSizeDim);
-//
-//         externalIds.putVar(keys.data());
-//         internalIds.putVar(values.data());
-//     } catch (netCDF::exceptions::NcException &e) {
-//         std::cerr << "NetCDF error: " << e.what() << std::endl;
-//         throw;
-//     }
-// }
-
 void Model::saveHydroMapping(const std::string &hydroMappingCsvPath) const {
     std::ofstream hydroMapOutFile(hydroMappingCsvPath);
     if (!hydroMapOutFile) {
@@ -1157,7 +1129,6 @@ Model *modelFromConfig(std::string configPath) {
 
     unsigned int rng_seed = config.getInt(ModelParamKey::rng_seed);
     GlobalRand::reseed(rng_seed);
-    std::string envDataType = d["envDataType"].GetString();
     unsigned int hwThreads = std::thread::hardware_concurrency();
     std::cout << hwThreads << " hardware threads available" << std::endl;
     int desiredThreads = -1;
@@ -1180,85 +1151,35 @@ Model *modelFromConfig(std::string configPath) {
     }
 
     Model *m;
-    if (envDataType == "file") {
-        // Get model params from JSON config object
-        int recStartTime = d["recStartTimestep"].GetInt();
-        int hydroStartTime = d["hydroStartTimestep"].GetInt();
-        // calculate the model start date as the later of the hydro/recruit data
-        int timeIntercept = std::max(recStartTime, hydroStartTime);
-        int recTimeIntercept = timeIntercept - recStartTime;
-        int hydroTimeIntercept = timeIntercept - hydroStartTime;
+    // Get model params from JSON config object
+    int recStartTime = d["recStartTimestep"].GetInt();
+    int hydroStartTime = d["hydroStartTimestep"].GetInt();
+    // calculate the model start date as the later of the hydro/recruit data
+    int timeIntercept = std::max(recStartTime, hydroStartTime);
+    int recTimeIntercept = timeIntercept - recStartTime;
+    int hydroTimeIntercept = timeIntercept - hydroStartTime;
 
-        std::vector<InitialPopulation> initialPopulations = InitialPopulation::parseFromConfig(d);
+    std::vector<InitialPopulation> initialPopulations = InitialPopulation::parseFromConfig(d);
 
-        m = new Model(
-            timeIntercept,
-            hydroTimeIntercept,
-            recTimeIntercept,
-            maxThreads,
-            std::move(initialPopulations),
-            d.HasMember("habitatTypeExitConditionHours")
-                ? d["habitatTypeExitConditionHours"].GetFloat()
-                : DEFAULT_EXIT_CONDITION_HOURS,
-            std::string(d["mapNodesFile"].GetString()),
-            std::string(d["mapEdgesFile"].GetString()),
-            std::string(d["mapGeometryFile"].GetString()),
-            d.HasMember("nodeHabitatsFile") ? std::string(d["nodeHabitatsFile"].GetString()) : "",
-            d.HasMember("blindChannelSimplificationRadius")
-                ? d["blindChannelSimplificationRadius"].GetFloat()
-                : 0.0f,
-            std::string(d["flowSpeedFile"].GetString()),
-            config
-        );
-    } else {
-        std::cout << "Full map generation disabled; only load from config is supported" << std::endl;
-        std::exit(1);
-        // Generate map from JSON config params
-        // std::vector<MapNode *> map;
-        // std::vector<MapNode *> recPoints;
-        // generateMap(
-        //     map, recPoints,
-        //     d["mapParams"]["m"].GetInt(),
-        //     d["mapParams"]["n"].GetInt(),
-        //     d["mapParams"]["a"].GetFloat(),
-        //     d["mapParams"]["pDist"].GetFloat(),
-        //     d["mapParams"]["pBlind"].GetFloat()
-        // );
-        // int simLength = d["simLength"].GetInt();
-        // std::vector<std::vector<float> > depths;
-        // std::vector<std::vector<float> > temps;
-        // float distFlow;
-        // env_sim(
-        //     simLength,
-        //     map,
-        //     depths,
-        //     temps,
-        //     distFlow
-        // );
-        // std::vector<int> recCounts;
-        // std::vector<std::vector<float> > recSizeDists;
-        // float lambda = d["recruitRate"].GetFloat();
-        // float meanSize = d["recruitSizeMean"].GetFloat();
-        // float sizeStd = d["recruitSizeStd"].GetFloat();
-        // for (int day = 0; day <= simLength / TIMESTEPS_PER_DAY; ++day) {
-        //     recCounts.push_back(poisson(lambda));
-        // }
-        // std::vector<float> recSizeDist;
-        // for (int bucketIdx = 0; bucketIdx < 14; ++bucketIdx) {
-        //     double bucketSize = 35.0 + 5.0 * (double) bucketIdx;
-        //     recSizeDist.push_back(normal_pdf(bucketSize, meanSize, sizeStd));
-        // }
-        // for (int week = 0; week <= simLength / (TIMESTEPS_PER_DAY * 7); ++week) {
-        //     recSizeDists.push_back(recSizeDist);
-        // }
-        // m = new Model(
-        //     maxThreads,
-        //     map,
-        //     recPoints,
-        //     recCounts, recSizeDists,
-        //     depths, temps, distFlow
-        // );
-    }
+    m = new Model(
+        timeIntercept,
+        hydroTimeIntercept,
+        recTimeIntercept,
+        maxThreads,
+        std::move(initialPopulations),
+        d.HasMember("habitatTypeExitConditionHours")
+            ? d["habitatTypeExitConditionHours"].GetFloat()
+            : DEFAULT_EXIT_CONDITION_HOURS,
+        std::string(d["mapNodesFile"].GetString()),
+        std::string(d["mapEdgesFile"].GetString()),
+        std::string(d["mapGeometryFile"].GetString()),
+        d.HasMember("nodeHabitatsFile") ? std::string(d["nodeHabitatsFile"].GetString()) : "",
+        d.HasMember("blindChannelSimplificationRadius")
+            ? d["blindChannelSimplificationRadius"].GetFloat()
+            : 0.0f,
+        std::string(d["flowSpeedFile"].GetString()),
+        config
+    );
     fclose(fp);
     return m;
 }

@@ -115,19 +115,7 @@ public:
         std::string flowSpeedFilename,
         const ModelConfigMap& config
     );
-
-    Model(
-        size_t maxThreads,
-        std::vector<MapNode *> &map,
-        std::vector<MapNode *> &recPoints,
-        std::vector<int> &recCounts,
-        std::vector<std::vector<float>> &recSizeDists,
-        std::vector<std::vector<float>> &depths,
-        std::vector<std::vector<float>> &temps,
-        std::vector<std::vector<float>> &salinities,
-        float distFlow
-    );
-
+    
     // for tests
     Model(HydroModel* hydroModel);
 
