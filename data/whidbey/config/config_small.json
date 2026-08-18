@@ -20,8 +20,6 @@
   "mapGeometryFile": "data/whidbey/nodes/area.csv",
   "nodeHabitatsFile": "data/whidbey/nodes/node_habitats.csv",
   "flowSpeedFile": "data/whidbey/hydro/WhidbeyBasin_Compiled_Full.nc",
-  "blindChannelSimplificationRadius": 0.0,
-  "habitatTypeExitConditionHours": 48,
   "mortMin": 0.0005,
   "mortMax": 0.002,
   "growthSlope": 0.0007,
