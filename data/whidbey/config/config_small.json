@@ -24,5 +24,6 @@
   "mortMax": 0.002,
   "growthSlope": 0.0007,
   "mortalityInflectionPoint": 500.0,
+  "habitatMortalityMultiplier": 1.0,
   "agentAwareness": "medium"
 }
