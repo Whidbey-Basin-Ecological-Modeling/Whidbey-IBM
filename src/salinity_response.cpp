@@ -4,16 +4,17 @@
 #include "map.h"
 #include <cmath>
 
-static constexpr double L_50 = 75.0;      // mm, size at which 50% preference is reached
-static constexpr double K_STEEP = 0.2;    // steepness of the sigmoid
-static constexpr double BETA = 2.0;       // global scaling for salinity importance
+static constexpr double L_50 = 65.0;      // mm, size at which 50% preference is reached
+static constexpr double K_STEEP = 0.1;    // steepness of the sigmoid
+static constexpr double BIAS_WEIGHT = 0.2;   // global scaling for salinity importance, 0.0 - 1.0
+static constexpr double SALINITY_MAX = 32.0; // maximum salinity for normalization
 
 float SalinityResponse::calculateSalinityBias(float forkLength, float nodeSalinity) {
-    // 1. Calculate the physiological 'drive' (0.0 to 1.0) using double precision
-    double drive = 1.0 / (1.0 + std::exp(-K_STEEP * (static_cast<double>(forkLength) - L_50)));
-    
-    // 2. Return the exponential weight calculated in double precision
-    return static_cast<float>(std::exp(BETA * drive * static_cast<double>(nodeSalinity)));
+    const double saltPreferenceSigmoidNormal = 1.0 / (1.0 + std::exp(-K_STEEP * (forkLength - L_50)));
+    const double salinityNormal = std::min(nodeSalinity / SALINITY_MAX, 1.0);
+    const double suitabilityMatchNormal = 1.0 - std::abs(saltPreferenceSigmoidNormal - salinityNormal);
+    const double scaledBoundedMultiplier = 1.0 + BIAS_WEIGHT * (2.0 * suitabilityMatchNormal - 1.0);
+    return scaledBoundedMultiplier;
 }
 
 float SalinityResponse::calculateSalinityBias(Model &model, MapNode &loc, float forkLength) {

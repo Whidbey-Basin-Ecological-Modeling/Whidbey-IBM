@@ -1,3 +1,18 @@
+## temp
+Step 330: 154605 living fish; 4 exited; 271217 (194309,1434,75474) dead (mort,strand,starve)
+Step 660: 298849 living fish; 2922 exited; 917346 (645105,17889,254352) dead (mort,strand,starve)
+Step 990: 459256 living fish; 4248 exited; 1775171 (1276187,37407,461577) dead (mort,strand,starve)
+Step 1320: 219656 living fish; 10526 exited; 2391803 (1808407,66169,517227) dead (mort,strand,starve)
+Step 1650: 152156 living fish; 16084 exited; 2727254 (2098241,81367,547646) dead (mort,strand,starve)
+Step 1980: 138181 living fish; 17669 exited; 2987122 (2305918,94219,586985) dead (mort,strand,starve)
+Step 2310: 117503 living fish; 28629 exited; 3166865 (2455721,101812,609332) dead (mort,strand,starve)
+Step 2640: 95011 living fish; 58238 exited; 3304815 (2558186,110320,636309) dead (mort,strand,starve)
+Step 2970: 54844 living fish; 77234 exited; 3393298 (2627889,120408,645001) dead (mort,strand,starve)
+Step 3300: 19866 living fish; 86458 exited; 3436869 (2653443,134250,649176) dead (mort,strand,starve)
+Step 3630: 14554 living fish; 90318 exited; 3453200 (2663998,138177,651025) dead (mort,strand,starve)
+Step 3960: 7731 living fish; 92778 exited; 3463548 (2670827,139923,652798) dead (mort,strand,starve)
+## end temp
+
 [100%] Built target headless
 Tue Aug 18 14:27:53 PDT 2026
 Configuring model...
