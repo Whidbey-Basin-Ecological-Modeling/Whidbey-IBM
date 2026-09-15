@@ -79,4 +79,11 @@ TEST_CASE("SalinityResponse::calculateSalinityBias response behavior", "[salinit
         REQUIRE(SalinityResponse::calculateSalinityBias(largeFish, SALINITY_MAX) >
                 SalinityResponse::calculateSalinityBias(smallFish, SALINITY_MAX));
     }
+
+    SECTION("Fish larger than L_50 in sub-midpoint salinity has bias < 1.0") {
+        float forkLength = 71.1116f;
+        float nodeSalinity = 13.4691f;
+
+        REQUIRE(SalinityResponse::calculateSalinityBias(forkLength, nodeSalinity) < 1.0f);
+    }
 }
