@@ -10,6 +10,7 @@
 #include "fish_movement_downstream.h"
 #include "fish_movement_factory.h"
 #include "fish_post_movement.h"
+#include "salinity_response.h"
 #include "util.h"
 
 const float CA = 0.303;
@@ -365,7 +366,10 @@ void Fish::getReachableNodes(Model &model, std::unordered_map<MapNode *, float> 
 // }
 
 float Fish::getFitness(Model &model, MapNode &loc, float cost) {
-    return this->getGrowth(model, loc, cost) / this->getMortality(model, loc);
+    float growth = this->getGrowth(model, loc, cost);
+    float mortality = this->getMortality(model, loc);
+    float salinityBias = SalinityResponse::calculateSalinityBias(model, loc, this->forkLength);
+    return salinityBias * (growth / mortality);
 }
 
 void Fish::incrementExitHabitatHoursByOneTimestep() {

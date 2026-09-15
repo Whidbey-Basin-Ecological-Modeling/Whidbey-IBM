@@ -18,6 +18,7 @@ set(MODEL_SOURCES
         ../src/map.cpp
         ../src/map_gen.cpp
         ../src/model.cpp
+        ../src/salinity_response.cpp
         ../src/util.cpp
 )
 
@@ -36,6 +37,7 @@ set(TEST_SOURCES
         fish_post_movement_test.cpp
         model_recruitment_test.cpp
         model_test.cpp
+        salinity_response_test.cpp
 )
 
 # These tests can use the Catch2-provided main
