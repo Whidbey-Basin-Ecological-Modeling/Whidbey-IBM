@@ -25,7 +25,10 @@ enum class ModelParamKey {
     PmaxUpperLimitNearshore,
     PmaxLowerLimit,
     AgentAwareness,
-    MortalityInflectionPoint
+    MortalityInflectionPoint,
+    SalinityAttractionLength,
+    SalinitySigmoidSteepness,
+    SalinityBiasWeight
 };
 
 class ModelConfigMap {

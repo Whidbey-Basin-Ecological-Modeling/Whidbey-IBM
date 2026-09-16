@@ -86,4 +86,27 @@ TEST_CASE("SalinityResponse::calculateSalinityBias response behavior", "[salinit
 
         REQUIRE(SalinityResponse::calculateSalinityBias(forkLength, nodeSalinity) < 1.0f);
     }
+
+    SECTION("Custom configuration parameters modify bias calculation accordingly") {
+        float fish = 65.0f;
+        float nodeSalinity = 0.0f; // fresh water
+
+        // With default attractionLength (65.0), 65mm fish is neutral (bias == 1.0)
+        REQUIRE(SalinityResponse::calculateSalinityBias(fish, nodeSalinity, 65.0f, 0.1f, 0.2f) == Catch::Approx(1.0f));
+
+        // If attractionLength is increased to 80.0, 65mm fish prefers fresh water (bias > 1.0)
+        REQUIRE(SalinityResponse::calculateSalinityBias(fish, nodeSalinity, 80.0f, 0.1f, 0.2f) > 1.0f);
+
+        // If attractionLength is decreased to 50.0, 65mm fish avoids fresh water (bias < 1.0)
+        REQUIRE(SalinityResponse::calculateSalinityBias(fish, nodeSalinity, 50.0f, 0.1f, 0.2f) < 1.0f);
+
+        // If biasWeight is 0, bias is exactly 1.0 regardless of fish size or salinity
+        REQUIRE(SalinityResponse::calculateSalinityBias(35.0f, nodeSalinity, 65.0f, 0.1f, 0.0f) == Catch::Approx(1.0f));
+        REQUIRE(SalinityResponse::calculateSalinityBias(95.0f, nodeSalinity, 65.0f, 0.1f, 0.0f) == Catch::Approx(1.0f));
+
+        // Steeper sigmoid increases preference magnitude for off-center fish
+        float biasLowSteep = SalinityResponse::calculateSalinityBias(70.0f, 32.0f, 65.0f, 0.01f, 0.2f);
+        float biasHighSteep = SalinityResponse::calculateSalinityBias(70.0f, 32.0f, 65.0f, 0.5f, 0.2f);
+        REQUIRE(biasHighSteep > biasLowSteep);
+    }
 }

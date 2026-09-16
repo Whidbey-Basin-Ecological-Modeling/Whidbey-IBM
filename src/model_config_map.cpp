@@ -19,6 +19,9 @@ std::unordered_map<ModelParamKey, ConfigDefinition> ModelConfigMap::createDefaul
         {ModelParamKey::PmaxLowerLimit, {"pmaxLowerLimit", 0.2f}},
         {ModelParamKey::AgentAwareness, {"agentAwareness", "medium"}}, // options are "low", "medium", and "high"
         {ModelParamKey::MortalityInflectionPoint, {"mortalityInflectionPoint", 500.0f}},
+        {ModelParamKey::SalinityAttractionLength, {"salinityAttractionLength", 65.0f}},
+        {ModelParamKey::SalinitySigmoidSteepness, {"salinitySigmoidSteepness", 0.1f}},
+        {ModelParamKey::SalinityBiasWeight, {"salinityBiasWeight", 0.2f}},
     };
 }
 
