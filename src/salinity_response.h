@@ -9,9 +9,9 @@ public:
     static float calculateSalinityBias(
         float forkLength,
         float nodeSalinity,
-        float attractionLength = 65.0f,
-        float sigmoidSteepness = 0.1f,
-        float biasWeight = 0.2f
+        float attractionLength,
+        float sigmoidSteepness,
+        float biasWeight
     );
     static float calculateSalinityBias(Model &model, MapNode &loc, float forkLength);
 };

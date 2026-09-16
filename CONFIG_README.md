@@ -19,6 +19,9 @@ Parameters:
 - `pmaxUpperLimit`: float; optional; default 0.8; upperLimit used in the Pmax equation 
 - `pmaxUpperLimitNearshore`: float; optional; default 1.0; nearshore habitat upperLimit used in the Pmax equation 
 - `pmaxLowerLimit`: float; optional; default 0.2; lowerLimit used in the Pmax equation 
+- `salinityAttractionLength`: float; optional; default 65.0; fish length (in mm) at which neutral salinity preference is reached in the salinity response calculation
+- `salinitySigmoidSteepness`: float; optional; default 0.1; steepness parameter of the sigmoid in the salinity response calculation
+- `salinityBiasWeight`: float; optional; default 0.2; weight/scaling factor applied to the salinity preference match in movement bias calculation
 - `agentAwareness`: string; optional; default "medium"; the agent awareness level (aka movement omniscience) to use in 
   the model. Options are "low", "medium", and "high".
 - `envDataType`: *DEPRECATED:* Only "string" is supported, and need not be specified in the config
