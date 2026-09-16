@@ -4,6 +4,36 @@ This file records major feature changes. It goes back in time to 11.19.2024. "Re
 when the completed feature was merged to the main branch. Functional parts of a feature may have been merged earlier.
 Minor updates are not recorded.
 
+## 09.15.2026
+- `SalinityResponse` model implemented to calculate salinity movement bias for fish.
+- added configuration parameters in JSON for salinity response: `salinityAttractionLength`, `salinitySigmoidSteepness`, and `salinityBiasWeight`.
+
+## 08.18.2026
+- probabilistic fish exit condition based on fish length (`FishPostMovement`).
+- distributaries and harbors are now treated as always wet.
+- removed simulated hydro and model data modes.
+- map loading now checks and aborts if nodes without edges are found.
+
+## 07.28.2026
+- switched to new map loading routines and updated configuration formats for Whidbey data.
+- hydro node IDs are read directly from netCDF, and nearest hydro nodes are mapped via direct pointers.
+- default value for `virtualNodes` changed to 0.
+
+## 07.14.2026
+- support for loading Whidbey map data formats (node habitat types, edges, and initial populations).
+- GUI and loader updated to support 1-based map indexing.
+
+## 06.23.2026
+- removed high tide data and functionality.
+- node areas are now read from the geometry (areas) file.
+
+## 06.09.2026
+- fish movement and stranding are now determined by hydro node wet/dry status (`is_wet`) rather than node elevation heuristics.
+- mortality breakdown is now reported to the console.
+
+## 05.26.2026
+- `wseTempFile` deprecated; all hydrology data (water surface elevation `zeta`, temperature, velocity, and salinity) is now unified into `flowSpeedFile`.
+
 ## 05.25.2026
 - new hydro data for Whidbey Basin
 - added salinity data to `DistribHydroNode` and `HydroModel`.
