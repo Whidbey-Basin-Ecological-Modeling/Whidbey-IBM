@@ -113,7 +113,7 @@ float limitWaterTemp(float waterTemp, HabitatType nodeType) {
 }
 
 float limitWaterTemp(float waterTemp, Habitat nodeHabitat) {
-    return limitWaterTemp(waterTemp, nodeHabitat.fineHabitat);
+    return limitWaterTemp(waterTemp, nodeHabitat.fine);
 }
 
 // Get the current temperature (C) at the given node
@@ -140,7 +140,7 @@ float limitDepth(const float depth, const HabitatType nodeType) {
 }
 
 float limitDepth(const float depth, const Habitat nodeHabitat) {
-    return limitDepth(depth, nodeHabitat.fineHabitat);
+    return limitDepth(depth, nodeHabitat.fine);
 }
 
 // Get the current depth (m) at the given node

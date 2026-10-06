@@ -9,7 +9,7 @@ bool isDistributary(HabitatType t, bool includeDistributaryEdge) {
 }
 
 bool isDistributary(Habitat h, bool includeDistributaryEdge) {
-    return isDistributary(h.fineHabitat, includeDistributaryEdge);
+    return isDistributary(h.fine, includeDistributaryEdge);
 }
 
 bool isHarbor(HabitatType t) {
@@ -17,7 +17,7 @@ bool isHarbor(HabitatType t) {
 }
 
 bool isHarbor(Habitat h) {
-    return isHarbor(h.fineHabitat);
+    return isHarbor(h.fine);
 }
 
 bool isNearshore(HabitatType t) {
@@ -25,7 +25,7 @@ bool isNearshore(HabitatType t) {
 }
 
 bool isNearshore(Habitat h) {
-    return isNearshore(h.fineHabitat);
+    return isNearshore(h.fine);
 }
 
 bool isBlindChannel(HabitatType t) {
@@ -33,7 +33,7 @@ bool isBlindChannel(HabitatType t) {
 }
 
 bool isBlindChannel(Habitat h) {
-    return isBlindChannel(h.fineHabitat);
+    return isBlindChannel(h.fine);
 }
 
 bool isImpoundment(HabitatType t) {
@@ -41,7 +41,7 @@ bool isImpoundment(HabitatType t) {
 }
 
 bool isImpoundment(Habitat h) {
-    return isImpoundment(h.fineHabitat);
+    return isImpoundment(h.fine);
 }
 
 bool isDistributaryOrHarbor(const HabitatType t) {
@@ -49,7 +49,7 @@ bool isDistributaryOrHarbor(const HabitatType t) {
 }
 
 bool isDistributaryOrHarbor(Habitat h) {
-    return isDistributaryOrHarbor(h.fineHabitat);
+    return isDistributaryOrHarbor(h.fine);
 }
 
 bool isDistributaryOrNearshore(const HabitatType t) {
@@ -57,7 +57,7 @@ bool isDistributaryOrNearshore(const HabitatType t) {
 }
 
 bool isDistributaryOrNearshore(Habitat h) {
-    return isDistributaryOrNearshore(h.fineHabitat);
+    return isDistributaryOrNearshore(h.fine);
 }
 
 bool isDistributaryWithoutEdgeOrIsNearshore(HabitatType habitat) {
@@ -65,7 +65,7 @@ bool isDistributaryWithoutEdgeOrIsNearshore(HabitatType habitat) {
 }
 
 bool isDistributaryWithoutEdgeOrIsNearshore(Habitat habitat) {
-    return isDistributaryWithoutEdgeOrIsNearshore(habitat.fineHabitat);
+    return isDistributaryWithoutEdgeOrIsNearshore(habitat.fine);
 }
 
 float habitatTypeMortalityConst(const HabitatType t, const float habitatMortalityMultiplier) {
@@ -77,7 +77,7 @@ float habitatTypeMortalityConst(const HabitatType t, const float habitatMortalit
 }
 
 float habitatTypeMortalityConst(const Habitat h, const float habitatMortalityMultiplier) {
-    return habitatTypeMortalityConst(h.fineHabitat, habitatMortalityMultiplier);
+    return habitatTypeMortalityConst(h.fine, habitatMortalityMultiplier);
 }
 
 Edge::Edge(MapNode *source, MapNode *target, float length)

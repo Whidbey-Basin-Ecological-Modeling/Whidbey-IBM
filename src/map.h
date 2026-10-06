@@ -56,15 +56,15 @@ enum class HabitatType {
 };
 
 struct Habitat {
-    HabitatType fineHabitat;
+    HabitatType fine;
 
-    Habitat() : fineHabitat(HabitatType::Distributary) {}
-    explicit Habitat(HabitatType fine) : fineHabitat(fine) {}
+    Habitat() : fine(HabitatType::Distributary) {}
+    explicit Habitat(HabitatType fine) : fine(fine) {}
 
-    bool operator==(const Habitat& other) const { return fineHabitat == other.fineHabitat; }
-    bool operator!=(const Habitat& other) const { return fineHabitat != other.fineHabitat; }
-    bool operator==(HabitatType fine) const { return fineHabitat == fine; }
-    bool operator!=(HabitatType fine) const { return fineHabitat != fine; }
+    bool operator==(const Habitat& other) const { return fine == other.fine; }
+    bool operator!=(const Habitat& other) const { return fine != other.fine; }
+    bool operator==(HabitatType other) const { return fine == other; }
+    bool operator!=(HabitatType other) const { return fine != other; }
 };
 
 bool isDistributary(HabitatType t, bool includeDistributaryEdge = true);

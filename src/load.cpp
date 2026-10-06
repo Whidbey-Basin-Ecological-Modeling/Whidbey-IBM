@@ -667,7 +667,7 @@ void outputNodeCounts(const std::vector<MapNode*> &nodes, const std::string &nod
 
     // Count nodes by habitat type
     for (const auto* node : nodes) {
-        habitatTypeCount[node->habitat.fineHabitat]++;
+        habitatTypeCount[node->habitat.fine]++;
     }
 
     // Output the counts
@@ -896,7 +896,7 @@ void checkDisjointDistributariesAndOtherMapErrors(std::vector<MapNode *> &map, s
             }
         }
         if (isDistributary(node->habitat) && disconnected) {
-            node->habitat.fineHabitat = HabitatType::BlindChannel;
+            node->habitat.fine = HabitatType::BlindChannel;
             ++corrected;
         }
     }
@@ -1462,7 +1462,7 @@ bool readNodeHabitatTypes(const std::vector<MapNode *> &dest, std::istream &node
             continue;
         }
 
-        dest[id]->habitat.fineHabitat = it->second;
+        dest[id]->habitat.fine = it->second;
     }
     return success;
 }

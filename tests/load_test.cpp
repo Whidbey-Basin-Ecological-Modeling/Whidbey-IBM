@@ -645,8 +645,8 @@ TEST_CASE("readNodeHabitatTypes functionality", "[load]") {
     nodes.push_back(new MapNode(2, 30.0f, 40.0f));
 
     SECTION("Valid habitat updates") {
-        nodes[1]->habitat.fineHabitat = HabitatType::OpenWater;
-        nodes[2]->habitat.fineHabitat = HabitatType::OpenWater;
+        nodes[1]->habitat.fine = HabitatType::OpenWater;
+        nodes[2]->habitat.fine = HabitatType::OpenWater;
 
         std::stringstream ss;
         ss << "node,habitat" << std::endl;
@@ -672,7 +672,7 @@ TEST_CASE("readNodeHabitatTypes functionality", "[load]") {
     }
 
     SECTION("Bad habitat data (too few columns)") {
-        nodes[1]->habitat.fineHabitat = HabitatType::OpenWater;
+        nodes[1]->habitat.fine = HabitatType::OpenWater;
         std::stringstream ss;
         ss << "node,habitat" << std::endl;
         ss << "1" << std::endl; // Missing second column
@@ -683,7 +683,7 @@ TEST_CASE("readNodeHabitatTypes functionality", "[load]") {
     }
 
     SECTION("Node ID out of range") {
-        nodes[1]->habitat.fineHabitat = HabitatType::OpenWater;
+        nodes[1]->habitat.fine = HabitatType::OpenWater;
         std::stringstream ss;
         ss << "node,habitat" << std::endl;
         ss << "3,nearshore" << std::endl; // ID 3 is out of range (max index 2)
@@ -694,7 +694,7 @@ TEST_CASE("readNodeHabitatTypes functionality", "[load]") {
     }
 
     SECTION("Unknown habitat type") {
-        nodes[1]->habitat.fineHabitat = HabitatType::OpenWater;
+        nodes[1]->habitat.fine = HabitatType::OpenWater;
         std::stringstream ss;
         ss << "node,habitat" << std::endl;
         ss << "1,magical forest" << std::endl;
