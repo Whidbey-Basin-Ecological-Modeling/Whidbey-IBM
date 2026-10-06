@@ -69,7 +69,7 @@ FlowVelocity HydroModel::getScaledFlowVelocityAt(const MapNode &node) {
 }
 
 double HydroModel::calculateFlowSpeedScalar(const MapNode &node) {
-    if (!isBlindChannel(node.type) && !isImpoundment(node.type)) {
+    if (!isBlindChannel(node.habitat) && !isImpoundment(node.habitat)) {
         return 1.0;
     }
     const double hydroFlowSpeed = this->getUnsignedFlowSpeedAtHydroNode(*node.nearestHydroNode);
@@ -80,7 +80,7 @@ double HydroModel::calculateFlowSpeedScalar(const MapNode &node) {
     if (scalar > 1.0) {
         scalar = 1.0;
     }
-    if (isImpoundment(node.type)) {
+    if (isImpoundment(node.habitat)) {
         constexpr double IMPOUNDMENT_MIN_FLOW_ADDL_SCALAR = 0.1;
         scalar *= IMPOUNDMENT_MIN_FLOW_ADDL_SCALAR;
     }
@@ -112,10 +112,14 @@ float limitWaterTemp(float waterTemp, HabitatType nodeType) {
     return waterTemperature;
 }
 
+float limitWaterTemp(float waterTemp, Habitat nodeHabitat) {
+    return limitWaterTemp(waterTemp, nodeHabitat.fineHabitat);
+}
+
 // Get the current temperature (C) at the given node
 float HydroModel::getTemp(MapNode &node) {
     const float hydroTemp = node.nearestHydroNode->temps[this->getTime()];
-    return limitWaterTemp(hydroTemp, node.type);
+    return limitWaterTemp(hydroTemp, node.habitat);
 }
 
 // Get the current salinity (psu) at the given node
@@ -124,7 +128,7 @@ float HydroModel::getSalinity(MapNode &node) {
 }
 
 bool HydroModel::isDry(MapNode &node) {
-    if (isDistributaryOrHarbor(node.type))
+    if (isDistributaryOrHarbor(node.habitat))
         return false;
 
     return node.nearestHydroNode->is_wet[this->getTime()] == 0.0f;
@@ -135,10 +139,14 @@ float limitDepth(const float depth, const HabitatType nodeType) {
     return (depth < min_depth) ? min_depth : depth;
 }
 
+float limitDepth(const float depth, const Habitat nodeHabitat) {
+    return limitDepth(depth, nodeHabitat.fineHabitat);
+}
+
 // Get the current depth (m) at the given node
 // Depth is hacked to be 5m in distributary midchannel, 3m at distributary edges
 // (based on blind channel model everywhere else)
 float HydroModel::getDepth(MapNode &node) {
     const float depth = node.nearestHydroNode->wses[this->getTime()] - node.elev;
-    return limitDepth(depth, node.type);
+    return limitDepth(depth, node.habitat);
 }

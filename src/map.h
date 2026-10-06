@@ -55,15 +55,34 @@ enum class HabitatType {
     HabitatTypeCountSentinel
 };
 
+struct Habitat {
+    HabitatType fineHabitat;
+
+    Habitat() : fineHabitat(HabitatType::Distributary) {}
+    explicit Habitat(HabitatType fine) : fineHabitat(fine) {}
+
+    bool operator==(const Habitat& other) const { return fineHabitat == other.fineHabitat; }
+    bool operator!=(const Habitat& other) const { return fineHabitat != other.fineHabitat; }
+    bool operator==(HabitatType fine) const { return fineHabitat == fine; }
+    bool operator!=(HabitatType fine) const { return fineHabitat != fine; }
+};
+
 bool isDistributary(HabitatType t, bool includeDistributaryEdge = true);
+bool isDistributary(Habitat h, bool includeDistributaryEdge = true);
 bool isDistributaryOrHarbor(HabitatType t);
+bool isDistributaryOrHarbor(Habitat h);
 bool isDistributaryOrNearshore(HabitatType t);
+bool isDistributaryOrNearshore(Habitat h);
 bool isNearshore(HabitatType t);
+bool isNearshore(Habitat h);
 bool isBlindChannel(HabitatType t);
+bool isBlindChannel(Habitat h);
 bool isImpoundment(HabitatType t);
+bool isImpoundment(Habitat h);
 
 // Returns the mortality constant for a given habitat type
 float habitatTypeMortalityConst(const HabitatType t, const float habitatMortalityMultiplier);
+float habitatTypeMortalityConst(const Habitat h, const float habitatMortalityMultiplier);
 
 // Represents a link between two map locations
 class Edge {
@@ -87,8 +106,8 @@ public:
     std::vector<Edge> edges;
     float x; // horizontal (longitudinal) UTM Zone 10N coordinate
     float y; // vertical (latitudinal) UTM Zone 10N coordinate
-    // see HabitatType declaration above
-    HabitatType type;
+    // see Habitat declaration above
+    Habitat habitat;
     // Area represented by this location (m^2)
     float area;
     // Ground-level elevation of this node (distance to NAVD88) in meters
@@ -111,7 +130,8 @@ public:
     // Maximum fish mass at this location (g) -- updated in Model::countAll
     float maxMass;
 
-    MapNode(HabitatType type, float area, float elev, float pathDist);
+    MapNode(Habitat habitat, float area, float elev, float pathDist);
+    MapNode(HabitatType fineHabitat, float area, float elev, float pathDist);
     MapNode(int id, float x, float y);
 };
 

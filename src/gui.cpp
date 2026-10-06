@@ -168,7 +168,7 @@ std::vector<std::string> getLocInfo(Model &model, MapNode &node) {
     std::ostringstream os;
     os << "Node ID: " << node.id + 1; result.push_back(os.str()); os.str("");
     os << "Pop. density: " << node.popDensity; result.push_back(os.str()); os.str("");
-    os << "Habitat type: " << getHabTypeName(node.type); result.push_back(os.str()); os.str("");
+    os << "Habitat type: " << getHabTypeName(node.habitat.fineHabitat); result.push_back(os.str()); os.str("");
     os << "Elevation: " << node.elev << "m"; result.push_back(os.str()); os.str("");
     os << "Area: " << node.area << "m2"; result.push_back(os.str()); os.str("");
     os << "Depth: " << model.hydroModel.getDepth(node) << "m"; result.push_back(os.str()); os.str("");
@@ -498,13 +498,13 @@ void MapView::redraw(wxDC &dc, float centerX, float centerY, float viewW, float 
             }
 
             // Choose pen color based on direction and types
-            if (n->type == HabitatType::DistributaryEdge && other->type == HabitatType::DistributaryEdge) {
+            if (n->habitat == HabitatType::DistributaryEdge && other->habitat == HabitatType::DistributaryEdge) {
                 dc.SetPen(wxPen(*getHabitatColor(HabitatType::DistributaryEdge)));
             } else {
                 // Legacy behavior:
                 // - outgoing edges used n->type color
                 // - incoming edges used source(node on the other end)->type color (i.e., "other")
-                dc.SetPen(wxPen(*getHabitatColor(isOutgoing ? n->type : other->type)));
+                dc.SetPen(wxPen(*getHabitatColor(isOutgoing ? n->habitat.fineHabitat : other->habitat.fineHabitat)));
             }
 
             int x1 = (int) zoom(other->x, centerX, viewW/2.0f, this->viewZoom);

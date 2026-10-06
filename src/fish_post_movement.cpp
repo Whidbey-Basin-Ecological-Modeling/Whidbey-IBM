@@ -9,7 +9,7 @@ float FishPostMovement::calculateExitProbability(float forkLength) {
 }
 
 bool FishPostMovement::shouldExit(Fish& fish, float (*rand_func)()) {
-    if (fish.location == nullptr || fish.location->type != HabitatType::Exit) {
+    if (fish.location == nullptr || fish.location->habitat != HabitatType::Exit) {
         return false;
     }
     float exitProbability = calculateExitProbability(fish.forkLength);

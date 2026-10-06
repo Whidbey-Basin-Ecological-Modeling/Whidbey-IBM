@@ -47,7 +47,7 @@ void env_sim(
         std::vector<float> nodeTemps;
         std::vector<float> nodeSalinities;
         for (size_t t = 0; t < sim_length; ++t) {
-            if (isDistributary(node->type)) {
+            if (isDistributary(node->habitat)) {
                 nodeDepths.push_back(dist_depth);
                 nodeTemps.push_back(dist_temp);
                 nodeSalinities.push_back(dist_salinity);

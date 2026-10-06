@@ -170,7 +170,7 @@ TEST_CASE("getReachableNeighbors basic functionality") {
         REQUIRE(result.size() == 1);
 
         const auto &[node, cost, fitness] = result[0];
-        REQUIRE(node->type == HabitatType::Distributary);
+        REQUIRE(node->habitat == HabitatType::Distributary);
         REQUIRE(cost == Catch::Approx(5.0f));
     }
 

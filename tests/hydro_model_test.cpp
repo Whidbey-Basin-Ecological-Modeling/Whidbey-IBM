@@ -43,7 +43,7 @@ TEST_CASE("HydroModel::getScaledFlowVelocityAt tests", "[hydro]") {
         CHECK(result_blind_channel.u > 0.0f);
         CHECK(result_blind_channel.v > 0.0f);
         SECTION("Impoundment node") {
-            node.type = HabitatType::Impoundment;
+            node.habitat.fineHabitat = HabitatType::Impoundment;
 
             FlowVelocity result_impoundment = hydro_model.getScaledFlowVelocityAt(node);
 
@@ -92,7 +92,7 @@ TEST_CASE("HydroModel::calculateFlowSpeedScalar tests", "[hydro]") {
         REQUIRE(bc_scalar <= 1.0);
         REQUIRE(bc_scalar > 0.0);
 
-        node.type = HabitatType::Impoundment;
+        node.habitat.fineHabitat = HabitatType::Impoundment;
         double impoundment_scalar = hydro_model.calculateFlowSpeedScalar(node);
 
         REQUIRE_THAT(impoundment_scalar, Catch::Matchers::WithinRel(bc_scalar * 0.1f, 0.001));
