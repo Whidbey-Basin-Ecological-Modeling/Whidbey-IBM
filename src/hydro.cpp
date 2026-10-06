@@ -69,7 +69,7 @@ FlowVelocity HydroModel::getScaledFlowVelocityAt(const MapNode &node) {
 }
 
 double HydroModel::calculateFlowSpeedScalar(const MapNode &node) {
-    if (!isBlindChannel(node.habitat) && !isImpoundment(node.habitat)) {
+    if (!node.habitat.isBlindChannel() && !node.habitat.isImpoundment()) {
         return 1.0;
     }
     const double hydroFlowSpeed = this->getUnsignedFlowSpeedAtHydroNode(*node.nearestHydroNode);
@@ -80,7 +80,7 @@ double HydroModel::calculateFlowSpeedScalar(const MapNode &node) {
     if (scalar > 1.0) {
         scalar = 1.0;
     }
-    if (isImpoundment(node.habitat)) {
+    if (node.habitat.isImpoundment()) {
         constexpr double IMPOUNDMENT_MIN_FLOW_ADDL_SCALAR = 0.1;
         scalar *= IMPOUNDMENT_MIN_FLOW_ADDL_SCALAR;
     }
@@ -99,21 +99,17 @@ float HydroModel::getUnsignedFlowSpeedAt(MapNode &node) {
     return scaledFlowSpeed(velocity, node);
 }
 
-float limitWaterTemp(float waterTemp, HabitatType nodeType) {
+float limitWaterTemp(float waterTemp, Habitat nodeHabitat) {
     float waterTemperature = waterTemp;
     if (waterTemperature > MAX_WATER_TEMP) {
         waterTemperature = MAX_WATER_TEMP;
     }
-    const float minimum_water_temperature = isDistributaryOrHarbor(nodeType) ? MIN_WATER_TEMP_DISTRIBUTARY : MIN_WATER_TEMP;
+    const float minimum_water_temperature = nodeHabitat.isDistributaryOrHarbor() ? MIN_WATER_TEMP_DISTRIBUTARY : MIN_WATER_TEMP;
     if (waterTemperature < minimum_water_temperature) {
         waterTemperature = minimum_water_temperature;
     }
 
     return waterTemperature;
-}
-
-float limitWaterTemp(float waterTemp, Habitat nodeHabitat) {
-    return limitWaterTemp(waterTemp, nodeHabitat.fine);
 }
 
 // Get the current temperature (C) at the given node
@@ -128,19 +124,15 @@ float HydroModel::getSalinity(MapNode &node) {
 }
 
 bool HydroModel::isDry(MapNode &node) {
-    if (isDistributaryOrHarbor(node.habitat))
+    if (node.habitat.isDistributaryOrHarbor())
         return false;
 
     return node.nearestHydroNode->is_wet[this->getTime()] == 0.0f;
 }
 
-float limitDepth(const float depth, const HabitatType nodeType) {
-    const float min_depth = isDistributaryOrHarbor(nodeType) ? MIN_DEPTH_DISTRIBUTARY : MIN_DEPTH;
-    return (depth < min_depth) ? min_depth : depth;
-}
-
 float limitDepth(const float depth, const Habitat nodeHabitat) {
-    return limitDepth(depth, nodeHabitat.fine);
+    const float min_depth = nodeHabitat.isDistributaryOrHarbor() ? MIN_DEPTH_DISTRIBUTARY : MIN_DEPTH;
+    return (depth < min_depth) ? min_depth : depth;
 }
 
 // Get the current depth (m) at the given node

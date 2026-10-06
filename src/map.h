@@ -61,28 +61,22 @@ struct Habitat {
     Habitat() : fine(HabitatType::Distributary) {}
     explicit Habitat(HabitatType fine) : fine(fine) {}
 
+    bool isDistributary(bool includeDistributaryEdge = true) const;
+    bool isHarbor() const;
+    bool isNearshore() const;
+    bool isBlindChannel() const;
+    bool isImpoundment() const;
+    bool isDistributaryOrHarbor() const;
+    bool isDistributaryOrNearshore() const;
+    bool isDistributaryWithoutEdgeOrIsNearshore() const;
+
+    float getMortalityConst(float habitatMortalityMultiplier) const;
+
     bool operator==(const Habitat& other) const { return fine == other.fine; }
     bool operator!=(const Habitat& other) const { return fine != other.fine; }
     bool operator==(HabitatType other) const { return fine == other; }
     bool operator!=(HabitatType other) const { return fine != other; }
 };
-
-bool isDistributary(HabitatType t, bool includeDistributaryEdge = true);
-bool isDistributary(Habitat h, bool includeDistributaryEdge = true);
-bool isDistributaryOrHarbor(HabitatType t);
-bool isDistributaryOrHarbor(Habitat h);
-bool isDistributaryOrNearshore(HabitatType t);
-bool isDistributaryOrNearshore(Habitat h);
-bool isNearshore(HabitatType t);
-bool isNearshore(Habitat h);
-bool isBlindChannel(HabitatType t);
-bool isBlindChannel(Habitat h);
-bool isImpoundment(HabitatType t);
-bool isImpoundment(Habitat h);
-
-// Returns the mortality constant for a given habitat type
-float habitatTypeMortalityConst(const HabitatType t, const float habitatMortalityMultiplier);
-float habitatTypeMortalityConst(const Habitat h, const float habitatMortalityMultiplier);
 
 // Represents a link between two map locations
 class Edge {

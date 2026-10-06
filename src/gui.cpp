@@ -65,6 +65,10 @@ wxColour *getHabitatColor(HabitatType t) {
     }
 }
 
+wxColour *getHabitatColor(Habitat h) {
+    return getHabitatColor(h.fine);
+}
+
 std::vector<HabitatType> legendHabitatTypes {
     HabitatType::Impoundment,
     HabitatType::Distributary,
@@ -92,6 +96,10 @@ std::string getHabTypeName(HabitatType t) {
     case HabitatType::Harbor:
         return "Boat harbor";
     }
+}
+
+std::string getHabTypeName(Habitat h) {
+    return getHabTypeName(h.fine);
 }
 
 std::string getStatusName(FishStatus s) {
@@ -168,8 +176,7 @@ std::vector<std::string> getLocInfo(Model &model, MapNode &node) {
     std::ostringstream os;
     os << "Node ID: " << node.id + 1; result.push_back(os.str()); os.str("");
     os << "Pop. density: " << node.popDensity; result.push_back(os.str()); os.str("");
-    os << "Habitat type: " << getHabTypeName(node.habitat.fine); result.push_back(os.str()); os.str("");
-    os << "Habitat type: " << getHabTypeName(node.habitat.fine); result.push_back(os.str()); os.str("");
+    os << "Habitat type: " << getHabTypeName(node.habitat); result.push_back(os.str()); os.str("");
     os << "Elevation: " << node.elev << "m"; result.push_back(os.str()); os.str("");
     os << "Area: " << node.area << "m2"; result.push_back(os.str()); os.str("");
     os << "Depth: " << model.hydroModel.getDepth(node) << "m"; result.push_back(os.str()); os.str("");
@@ -505,7 +512,7 @@ void MapView::redraw(wxDC &dc, float centerX, float centerY, float viewW, float 
                 // Legacy behavior:
                 // - outgoing edges used n->type color
                 // - incoming edges used source(node on the other end)->type color (i.e., "other")
-                dc.SetPen(wxPen(*getHabitatColor(isOutgoing ? n->habitat.fine : other->habitat.fine)));
+                dc.SetPen(wxPen(*getHabitatColor(isOutgoing ? n->habitat : other->habitat)));
             }
 
             int x1 = (int) zoom(other->x, centerX, viewW/2.0f, this->viewZoom);

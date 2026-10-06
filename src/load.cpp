@@ -895,7 +895,7 @@ void checkDisjointDistributariesAndOtherMapErrors(std::vector<MapNode *> &map, s
                 ++orphaned_protected;
             }
         }
-        if (isDistributary(node->habitat) && disconnected) {
+        if (node->habitat.isDistributary() && disconnected) {
             node->habitat.fine = HabitatType::BlindChannel;
             ++corrected;
         }

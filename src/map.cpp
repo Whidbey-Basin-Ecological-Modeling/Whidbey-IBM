@@ -4,80 +4,44 @@
 #include <cmath>
 #include <limits>
 
-bool isDistributary(HabitatType t, bool includeDistributaryEdge) {
-    return (t==HabitatType::Distributary) || (includeDistributaryEdge && t==HabitatType::DistributaryEdge);
+bool Habitat::isDistributary(bool includeDistributaryEdge) const {
+    return (fine == HabitatType::Distributary) || (includeDistributaryEdge && fine == HabitatType::DistributaryEdge);
 }
 
-bool isDistributary(Habitat h, bool includeDistributaryEdge) {
-    return isDistributary(h.fine, includeDistributaryEdge);
+bool Habitat::isHarbor() const {
+    return fine == HabitatType::Harbor;
 }
 
-bool isHarbor(HabitatType t) {
-    return t == HabitatType::Harbor;
+bool Habitat::isNearshore() const {
+    return fine == HabitatType::Nearshore;
 }
 
-bool isHarbor(Habitat h) {
-    return isHarbor(h.fine);
+bool Habitat::isBlindChannel() const {
+    return fine == HabitatType::BlindChannel;
 }
 
-bool isNearshore(HabitatType t) {
-    return t == HabitatType::Nearshore;
+bool Habitat::isImpoundment() const {
+    return fine == HabitatType::Impoundment;
 }
 
-bool isNearshore(Habitat h) {
-    return isNearshore(h.fine);
+bool Habitat::isDistributaryOrHarbor() const {
+    return isDistributary() || isHarbor();
 }
 
-bool isBlindChannel(HabitatType t) {
-    return t == HabitatType::BlindChannel;
+bool Habitat::isDistributaryOrNearshore() const {
+    return isDistributary() || isNearshore();
 }
 
-bool isBlindChannel(Habitat h) {
-    return isBlindChannel(h.fine);
+bool Habitat::isDistributaryWithoutEdgeOrIsNearshore() const {
+    return isDistributary(false) || isNearshore();
 }
 
-bool isImpoundment(HabitatType t) {
-    return t == HabitatType::Impoundment;
-}
-
-bool isImpoundment(Habitat h) {
-    return isImpoundment(h.fine);
-}
-
-bool isDistributaryOrHarbor(const HabitatType t) {
-    return isDistributary(t) || isHarbor(t);
-}
-
-bool isDistributaryOrHarbor(Habitat h) {
-    return isDistributaryOrHarbor(h.fine);
-}
-
-bool isDistributaryOrNearshore(const HabitatType t) {
-    return isDistributary(t) || isNearshore(t);
-}
-
-bool isDistributaryOrNearshore(Habitat h) {
-    return isDistributaryOrNearshore(h.fine);
-}
-
-bool isDistributaryWithoutEdgeOrIsNearshore(HabitatType habitat) {
-    return isDistributary(habitat, false) || isNearshore(habitat);
-}
-
-bool isDistributaryWithoutEdgeOrIsNearshore(Habitat habitat) {
-    return isDistributaryWithoutEdgeOrIsNearshore(habitat.fine);
-}
-
-float habitatTypeMortalityConst(const HabitatType t, const float habitatMortalityMultiplier) {
-    float defaultNoMultiplier = 1.0;
-    if (isDistributaryWithoutEdgeOrIsNearshore(t)) {
+float Habitat::getMortalityConst(const float habitatMortalityMultiplier) const {
+    float defaultNoMultiplier = 1.0f;
+    if (isDistributaryWithoutEdgeOrIsNearshore()) {
         return habitatMortalityMultiplier;
     }
     return defaultNoMultiplier;
-}
-
-float habitatTypeMortalityConst(const Habitat h, const float habitatMortalityMultiplier) {
-    return habitatTypeMortalityConst(h.fine, habitatMortalityMultiplier);
 }
 
 Edge::Edge(MapNode *source, MapNode *target, float length)

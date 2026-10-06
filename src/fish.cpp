@@ -440,7 +440,7 @@ void Fish::dieStarvation(long currentTime) {
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
 float Fish::getPmax(const Model &model, const MapNode &loc) { // NOLINT(*-convert-member-functions-to-static)
-    const bool isNearshoreHabitat = isNearshore(loc.habitat);
+    const bool isNearshoreHabitat = loc.habitat.isNearshore();
     const float growthSlope = (isNearshoreHabitat)
                                   ? model.getFloat(ModelParamKey::GrowthSlopeNearshore)
                                   : model.getFloat(ModelParamKey::GrowthSlope);
@@ -510,7 +510,7 @@ float Fish::getMortality(Model &model, MapNode &loc) const {
     const double mort_min_c = model.getFloat(ModelParamKey::MortMin);
     const double mort_max_d = model.getFloat(ModelParamKey::MortMax);
     const float habitat_mortality_multiplier = model.getFloat(ModelParamKey::HabitatMortalityMultiplier);
-    const double habTypeMortConst = habitatTypeMortalityConst(loc.habitat, habitat_mortality_multiplier);
+    const double habTypeMortConst = loc.habitat.getMortalityConst(habitat_mortality_multiplier);
     const double a = 1.849; // slope
     const double b_m = -0.8; //slope at inflection
     const double b_s = -2.395; // intercept

@@ -156,7 +156,7 @@ std::vector<std::tuple<MapNode *, float, float> > FishMovement::getReachableNeig
         float transitSpeed = (float) calculateTransitSpeed(edge, startPoint, swimSpeed);
         if (canMoveInDirectionOfEndNode(transitSpeed, swimSpeed)) {
             float edgeCost = (edge.length / transitSpeed) * swimSpeed;
-            if (isDistributary(endNode->habitat) && startPoint == initialFishLocation) {
+            if (endNode->habitat.isDistributary() && startPoint == initialFishLocation) {
                 edgeCost = std::min(edgeCost, swimRange - spentCost);
             }
             float totalCost = spentCost + edgeCost;
