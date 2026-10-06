@@ -1,16 +1,16 @@
 ## temp
-Step 330: 154605 living fish; 4 exited; 271217 (194309,1434,75474) dead (mort,strand,starve)
-Step 660: 298849 living fish; 2922 exited; 917346 (645105,17889,254352) dead (mort,strand,starve)
-Step 990: 459256 living fish; 4248 exited; 1775171 (1276187,37407,461577) dead (mort,strand,starve)
-Step 1320: 219656 living fish; 10526 exited; 2391803 (1808407,66169,517227) dead (mort,strand,starve)
-Step 1650: 152156 living fish; 16084 exited; 2727254 (2098241,81367,547646) dead (mort,strand,starve)
-Step 1980: 138181 living fish; 17669 exited; 2987122 (2305918,94219,586985) dead (mort,strand,starve)
-Step 2310: 117503 living fish; 28629 exited; 3166865 (2455721,101812,609332) dead (mort,strand,starve)
-Step 2640: 95011 living fish; 58238 exited; 3304815 (2558186,110320,636309) dead (mort,strand,starve)
-Step 2970: 54844 living fish; 77234 exited; 3393298 (2627889,120408,645001) dead (mort,strand,starve)
-Step 3300: 19866 living fish; 86458 exited; 3436869 (2653443,134250,649176) dead (mort,strand,starve)
-Step 3630: 14554 living fish; 90318 exited; 3453200 (2663998,138177,651025) dead (mort,strand,starve)
-Step 3960: 7731 living fish; 92778 exited; 3463548 (2670827,139923,652798) dead (mort,strand,starve)
+Step 330: 156192 living fish; 5 exited; 269662 (196098,1379,72185) dead (mort,strand,starve)
+Step 660: 310310 living fish; 2959 exited; 905924 (661649,18122,226153) dead (mort,strand,starve)
+Step 990: 486213 living fish; 4528 exited; 1747824 (1318190,38420,391214) dead (mort,strand,starve)
+Step 1320: 227154 living fish; 11424 exited; 2383407 (1873905,68449,441053) dead (mort,strand,starve)
+Step 1650: 155515 living fish; 16928 exited; 2723053 (2168367,84466,470220) dead (mort,strand,starve)
+Step 1980: 143420 living fish; 18865 exited; 2980754 (2375646,99318,505790) dead (mort,strand,starve)
+Step 2310: 125184 living fish; 32197 exited; 3155666 (2525372,107942,522352) dead (mort,strand,starve)
+Step 2640: 116388 living fish; 66709 exited; 3274967 (2627055,118338,529574) dead (mort,strand,starve)
+Step 2970: 69742 living fish; 95623 exited; 3360045 (2701575,128061,530409) dead (mort,strand,starve)
+Step 3300: 28200 living fish; 113738 exited; 3401262 (2729733,140506,531023) dead (mort,strand,starve)
+Step 3630: 20633 living fish; 121656 exited; 3415811 (2740663,143984,531164) dead (mort,strand,starve)
+Step 3960: 12112 living fish; 126365 exited; 3425580 (2748093,146155,531332) dead (mort,strand,starve)
 ## end temp
 
 [100%] Built target headless
