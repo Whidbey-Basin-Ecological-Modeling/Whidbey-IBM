@@ -79,29 +79,6 @@ std::vector<HabitatType> legendHabitatTypes {
     HabitatType::Harbor
 };
 
-std::string getHabTypeName(HabitatType t) {
-    switch(t) {
-    case HabitatType::Impoundment:
-        return "Impoundment";
-    case HabitatType::Distributary:
-        return "Distributary";
-    case HabitatType::DistributaryEdge:
-        return "Distributary edge";
-    case HabitatType::BlindChannel:
-        return "Blind channel";
-    case HabitatType::LowTideTerrace:
-        return "Low tide terrace";
-    case HabitatType::Nearshore:
-        return "Nearshore";
-    case HabitatType::Harbor:
-        return "Boat harbor";
-    }
-}
-
-std::string getHabTypeName(Habitat h) {
-    return getHabTypeName(h.fine);
-}
-
 std::string getStatusName(FishStatus s) {
     switch(s) {
     case FishStatus::Alive:
@@ -176,7 +153,7 @@ std::vector<std::string> getLocInfo(Model &model, MapNode &node) {
     std::ostringstream os;
     os << "Node ID: " << node.id + 1; result.push_back(os.str()); os.str("");
     os << "Pop. density: " << node.popDensity; result.push_back(os.str()); os.str("");
-    os << "Habitat type: " << getHabTypeName(node.habitat); result.push_back(os.str()); os.str("");
+    os << "Habitat type: " << node.habitat.toString(); result.push_back(os.str()); os.str("");
     os << "Elevation: " << node.elev << "m"; result.push_back(os.str()); os.str("");
     os << "Area: " << node.area << "m2"; result.push_back(os.str()); os.str("");
     os << "Depth: " << model.hydroModel.getDepth(node) << "m"; result.push_back(os.str()); os.str("");
@@ -234,7 +211,7 @@ std::vector<std::string> getTimeInfo(Model &model) {
 std::vector<std::string> getLegendText() {
     std::vector<std::string> result;
     for (HabitatType t : legendHabitatTypes) {
-        result.push_back(getHabTypeName(t));
+        result.push_back(Habitat::toString(t));
     }
     return result;
 }

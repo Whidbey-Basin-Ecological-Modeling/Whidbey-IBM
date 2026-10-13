@@ -24,6 +24,7 @@ set(MODEL_SOURCES
 )
 
 set(TEST_SOURCES
+        habitat_test.cpp
         fish_movement_test.cpp
         hydro_model_test.cpp
         load_utils_test.cpp

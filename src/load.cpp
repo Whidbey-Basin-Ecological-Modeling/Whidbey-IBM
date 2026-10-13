@@ -316,24 +316,6 @@ typedef struct MapNodeData {
      : id(id), area(area), elev(elev), pathDist(pathDist), type(type) {}
 } MapNodeData;
 
-// Map from string identifiers to their HabitatType enum values
-const std::unordered_map<std::string, HabitatType> habTypeByName {
-    {"blind channel", HabitatType::BlindChannel},
-    {"impoundment", HabitatType::Impoundment},
-    {"low tide terrace", HabitatType::LowTideTerrace},
-    {"distributary channel", HabitatType::Distributary},
-    {"distributary", HabitatType::Distributary},
-    {"boat harbor", HabitatType::Harbor},
-    {"harbor", HabitatType::Harbor},
-    {"nearshore", HabitatType::Nearshore},
-    {"shoreline", HabitatType::Nearshore},
-    {"open water", HabitatType::OpenWater},
-    {"intertidal mud flat", HabitatType::IntertidalMudFlat},
-    {"rock", HabitatType::Rock},
-    {"sub-tidal flat", HabitatType::SubtidalFlat},
-    {"exit", HabitatType::Exit}
-};
-
 // Load sampling site structs from a sampling site CSV
 // In order to do this, we have to figure out what the closest map nodes
 // to link to the site are, since sites are defined by coordinates that likely aren't overlapping a node
@@ -633,35 +615,6 @@ void loadSamplingSites(std::string &filePath, std::vector<MapNode *> &map, std::
 // }
 
 
-std::string getHabitatTypeName(HabitatType t) {
-    switch(t) {
-        case HabitatType::Impoundment:
-            return "Impoundment";
-        case HabitatType::Distributary:
-            return "Distributary";
-        case HabitatType::DistributaryEdge:
-            return "Distributary edge";
-        case HabitatType::BlindChannel:
-            return "Blind channel";
-        case HabitatType::LowTideTerrace:
-            return "Low tide terrace";
-        case HabitatType::Nearshore:
-            return "Nearshore";
-        case HabitatType::Harbor:
-            return "Boat harbor";
-        case HabitatType::OpenWater:
-            return "Open water";
-        case HabitatType::IntertidalMudFlat:
-            return "Intertidal mud flat";
-        case HabitatType::Rock:
-            return "Rock";
-        case HabitatType::SubtidalFlat:
-            return "Sub-tidal flat";
-        case HabitatType::Exit:
-            return "Exit";
-    }
-}
-
 void outputNodeCounts(const std::vector<MapNode*> &nodes, const std::string &nodeCategory) {
     std::unordered_map<HabitatType, int> habitatTypeCount;
 
@@ -673,7 +626,7 @@ void outputNodeCounts(const std::vector<MapNode*> &nodes, const std::string &nod
     // Output the counts
     for (const auto& [type, count] : habitatTypeCount) {
         if (count > 0) {
-            std::cout << nodeCategory << " nodes: " << count << " " << getHabitatTypeName(type) << std::endl;
+            std::cout << nodeCategory << " nodes: " << count << " " << Habitat::toString(type) << std::endl;
         }
     }
 }
@@ -1192,7 +1145,7 @@ void initializeAllRecruitPoints(std::vector<InitialPopulation> &initialPopulatio
         float area = std::stof(chunks[5]);
         float sourceDistance = std::stof(chunks[7]);
         float elev = std::stof(chunks[10]);
-        HabitatType habType = std::stoi(chunks[11]) == 1 ? HabitatType::DistributaryEdge : habTypeByName.at(chunks[6]);
+        HabitatType habType = std::stoi(chunks[11]) == 1 ? HabitatType::DistributaryEdge : Habitat::fromString(chunks[6]);
 
         dest.push_back(new MapNode(
             habType, area, elev, sourceDistance
@@ -1455,14 +1408,14 @@ bool readNodeHabitatTypes(const std::vector<MapNode *> &dest, std::istream &node
             continue;
         }
 
-        auto it = habTypeByName.find(habitatName);
-        if (it == habTypeByName.end()) {
+        HabitatType habType;
+        if (!Habitat::tryParse(habitatName, habType)) {
             std::cerr << "Error: Unknown habitat type: " << habitatName << std::endl;
             success = false;
             continue;
         }
 
-        dest[id]->habitat.fine = it->second;
+        dest[id]->habitat.fine = habType;
     }
     return success;
 }
