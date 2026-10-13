@@ -29,11 +29,22 @@ enum class HabitatType {
     HabitatTypeCountSentinel
 };
 
+enum class LargeHabitatType {
+    Delta,
+    Freshwater,
+    Intertidal,
+    Offshore,
+
+    LargeHabitatTypeCountSentinel
+};
+
 struct Habitat {
     HabitatType fine;
+    LargeHabitatType large;
 
-    Habitat() : fine(HabitatType::Distributary) {}
-    explicit Habitat(HabitatType fine) : fine(fine) {}
+    Habitat() : fine(HabitatType::Distributary), large(getDefaultLargeHabitat(HabitatType::Distributary)) {}
+    explicit Habitat(HabitatType fine) : fine(fine), large(getDefaultLargeHabitat(fine)) {}
+    Habitat(HabitatType fine, LargeHabitatType large) : fine(fine), large(large) {}
 
     bool isDistributary(bool includeDistributaryEdge = true) const;
     bool isHarbor() const;
@@ -48,14 +59,21 @@ struct Habitat {
 
     std::string toString() const;
     static std::string toString(HabitatType type);
+    static std::string toString(LargeHabitatType type);
     static HabitatType fromString(const std::string& name);
+    static LargeHabitatType largeFromString(const std::string& name);
     static bool tryParse(const std::string& name, HabitatType& out);
+    static bool tryParse(const std::string& name, LargeHabitatType& out);
     static bool tryParse(const std::string& name, Habitat& out);
 
-    bool operator==(const Habitat& other) const { return fine == other.fine; }
-    bool operator!=(const Habitat& other) const { return fine != other.fine; }
+    static LargeHabitatType getDefaultLargeHabitat(HabitatType fine);
+
+    bool operator==(const Habitat& other) const { return fine == other.fine && large == other.large; }
+    bool operator!=(const Habitat& other) const { return !(*this == other); }
     bool operator==(HabitatType other) const { return fine == other; }
     bool operator!=(HabitatType other) const { return fine != other; }
+    bool operator==(LargeHabitatType other) const { return large == other; }
+    bool operator!=(LargeHabitatType other) const { return large != other; }
 };
 
 #endif // __FISH_HABITAT_H

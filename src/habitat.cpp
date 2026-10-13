@@ -42,6 +42,13 @@ const std::unordered_map<std::string, HabitatType> HABITAT_TYPES_BY_NAME = {
     {"exit", HabitatType::Exit}
 };
 
+const std::unordered_map<std::string, LargeHabitatType> LARGE_HABITAT_TYPES_BY_NAME = {
+    {"delta", LargeHabitatType::Delta},
+    {"freshwater", LargeHabitatType::Freshwater},
+    {"intertidal", LargeHabitatType::Intertidal},
+    {"offshore", LargeHabitatType::Offshore}
+};
+
 } // namespace
 
 bool Habitat::isDistributary(bool includeDistributaryEdge) const {
@@ -119,10 +126,60 @@ std::string Habitat::toString(HabitatType type) {
     }
 }
 
+std::string Habitat::toString(LargeHabitatType type) {
+    switch (type) {
+        case LargeHabitatType::Delta:
+            return "Delta";
+        case LargeHabitatType::Freshwater:
+            return "Freshwater";
+        case LargeHabitatType::Intertidal:
+            return "Intertidal";
+        case LargeHabitatType::Offshore:
+            return "Offshore";
+        default:
+            return "Unknown";
+    }
+}
+
+LargeHabitatType Habitat::getDefaultLargeHabitat(HabitatType fine) {
+    switch (fine) {
+        case HabitatType::Distributary:
+        case HabitatType::DistributaryEdge:
+        case HabitatType::BlindChannel:
+        case HabitatType::Impoundment:
+        case HabitatType::LowTideTerrace:
+            return LargeHabitatType::Delta;
+
+        case HabitatType::IntertidalMudFlat:
+        case HabitatType::Harbor:
+        case HabitatType::Nearshore:
+        case HabitatType::SubtidalFlat:
+        case HabitatType::Rock:
+            return LargeHabitatType::Intertidal;
+
+        case HabitatType::OpenWater:
+        case HabitatType::Exit:
+            return LargeHabitatType::Offshore;
+
+        default:
+            return LargeHabitatType::Delta;
+    }
+}
+
 bool Habitat::tryParse(const std::string& name, HabitatType& out) {
     std::string normalized = normalizeName(name);
     auto it = HABITAT_TYPES_BY_NAME.find(normalized);
     if (it != HABITAT_TYPES_BY_NAME.end()) {
+        out = it->second;
+        return true;
+    }
+    return false;
+}
+
+bool Habitat::tryParse(const std::string& name, LargeHabitatType& out) {
+    std::string normalized = normalizeName(name);
+    auto it = LARGE_HABITAT_TYPES_BY_NAME.find(normalized);
+    if (it != LARGE_HABITAT_TYPES_BY_NAME.end()) {
         out = it->second;
         return true;
     }
@@ -144,4 +201,12 @@ HabitatType Habitat::fromString(const std::string& name) {
         return type;
     }
     throw std::invalid_argument("Unknown habitat type: " + name);
+}
+
+LargeHabitatType Habitat::largeFromString(const std::string& name) {
+    LargeHabitatType type;
+    if (tryParse(name, type)) {
+        return type;
+    }
+    throw std::invalid_argument("Unknown large habitat type: " + name);
 }

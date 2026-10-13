@@ -849,7 +849,7 @@ void checkDisjointDistributariesAndOtherMapErrors(std::vector<MapNode *> &map, s
             }
         }
         if (node->habitat.isDistributary() && disconnected) {
-            node->habitat.fine = HabitatType::BlindChannel;
+            node->habitat = Habitat(HabitatType::BlindChannel);
             ++corrected;
         }
     }
@@ -1415,7 +1415,7 @@ bool readNodeHabitatTypes(const std::vector<MapNode *> &dest, std::istream &node
             continue;
         }
 
-        dest[id]->habitat.fine = habType;
+        dest[id]->habitat = Habitat(habType);
     }
     return success;
 }
