@@ -50,15 +50,15 @@ TEST_CASE("Habitat fine-to-large default mappings and disambiguations", "[habita
         REQUIRE(Habitat(HabitatType::DistributaryEdge).large == LargeHabitatType::Delta);
     }
 
-    SECTION("Intertidal defaults (including Harbor and IntertidalMudFlat disambiguation)") {
+    SECTION("Intertidal defaults (including Harbor and Mudflat disambiguation)") {
         REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::Harbor) == LargeHabitatType::Intertidal);
-        REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::IntertidalMudFlat) == LargeHabitatType::Intertidal);
+        REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::Mudflat) == LargeHabitatType::Intertidal);
         REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::Nearshore) == LargeHabitatType::Intertidal);
         REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::SubtidalFlat) == LargeHabitatType::Intertidal);
         REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::Rock) == LargeHabitatType::Intertidal);
 
         REQUIRE(Habitat(HabitatType::Harbor).large == LargeHabitatType::Intertidal);
-        REQUIRE(Habitat(HabitatType::IntertidalMudFlat).large == LargeHabitatType::Intertidal);
+        REQUIRE(Habitat(HabitatType::Mudflat).large == LargeHabitatType::Intertidal);
         REQUIRE(Habitat(HabitatType::Nearshore).large == LargeHabitatType::Intertidal);
         REQUIRE(Habitat(HabitatType::SubtidalFlat).large == LargeHabitatType::Intertidal);
         REQUIRE(Habitat(HabitatType::Rock).large == LargeHabitatType::Intertidal);
@@ -135,7 +135,7 @@ TEST_CASE("Habitat::toString conversions", "[habitat]") {
     REQUIRE(Habitat::toString(HabitatType::Harbor) == "Boat harbor");
     REQUIRE(Habitat::toString(HabitatType::Nearshore) == "Nearshore");
     REQUIRE(Habitat::toString(HabitatType::OpenWater) == "Open water");
-    REQUIRE(Habitat::toString(HabitatType::IntertidalMudFlat) == "Intertidal mud flat");
+    REQUIRE(Habitat::toString(HabitatType::Mudflat) == "Mudflat");
     REQUIRE(Habitat::toString(HabitatType::Rock) == "Rock");
     REQUIRE(Habitat::toString(HabitatType::SubtidalFlat) == "Sub-tidal flat");
     REQUIRE(Habitat::toString(HabitatType::Exit) == "Exit");
@@ -188,8 +188,9 @@ TEST_CASE("Habitat string parsing and aliases", "[habitat]") {
         REQUIRE(Habitat::fromString("boat harbor") == HabitatType::Harbor);
         REQUIRE(Habitat::fromString("harbor") == HabitatType::Harbor);
         REQUIRE(Habitat::fromString("shoreline") == HabitatType::Nearshore);
-        REQUIRE(Habitat::fromString("intertidal mud flat") == HabitatType::IntertidalMudFlat);
-        REQUIRE(Habitat::fromString("intertidal mudflat") == HabitatType::IntertidalMudFlat);
+        REQUIRE(Habitat::fromString("intertidal mud flat") == HabitatType::Mudflat);
+        REQUIRE(Habitat::fromString("intertidal mudflat") == HabitatType::Mudflat);
+        REQUIRE(Habitat::fromString("mudflat") == HabitatType::Mudflat);
         REQUIRE(Habitat::fromString("sub-tidal flat") == HabitatType::SubtidalFlat);
         REQUIRE(Habitat::fromString("subtidal flat") == HabitatType::SubtidalFlat);
     }
@@ -209,7 +210,7 @@ TEST_CASE("Habitat string parsing and aliases", "[habitat]") {
             HabitatType::DistributaryEdge,
             HabitatType::Harbor,
             HabitatType::Nearshore,
-            HabitatType::IntertidalMudFlat,
+            HabitatType::Mudflat,
             HabitatType::OpenWater,
             HabitatType::Rock,
             HabitatType::SubtidalFlat,

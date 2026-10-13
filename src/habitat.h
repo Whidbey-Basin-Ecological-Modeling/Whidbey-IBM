@@ -20,7 +20,7 @@ enum class HabitatType {
     Nearshore,
 
     // new types
-    IntertidalMudFlat,
+    Mudflat,
     OpenWater,
     Rock,
     SubtidalFlat,

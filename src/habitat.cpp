@@ -34,8 +34,9 @@ const std::unordered_map<std::string, HabitatType> HABITAT_TYPES_BY_NAME = {
     {"nearshore", HabitatType::Nearshore},
     {"shoreline", HabitatType::Nearshore},
     {"open water", HabitatType::OpenWater},
-    {"intertidal mud flat", HabitatType::IntertidalMudFlat},
-    {"intertidal mudflat", HabitatType::IntertidalMudFlat},
+    {"intertidal mud flat", HabitatType::Mudflat},
+    {"intertidal mudflat", HabitatType::Mudflat},
+    {"mudflat", HabitatType::Mudflat},
     {"rock", HabitatType::Rock},
     {"sub-tidal flat", HabitatType::SubtidalFlat},
     {"subtidal flat", HabitatType::SubtidalFlat},
@@ -113,8 +114,8 @@ std::string Habitat::toString(HabitatType type) {
             return "Boat harbor";
         case HabitatType::OpenWater:
             return "Open water";
-        case HabitatType::IntertidalMudFlat:
-            return "Intertidal mud flat";
+        case HabitatType::Mudflat:
+            return "Mudflat";
         case HabitatType::Rock:
             return "Rock";
         case HabitatType::SubtidalFlat:
@@ -150,7 +151,7 @@ LargeHabitatType Habitat::getDefaultLargeHabitat(HabitatType fine) {
         case HabitatType::LowTideTerrace:
             return LargeHabitatType::Delta;
 
-        case HabitatType::IntertidalMudFlat:
+        case HabitatType::Mudflat:
         case HabitatType::Harbor:
         case HabitatType::Nearshore:
         case HabitatType::SubtidalFlat:
