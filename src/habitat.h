@@ -77,7 +77,7 @@ public:
           large(large),
           habitatStructure(getDefaultStructure(fine, large)) {}
 
-    HabitatType type() const { return fine; }
+    HabitatType fineType() const { return fine; }
     LargeHabitatType largeType() const { return large; }
     HabitatStructure structure() const { return habitatStructure; }
 

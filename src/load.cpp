@@ -620,7 +620,7 @@ void outputNodeCounts(const std::vector<MapNode*> &nodes, const std::string &nod
 
     // Count nodes by habitat type
     for (const auto* node : nodes) {
-        habitatTypeCount[node->habitat.type()]++;
+        habitatTypeCount[node->habitat.fineType()]++;
     }
 
     // Output the counts

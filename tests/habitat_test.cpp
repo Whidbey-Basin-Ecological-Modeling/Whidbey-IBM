@@ -5,7 +5,7 @@
 TEST_CASE("Habitat class constructors and equality operators", "[habitat]") {
     SECTION("Default constructor initializes to Distributary and Delta and Neutral structure") {
         Habitat h;
-        REQUIRE(h.type() == HabitatType::Distributary);
+        REQUIRE(h.fineType() == HabitatType::Distributary);
         REQUIRE(h.largeType() == LargeHabitatType::Delta);
         REQUIRE(h.structure() == HabitatStructure::Neutral);
         REQUIRE(h == HabitatType::Distributary);
@@ -16,7 +16,7 @@ TEST_CASE("Habitat class constructors and equality operators", "[habitat]") {
 
     SECTION("Explicit single-argument constructor initializes with specified HabitatType, default LargeHabitatType, and default HabitatStructure") {
         Habitat h(HabitatType::Nearshore);
-        REQUIRE(h.type() == HabitatType::Nearshore);
+        REQUIRE(h.fineType() == HabitatType::Nearshore);
         REQUIRE(h.largeType() == LargeHabitatType::Intertidal);
         REQUIRE(h.structure() == HabitatStructure::Neutral);
         REQUIRE(h == HabitatType::Nearshore);
@@ -30,7 +30,7 @@ TEST_CASE("Habitat class constructors and equality operators", "[habitat]") {
 
     SECTION("Explicit two-argument constructor initializes fine and large independently and structure according to fine/large") {
         Habitat h(HabitatType::Harbor, LargeHabitatType::Delta);
-        REQUIRE(h.type() == HabitatType::Harbor);
+        REQUIRE(h.fineType() == HabitatType::Harbor);
         REQUIRE(h.largeType() == LargeHabitatType::Delta);
         REQUIRE(h.structure() == HabitatStructure::Simplified);
         REQUIRE(h == HabitatType::Harbor);
@@ -332,7 +332,7 @@ TEST_CASE("Habitat string parsing and aliases", "[habitat]") {
 
         Habitat outHabitat;
         REQUIRE(Habitat::tryParse("boat harbor", outHabitat) == true);
-        REQUIRE(outHabitat.type() == HabitatType::Harbor);
+        REQUIRE(outHabitat.fineType() == HabitatType::Harbor);
 
         REQUIRE(Habitat::tryParse("unknown_fake_habitat", outType) == false);
         REQUIRE(Habitat::tryParse("", outType) == false);
