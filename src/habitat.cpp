@@ -175,8 +175,8 @@ LargeHabitatType Habitat::getDefaultLargeHabitat(HabitatType fine) {
         case HabitatType::LowTideTerrace:
             return LargeHabitatType::Delta;
 
-        case HabitatType::Mudflat:
-        case HabitatType::Harbor:
+        case HabitatType::Mudflat: // TODO: check this
+        case HabitatType::Harbor: // TODO: check this
         case HabitatType::Nearshore:
         case HabitatType::SubtidalFlat:
         case HabitatType::Rock:
