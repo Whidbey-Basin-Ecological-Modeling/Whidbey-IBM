@@ -60,6 +60,12 @@ const std::unordered_map<std::string, LargeHabitatType> LARGE_HABITAT_TYPES_BY_N
     {"offshore", LargeHabitatType::Offshore}
 };
 
+const std::unordered_map<std::string, HabitatStructure> HABITAT_STRUCTURES_BY_NAME = {
+    {"simplified", HabitatStructure::Simplified},
+    {"neutral", HabitatStructure::Neutral},
+    {"complex", HabitatStructure::Complex}
+};
+
 } // namespace
 
 bool Habitat::isDistributary(bool includeDistributaryEdge) const {
@@ -166,6 +172,19 @@ std::string Habitat::toString(LargeHabitatType type) {
     }
 }
 
+std::string Habitat::toString(HabitatStructure structure) {
+    switch (structure) {
+        case HabitatStructure::Simplified:
+            return "Simplified";
+        case HabitatStructure::Neutral:
+            return "Neutral";
+        case HabitatStructure::Complex:
+            return "Complex";
+        default:
+            return "Unknown";
+    }
+}
+
 LargeHabitatType Habitat::getDefaultLargeHabitat(HabitatType fine) {
     switch (fine) {
         case HabitatType::Distributary:
@@ -200,6 +219,68 @@ LargeHabitatType Habitat::getDefaultLargeHabitat(HabitatType fine) {
     }
 }
 
+HabitatStructure Habitat::getDefaultStructure(HabitatType fine, LargeHabitatType large) {
+    switch (large) {
+        case LargeHabitatType::Delta:
+            switch (fine) {
+                case HabitatType::BlindChannel:
+                case HabitatType::Impoundment:
+                case HabitatType::LowTideTerrace:
+                    return HabitatStructure::Complex;
+                case HabitatType::Distributary:
+                case HabitatType::DistributaryEdge:
+                    return HabitatStructure::Neutral;
+                case HabitatType::Harbor:
+                case HabitatType::Mudflat:
+                    return HabitatStructure::Simplified;
+                default:
+                    return HabitatStructure::Neutral;
+            }
+
+        case LargeHabitatType::Freshwater:
+            switch (fine) {
+                case HabitatType::Creek:
+                    return HabitatStructure::Complex;
+                case HabitatType::Mainstem:
+                    return HabitatStructure::Neutral;
+                default:
+                    return HabitatStructure::Neutral;
+            }
+
+        case LargeHabitatType::Intertidal:
+            switch (fine) {
+                case HabitatType::Eelgrass:
+                case HabitatType::Lagoon:
+                    return HabitatStructure::Complex;
+                case HabitatType::Beach:
+                case HabitatType::Mudflat:
+                case HabitatType::Rock:
+                case HabitatType::Nearshore:
+                case HabitatType::SubtidalFlat:
+                    return HabitatStructure::Neutral;
+                case HabitatType::Harbor:
+                case HabitatType::Riprap:
+                    return HabitatStructure::Simplified;
+                default:
+                    return HabitatStructure::Neutral;
+            }
+
+        case LargeHabitatType::Offshore:
+            switch (fine) {
+                case HabitatType::Kelp:
+                    return HabitatStructure::Complex;
+                case HabitatType::OpenWater:
+                case HabitatType::Exit:
+                    return HabitatStructure::Neutral;
+                default:
+                    return HabitatStructure::Neutral;
+            }
+
+        default:
+            return HabitatStructure::Neutral;
+    }
+}
+
 bool Habitat::tryParse(const std::string& name, HabitatType& out) {
     std::string normalized = normalizeName(name);
     auto it = HABITAT_TYPES_BY_NAME.find(normalized);
@@ -214,6 +295,16 @@ bool Habitat::tryParse(const std::string& name, LargeHabitatType& out) {
     std::string normalized = normalizeName(name);
     auto it = LARGE_HABITAT_TYPES_BY_NAME.find(normalized);
     if (it != LARGE_HABITAT_TYPES_BY_NAME.end()) {
+        out = it->second;
+        return true;
+    }
+    return false;
+}
+
+bool Habitat::tryParse(const std::string& name, HabitatStructure& out) {
+    std::string normalized = normalizeName(name);
+    auto it = HABITAT_STRUCTURES_BY_NAME.find(normalized);
+    if (it != HABITAT_STRUCTURES_BY_NAME.end()) {
         out = it->second;
         return true;
     }
@@ -243,4 +334,12 @@ LargeHabitatType Habitat::largeFromString(const std::string& name) {
         return type;
     }
     throw std::invalid_argument("Unknown large habitat type: " + name);
+}
+
+HabitatStructure Habitat::structureFromString(const std::string& name) {
+    HabitatStructure type;
+    if (tryParse(name, type)) {
+        return type;
+    }
+    throw std::invalid_argument("Unknown habitat structure: " + name);
 }

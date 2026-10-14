@@ -1416,6 +1416,7 @@ bool readNodeHabitatTypes(const std::vector<MapNode *> &dest, std::istream &node
         }
 
         dest[id]->habitat = Habitat(habType);
+        dest[id]->habitat.structure = Habitat::getDefaultStructure(dest[id]->habitat.fine, dest[id]->habitat.large);
     }
     return success;
 }
