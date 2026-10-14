@@ -66,7 +66,7 @@ wxColour *getHabitatColor(HabitatType t) {
 }
 
 wxColour *getHabitatColor(Habitat h) {
-    return getHabitatColor(h.fine);
+    return getHabitatColor(h.type());
 }
 
 std::vector<HabitatType> legendHabitatTypes {

@@ -55,15 +55,31 @@ enum class HabitatStructure {
     HabitatStructureCountSentinel
 };
 
-struct Habitat {
+class Habitat {
+private:
     HabitatType fine;
     LargeHabitatType large;
-    HabitatStructure structure;
+    HabitatStructure habitatStructure;
 
-    Habitat() : fine(HabitatType::Distributary), large(getDefaultLargeHabitat(HabitatType::Distributary)), structure(HabitatStructure::Neutral) {}
-    explicit Habitat(HabitatType fine) : fine(fine), large(getDefaultLargeHabitat(fine)), structure(getDefaultStructure(fine, getDefaultLargeHabitat(fine))) {}
-    Habitat(HabitatType fine, LargeHabitatType large) : fine(fine), large(large), structure(getDefaultStructure(fine, large)) {}
-    Habitat(HabitatType fine, LargeHabitatType large, HabitatStructure structure) : fine(fine), large(large), structure(structure) {}
+public:
+    Habitat()
+        : fine(HabitatType::Distributary),
+          large(getDefaultLargeHabitat(HabitatType::Distributary)),
+          habitatStructure(getDefaultStructure(HabitatType::Distributary, large)) {}
+
+    explicit Habitat(HabitatType fine)
+        : fine(fine),
+          large(getDefaultLargeHabitat(fine)),
+          habitatStructure(getDefaultStructure(fine, large)) {}
+
+    Habitat(HabitatType fine, LargeHabitatType large)
+        : fine(fine),
+          large(large),
+          habitatStructure(getDefaultStructure(fine, large)) {}
+
+    HabitatType type() const { return fine; }
+    LargeHabitatType largeType() const { return large; }
+    HabitatStructure structure() const { return habitatStructure; }
 
     bool isDistributary(bool includeDistributaryEdge = true) const;
     bool isHarbor() const;
@@ -91,14 +107,16 @@ struct Habitat {
     static LargeHabitatType getDefaultLargeHabitat(HabitatType fine);
     static HabitatStructure getDefaultStructure(HabitatType fine, LargeHabitatType large);
 
-    bool operator==(const Habitat& other) const { return fine == other.fine && large == other.large && structure == other.structure; }
+    bool operator==(const Habitat& other) const {
+        return fine == other.fine && large == other.large && habitatStructure == other.habitatStructure;
+    }
     bool operator!=(const Habitat& other) const { return !(*this == other); }
     bool operator==(HabitatType other) const { return fine == other; }
     bool operator!=(HabitatType other) const { return fine != other; }
     bool operator==(LargeHabitatType other) const { return large == other; }
     bool operator!=(LargeHabitatType other) const { return large != other; }
-    bool operator==(HabitatStructure other) const { return structure == other; }
-    bool operator!=(HabitatStructure other) const { return structure != other; }
+    bool operator==(HabitatStructure other) const { return habitatStructure == other; }
+    bool operator!=(HabitatStructure other) const { return habitatStructure != other; }
 };
 
 #endif // __FISH_HABITAT_H

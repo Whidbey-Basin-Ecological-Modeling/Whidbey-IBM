@@ -2,23 +2,23 @@
 #include <stdexcept>
 #include "habitat.h"
 
-TEST_CASE("Habitat struct constructors and equality operators", "[habitat]") {
+TEST_CASE("Habitat class constructors and equality operators", "[habitat]") {
     SECTION("Default constructor initializes to Distributary and Delta and Neutral structure") {
         Habitat h;
-        REQUIRE(h.fine == HabitatType::Distributary);
-        REQUIRE(h.large == LargeHabitatType::Delta);
-        REQUIRE(h.structure == HabitatStructure::Neutral);
+        REQUIRE(h.type() == HabitatType::Distributary);
+        REQUIRE(h.largeType() == LargeHabitatType::Delta);
+        REQUIRE(h.structure() == HabitatStructure::Neutral);
         REQUIRE(h == HabitatType::Distributary);
         REQUIRE(h == LargeHabitatType::Delta);
         REQUIRE(h == HabitatStructure::Neutral);
-        REQUIRE(h == Habitat(HabitatType::Distributary, LargeHabitatType::Delta, HabitatStructure::Neutral));
+        REQUIRE(h == Habitat(HabitatType::Distributary, LargeHabitatType::Delta));
     }
 
     SECTION("Explicit single-argument constructor initializes with specified HabitatType, default LargeHabitatType, and default HabitatStructure") {
         Habitat h(HabitatType::Nearshore);
-        REQUIRE(h.fine == HabitatType::Nearshore);
-        REQUIRE(h.large == LargeHabitatType::Intertidal);
-        REQUIRE(h.structure == HabitatStructure::Neutral);
+        REQUIRE(h.type() == HabitatType::Nearshore);
+        REQUIRE(h.largeType() == LargeHabitatType::Intertidal);
+        REQUIRE(h.structure() == HabitatStructure::Neutral);
         REQUIRE(h == HabitatType::Nearshore);
         REQUIRE(h == LargeHabitatType::Intertidal);
         REQUIRE(h == HabitatStructure::Neutral);
@@ -30,25 +30,14 @@ TEST_CASE("Habitat struct constructors and equality operators", "[habitat]") {
 
     SECTION("Explicit two-argument constructor initializes fine and large independently and structure according to fine/large") {
         Habitat h(HabitatType::Harbor, LargeHabitatType::Delta);
-        REQUIRE(h.fine == HabitatType::Harbor);
-        REQUIRE(h.large == LargeHabitatType::Delta);
-        REQUIRE(h.structure == HabitatStructure::Simplified);
+        REQUIRE(h.type() == HabitatType::Harbor);
+        REQUIRE(h.largeType() == LargeHabitatType::Delta);
+        REQUIRE(h.structure() == HabitatStructure::Simplified);
         REQUIRE(h == HabitatType::Harbor);
         REQUIRE(h == LargeHabitatType::Delta);
         REQUIRE(h == HabitatStructure::Simplified);
         REQUIRE(h != Habitat(HabitatType::Harbor)); // default large for Harbor is Intertidal
         REQUIRE(h == Habitat(HabitatType::Harbor, LargeHabitatType::Delta));
-    }
-
-    SECTION("Explicit three-argument constructor initializes fine, large, and structure independently") {
-        Habitat h(HabitatType::Distributary, LargeHabitatType::Delta, HabitatStructure::Complex);
-        REQUIRE(h.fine == HabitatType::Distributary);
-        REQUIRE(h.large == LargeHabitatType::Delta);
-        REQUIRE(h.structure == HabitatStructure::Complex);
-        REQUIRE(h == HabitatType::Distributary);
-        REQUIRE(h == LargeHabitatType::Delta);
-        REQUIRE(h == HabitatStructure::Complex);
-        REQUIRE(h != Habitat(HabitatType::Distributary, LargeHabitatType::Delta));
     }
 }
 
@@ -60,11 +49,11 @@ TEST_CASE("Habitat fine-to-large default mappings and disambiguations", "[habita
         REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::Distributary) == LargeHabitatType::Delta);
         REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::DistributaryEdge) == LargeHabitatType::Delta);
 
-        REQUIRE(Habitat(HabitatType::BlindChannel).large == LargeHabitatType::Delta);
-        REQUIRE(Habitat(HabitatType::Impoundment).large == LargeHabitatType::Delta);
-        REQUIRE(Habitat(HabitatType::LowTideTerrace).large == LargeHabitatType::Delta);
-        REQUIRE(Habitat(HabitatType::Distributary).large == LargeHabitatType::Delta);
-        REQUIRE(Habitat(HabitatType::DistributaryEdge).large == LargeHabitatType::Delta);
+        REQUIRE(Habitat(HabitatType::BlindChannel).largeType() == LargeHabitatType::Delta);
+        REQUIRE(Habitat(HabitatType::Impoundment).largeType() == LargeHabitatType::Delta);
+        REQUIRE(Habitat(HabitatType::LowTideTerrace).largeType() == LargeHabitatType::Delta);
+        REQUIRE(Habitat(HabitatType::Distributary).largeType() == LargeHabitatType::Delta);
+        REQUIRE(Habitat(HabitatType::DistributaryEdge).largeType() == LargeHabitatType::Delta);
     }
 
     SECTION("Intertidal defaults (including Harbor and Mudflat disambiguation)") {
@@ -78,23 +67,23 @@ TEST_CASE("Habitat fine-to-large default mappings and disambiguations", "[habita
         REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::Eelgrass) == LargeHabitatType::Intertidal);
         REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::Lagoon) == LargeHabitatType::Intertidal);
 
-        REQUIRE(Habitat(HabitatType::Harbor).large == LargeHabitatType::Intertidal);
-        REQUIRE(Habitat(HabitatType::Mudflat).large == LargeHabitatType::Intertidal);
-        REQUIRE(Habitat(HabitatType::Nearshore).large == LargeHabitatType::Intertidal);
-        REQUIRE(Habitat(HabitatType::SubtidalFlat).large == LargeHabitatType::Intertidal);
-        REQUIRE(Habitat(HabitatType::Rock).large == LargeHabitatType::Intertidal);
-        REQUIRE(Habitat(HabitatType::Beach).large == LargeHabitatType::Intertidal);
-        REQUIRE(Habitat(HabitatType::Riprap).large == LargeHabitatType::Intertidal);
-        REQUIRE(Habitat(HabitatType::Eelgrass).large == LargeHabitatType::Intertidal);
-        REQUIRE(Habitat(HabitatType::Lagoon).large == LargeHabitatType::Intertidal);
+        REQUIRE(Habitat(HabitatType::Harbor).largeType() == LargeHabitatType::Intertidal);
+        REQUIRE(Habitat(HabitatType::Mudflat).largeType() == LargeHabitatType::Intertidal);
+        REQUIRE(Habitat(HabitatType::Nearshore).largeType() == LargeHabitatType::Intertidal);
+        REQUIRE(Habitat(HabitatType::SubtidalFlat).largeType() == LargeHabitatType::Intertidal);
+        REQUIRE(Habitat(HabitatType::Rock).largeType() == LargeHabitatType::Intertidal);
+        REQUIRE(Habitat(HabitatType::Beach).largeType() == LargeHabitatType::Intertidal);
+        REQUIRE(Habitat(HabitatType::Riprap).largeType() == LargeHabitatType::Intertidal);
+        REQUIRE(Habitat(HabitatType::Eelgrass).largeType() == LargeHabitatType::Intertidal);
+        REQUIRE(Habitat(HabitatType::Lagoon).largeType() == LargeHabitatType::Intertidal);
     }
 
     SECTION("Freshwater defaults") {
         REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::Creek) == LargeHabitatType::Freshwater);
         REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::Mainstem) == LargeHabitatType::Freshwater);
 
-        REQUIRE(Habitat(HabitatType::Creek).large == LargeHabitatType::Freshwater);
-        REQUIRE(Habitat(HabitatType::Mainstem).large == LargeHabitatType::Freshwater);
+        REQUIRE(Habitat(HabitatType::Creek).largeType() == LargeHabitatType::Freshwater);
+        REQUIRE(Habitat(HabitatType::Mainstem).largeType() == LargeHabitatType::Freshwater);
     }
 
     SECTION("Offshore defaults") {
@@ -102,9 +91,9 @@ TEST_CASE("Habitat fine-to-large default mappings and disambiguations", "[habita
         REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::OpenWater) == LargeHabitatType::Offshore);
         REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::Exit) == LargeHabitatType::Offshore);
 
-        REQUIRE(Habitat(HabitatType::Kelp).large == LargeHabitatType::Offshore);
-        REQUIRE(Habitat(HabitatType::OpenWater).large == LargeHabitatType::Offshore);
-        REQUIRE(Habitat(HabitatType::Exit).large == LargeHabitatType::Offshore);
+        REQUIRE(Habitat(HabitatType::Kelp).largeType() == LargeHabitatType::Offshore);
+        REQUIRE(Habitat(HabitatType::OpenWater).largeType() == LargeHabitatType::Offshore);
+        REQUIRE(Habitat(HabitatType::Exit).largeType() == LargeHabitatType::Offshore);
     }
 }
 
@@ -343,7 +332,7 @@ TEST_CASE("Habitat string parsing and aliases", "[habitat]") {
 
         Habitat outHabitat;
         REQUIRE(Habitat::tryParse("boat harbor", outHabitat) == true);
-        REQUIRE(outHabitat.fine == HabitatType::Harbor);
+        REQUIRE(outHabitat.type() == HabitatType::Harbor);
 
         REQUIRE(Habitat::tryParse("unknown_fake_habitat", outType) == false);
         REQUIRE(Habitat::tryParse("", outType) == false);
