@@ -19,12 +19,14 @@ set(MODEL_SOURCES
         ../src/map.cpp
         ../src/map_gen.cpp
         ../src/model.cpp
+        ../src/predation.cpp
         ../src/salinity_response.cpp
         ../src/util.cpp
 )
 
 set(TEST_SOURCES
         habitat_test.cpp
+        predation_test.cpp
         fish_movement_test.cpp
         hydro_model_test.cpp
         load_utils_test.cpp

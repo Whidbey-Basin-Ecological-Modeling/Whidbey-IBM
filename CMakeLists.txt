@@ -112,6 +112,7 @@ set(COMMON_SOURCES
   src/map_gen.cpp
   src/model.cpp
   src/model_config_map.cpp
+  src/predation.cpp
   src/salinity_response.cpp
   src/util.cpp
   src/fish_movement_high_awareness.cpp
