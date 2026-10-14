@@ -25,6 +25,7 @@ set(MODEL_SOURCES
 )
 
 set(TEST_SOURCES
+        fish_mortality_test.cpp
         habitat_test.cpp
         predation_test.cpp
         fish_movement_test.cpp
