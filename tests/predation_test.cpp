@@ -283,82 +283,82 @@ TEST_CASE("PredationMortality calculateHabitatTypeConst", "[predation]") {
     using Catch::Approx;
 
     SECTION("Delta complex habitat, hour < 2500, fork length 50mm") {
-        Habitat hab(HabitatType::BlindChannel);
-        CHECK(hab.structure() == HabitatStructure::Complex);
-        CHECK(hab.largeType() == LargeHabitatType::Delta);
+        Habitat habitat(HabitatType::BlindChannel);
+        CHECK(habitat.structure() == HabitatStructure::Complex);
+        CHECK(habitat.largeType() == LargeHabitatType::Delta);
 
-        double habTypeConst = PredationMortality::calculateHabitatTypeConst(hab, 1000, 50.0);
+        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 1000, 50.0);
         // Z (0.6) * mort.const (0.5) * (1 + active_pred_sum (0.64)) = 0.3 * 1.64 = 0.492
-        REQUIRE(habTypeConst == Approx(0.492));
+        REQUIRE(habitatTypeConst == Approx(0.492));
     }
 
     SECTION("Delta neutral habitat, hour >= 2500, fork length 50mm") {
-        Habitat hab(HabitatType::Distributary);
-        CHECK(hab.structure() == HabitatStructure::Neutral);
-        CHECK(hab.largeType() == LargeHabitatType::Delta);
+        Habitat habitat(HabitatType::Distributary);
+        CHECK(habitat.structure() == HabitatStructure::Neutral);
+        CHECK(habitat.largeType() == LargeHabitatType::Delta);
 
-        double habTypeConst = PredationMortality::calculateHabitatTypeConst(hab, 2500, 50.0);
+        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 2500, 50.0);
         // Z (0.6) * mort.const (1.0) * (1 + active_pred_sum (0.74)) = 0.6 * 1.74 = 1.044
-        REQUIRE(habTypeConst == Approx(1.044));
+        REQUIRE(habitatTypeConst == Approx(1.044));
     }
 
     SECTION("Delta simplified habitat, hour < 2500, fork length 50mm") {
-        Habitat hab(HabitatType::Harbor, LargeHabitatType::Delta);
-        CHECK(hab.structure() == HabitatStructure::Simplified);
-        CHECK(hab.largeType() == LargeHabitatType::Delta);
+        Habitat habitat(HabitatType::Harbor, LargeHabitatType::Delta);
+        CHECK(habitat.structure() == HabitatStructure::Simplified);
+        CHECK(habitat.largeType() == LargeHabitatType::Delta);
 
-        double habTypeConst = PredationMortality::calculateHabitatTypeConst(hab, 1000, 50.0);
+        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 1000, 50.0);
         // Z (0.6) * mort.const (1.5) * (1 + active_pred_sum (0.64)) = 0.9 * 1.64 = 1.476
-        REQUIRE(habTypeConst == Approx(1.476));
+        REQUIRE(habitatTypeConst == Approx(1.476));
     }
 
     SECTION("Freshwater complex habitat, hour < 2500, fork length 65mm") {
-        Habitat hab(HabitatType::Creek);
-        CHECK(hab.structure() == HabitatStructure::Complex);
-        CHECK(hab.largeType() == LargeHabitatType::Freshwater);
+        Habitat habitat(HabitatType::Creek);
+        CHECK(habitat.structure() == HabitatStructure::Complex);
+        CHECK(habitat.largeType() == LargeHabitatType::Freshwater);
 
-        double habTypeConst = PredationMortality::calculateHabitatTypeConst(hab, 1000, 65.0);
+        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 1000, 65.0);
         // Z (0.6) * mort.const (0.5) * (1 + active_pred_sum (0.20)) = 0.3 * 1.20 = 0.36
-        REQUIRE(habTypeConst == Approx(0.36));
+        REQUIRE(habitatTypeConst == Approx(0.36));
     }
 
     SECTION("Offshore neutral habitat, hour < 2500, fork length 200mm") {
-        Habitat hab(HabitatType::OpenWater);
-        CHECK(hab.structure() == HabitatStructure::Neutral);
-        CHECK(hab.largeType() == LargeHabitatType::Offshore);
+        Habitat habitat(HabitatType::OpenWater);
+        CHECK(habitat.structure() == HabitatStructure::Neutral);
+        CHECK(habitat.largeType() == LargeHabitatType::Offshore);
 
-        double habTypeConst = PredationMortality::calculateHabitatTypeConst(hab, 1000, 200.0);
+        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 1000, 200.0);
         // Z (0.6) * mort.const (1.0) * (1 + active_pred_sum (1.32)) = 0.6 * 2.32 = 1.392
-        REQUIRE(habTypeConst == Approx(1.392));
+        REQUIRE(habitatTypeConst == Approx(1.392));
     }
 
     SECTION("Intertidal complex habitat, hour >= 2500, fork length 150mm") {
-        Habitat hab(HabitatType::Eelgrass);
-        CHECK(hab.structure() == HabitatStructure::Complex);
-        CHECK(hab.largeType() == LargeHabitatType::Intertidal);
+        Habitat habitat(HabitatType::Eelgrass);
+        CHECK(habitat.structure() == HabitatStructure::Complex);
+        CHECK(habitat.largeType() == LargeHabitatType::Intertidal);
 
-        double habTypeConst = PredationMortality::calculateHabitatTypeConst(hab, 3000, 150.0);
+        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 3000, 150.0);
         // Z (0.6) * mort.const (0.5) * (1 + active_pred_sum (1.30)) = 0.3 * 2.30 = 0.69
-        REQUIRE(habTypeConst == Approx(0.69));
+        REQUIRE(habitatTypeConst == Approx(0.69));
     }
 
     SECTION("Intertidal simplified habitat, hour < 2500, fork length 50mm") {
-        Habitat hab(HabitatType::Harbor, LargeHabitatType::Intertidal);
-        CHECK(hab.structure() == HabitatStructure::Simplified);
-        CHECK(hab.largeType() == LargeHabitatType::Intertidal);
+        Habitat habitat(HabitatType::Harbor, LargeHabitatType::Intertidal);
+        CHECK(habitat.structure() == HabitatStructure::Simplified);
+        CHECK(habitat.largeType() == LargeHabitatType::Intertidal);
 
-        double habTypeConst = PredationMortality::calculateHabitatTypeConst(hab, 1000, 50.0);
+        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 1000, 50.0);
         // Z (0.6) * mort.const (1.5) * (1 + active_pred_sum (1.25)) = 0.9 * 2.25 = 2.025
-        REQUIRE(habTypeConst == Approx(2.025));
+        REQUIRE(habitatTypeConst == Approx(2.025));
     }
 
     SECTION("No active predators outside fork length bounds") {
-        Habitat hab(HabitatType::Distributary);
-        CHECK(hab.structure() == HabitatStructure::Neutral);
-        CHECK(hab.largeType() == LargeHabitatType::Delta);
+        Habitat habitat(HabitatType::Distributary);
+        CHECK(habitat.structure() == HabitatStructure::Neutral);
+        CHECK(habitat.largeType() == LargeHabitatType::Delta);
 
-        double habTypeConst = PredationMortality::calculateHabitatTypeConst(hab, 1000, 20.0);
+        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 1000, 20.0);
         // Z (0.6) * mort.const (1.0) * (1 + active_pred_sum (0.0)) = 0.6 * 1.0 = 0.6
-        REQUIRE(habTypeConst == Approx(0.6));
+        REQUIRE(habitatTypeConst == Approx(0.6));
     }
 }
