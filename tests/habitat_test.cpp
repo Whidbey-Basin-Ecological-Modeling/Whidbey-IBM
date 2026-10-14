@@ -56,18 +56,36 @@ TEST_CASE("Habitat fine-to-large default mappings and disambiguations", "[habita
         REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::Nearshore) == LargeHabitatType::Intertidal);
         REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::SubtidalFlat) == LargeHabitatType::Intertidal);
         REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::Rock) == LargeHabitatType::Intertidal);
+        REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::Beach) == LargeHabitatType::Intertidal);
+        REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::Riprap) == LargeHabitatType::Intertidal);
+        REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::Eelgrass) == LargeHabitatType::Intertidal);
+        REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::Lagoon) == LargeHabitatType::Intertidal);
 
         REQUIRE(Habitat(HabitatType::Harbor).large == LargeHabitatType::Intertidal);
         REQUIRE(Habitat(HabitatType::Mudflat).large == LargeHabitatType::Intertidal);
         REQUIRE(Habitat(HabitatType::Nearshore).large == LargeHabitatType::Intertidal);
         REQUIRE(Habitat(HabitatType::SubtidalFlat).large == LargeHabitatType::Intertidal);
         REQUIRE(Habitat(HabitatType::Rock).large == LargeHabitatType::Intertidal);
+        REQUIRE(Habitat(HabitatType::Beach).large == LargeHabitatType::Intertidal);
+        REQUIRE(Habitat(HabitatType::Riprap).large == LargeHabitatType::Intertidal);
+        REQUIRE(Habitat(HabitatType::Eelgrass).large == LargeHabitatType::Intertidal);
+        REQUIRE(Habitat(HabitatType::Lagoon).large == LargeHabitatType::Intertidal);
+    }
+
+    SECTION("Freshwater defaults") {
+        REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::Creek) == LargeHabitatType::Freshwater);
+        REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::Mainstem) == LargeHabitatType::Freshwater);
+
+        REQUIRE(Habitat(HabitatType::Creek).large == LargeHabitatType::Freshwater);
+        REQUIRE(Habitat(HabitatType::Mainstem).large == LargeHabitatType::Freshwater);
     }
 
     SECTION("Offshore defaults") {
+        REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::Kelp) == LargeHabitatType::Offshore);
         REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::OpenWater) == LargeHabitatType::Offshore);
         REQUIRE(Habitat::getDefaultLargeHabitat(HabitatType::Exit) == LargeHabitatType::Offshore);
 
+        REQUIRE(Habitat(HabitatType::Kelp).large == LargeHabitatType::Offshore);
         REQUIRE(Habitat(HabitatType::OpenWater).large == LargeHabitatType::Offshore);
         REQUIRE(Habitat(HabitatType::Exit).large == LargeHabitatType::Offshore);
     }
@@ -138,6 +156,13 @@ TEST_CASE("Habitat::toString conversions", "[habitat]") {
     REQUIRE(Habitat::toString(HabitatType::Mudflat) == "Mudflat");
     REQUIRE(Habitat::toString(HabitatType::Rock) == "Rock");
     REQUIRE(Habitat::toString(HabitatType::SubtidalFlat) == "Sub-tidal flat");
+    REQUIRE(Habitat::toString(HabitatType::Creek) == "Creek");
+    REQUIRE(Habitat::toString(HabitatType::Mainstem) == "Mainstem");
+    REQUIRE(Habitat::toString(HabitatType::Beach) == "Beach");
+    REQUIRE(Habitat::toString(HabitatType::Riprap) == "Riprap");
+    REQUIRE(Habitat::toString(HabitatType::Eelgrass) == "Eelgrass");
+    REQUIRE(Habitat::toString(HabitatType::Lagoon) == "Lagoon");
+    REQUIRE(Habitat::toString(HabitatType::Kelp) == "Kelp");
     REQUIRE(Habitat::toString(HabitatType::Exit) == "Exit");
     REQUIRE(Habitat::toString(HabitatType::HabitatTypeCountSentinel) == "Unknown");
 
@@ -166,6 +191,13 @@ TEST_CASE("Habitat string parsing and aliases", "[habitat]") {
         REQUIRE(Habitat::fromString("open water") == HabitatType::OpenWater);
         REQUIRE(Habitat::fromString("rock") == HabitatType::Rock);
         REQUIRE(Habitat::fromString("exit") == HabitatType::Exit);
+        REQUIRE(Habitat::fromString("creek") == HabitatType::Creek);
+        REQUIRE(Habitat::fromString("mainstem") == HabitatType::Mainstem);
+        REQUIRE(Habitat::fromString("beach") == HabitatType::Beach);
+        REQUIRE(Habitat::fromString("riprap") == HabitatType::Riprap);
+        REQUIRE(Habitat::fromString("eelgrass") == HabitatType::Eelgrass);
+        REQUIRE(Habitat::fromString("lagoon") == HabitatType::Lagoon);
+        REQUIRE(Habitat::fromString("kelp") == HabitatType::Kelp);
     }
 
     SECTION("Large habitat parsing") {
@@ -193,6 +225,10 @@ TEST_CASE("Habitat string parsing and aliases", "[habitat]") {
         REQUIRE(Habitat::fromString("mudflat") == HabitatType::Mudflat);
         REQUIRE(Habitat::fromString("sub-tidal flat") == HabitatType::SubtidalFlat);
         REQUIRE(Habitat::fromString("subtidal flat") == HabitatType::SubtidalFlat);
+        REQUIRE(Habitat::fromString("rip-rap") == HabitatType::Riprap);
+        REQUIRE(Habitat::fromString("rip rap") == HabitatType::Riprap);
+        REQUIRE(Habitat::fromString("eel grass") == HabitatType::Eelgrass);
+        REQUIRE(Habitat::fromString("kelp") == HabitatType::Kelp);
     }
 
     SECTION("Whitespace and carriage return trimming") {

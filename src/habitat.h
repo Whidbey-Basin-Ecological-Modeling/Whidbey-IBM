@@ -11,19 +11,28 @@
 * Nearshore: Adjacent to ocean, locations from which fish may exit the model
 */
 enum class HabitatType {
-    BlindChannel,
-    Impoundment,
-    LowTideTerrace,
-    Distributary,
-    DistributaryEdge,
-    Harbor,
-    Nearshore,
+    Impoundment, //TODO: remove
+    LowTideTerrace, //TODO: remove
+    DistributaryEdge, //TODO: remove
+    Nearshore, //TODO: remove
+    SubtidalFlat, //TODO: remove
 
-    // new types
+    Distributary,
+    BlindChannel,
+
+    Creek,
+    Mainstem,
+
+    Beach,
     Mudflat,
-    OpenWater,
     Rock,
-    SubtidalFlat,
+    Harbor,
+    Riprap,
+    Eelgrass,
+    Lagoon,
+
+    Kelp,
+    OpenWater,
     Exit,
 
     HabitatTypeCountSentinel

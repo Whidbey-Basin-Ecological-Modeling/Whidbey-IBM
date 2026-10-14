@@ -40,6 +40,16 @@ const std::unordered_map<std::string, HabitatType> HABITAT_TYPES_BY_NAME = {
     {"rock", HabitatType::Rock},
     {"sub-tidal flat", HabitatType::SubtidalFlat},
     {"subtidal flat", HabitatType::SubtidalFlat},
+    {"creek", HabitatType::Creek},
+    {"mainstem", HabitatType::Mainstem},
+    {"beach", HabitatType::Beach},
+    {"riprap", HabitatType::Riprap},
+    {"rip-rap", HabitatType::Riprap},
+    {"rip rap", HabitatType::Riprap},
+    {"eelgrass", HabitatType::Eelgrass},
+    {"eel grass", HabitatType::Eelgrass},
+    {"lagoon", HabitatType::Lagoon},
+    {"kelp", HabitatType::Kelp},
     {"exit", HabitatType::Exit}
 };
 
@@ -122,6 +132,20 @@ std::string Habitat::toString(HabitatType type) {
             return "Sub-tidal flat";
         case HabitatType::Exit:
             return "Exit";
+        case HabitatType::Creek:
+            return "Creek";
+        case HabitatType::Mainstem:
+            return "Mainstem";
+        case HabitatType::Beach:
+            return "Beach";
+        case HabitatType::Riprap:
+            return "Riprap";
+        case HabitatType::Eelgrass:
+            return "Eelgrass";
+        case HabitatType::Lagoon:
+            return "Lagoon";
+        case HabitatType::Kelp:
+            return "Kelp";
         default:
             return "Unknown";
     }
@@ -156,8 +180,17 @@ LargeHabitatType Habitat::getDefaultLargeHabitat(HabitatType fine) {
         case HabitatType::Nearshore:
         case HabitatType::SubtidalFlat:
         case HabitatType::Rock:
+        case HabitatType::Beach:
+        case HabitatType::Riprap:
+        case HabitatType::Eelgrass:
+        case HabitatType::Lagoon:
             return LargeHabitatType::Intertidal;
 
+        case HabitatType::Creek:
+        case HabitatType::Mainstem:
+            return LargeHabitatType::Freshwater;
+
+        case HabitatType::Kelp:
         case HabitatType::OpenWater:
         case HabitatType::Exit:
             return LargeHabitatType::Offshore;
