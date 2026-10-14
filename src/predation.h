@@ -28,7 +28,7 @@ public:
     static bool isPredatorActive(PredatorGroup group, double forkLength);
     static double getPredatorRelativeDensity(PredatorGroup group, LargeHabitatType largeHabitat, int hour);
     static double calculateActivePredatorRelativeDensitySum(LargeHabitatType largeHabitat, int hour, double forkLength);
-    static double calculateHabTypeConst(const Habitat& habitat, int hour, double forkLength);
+    static double calculateHabitatTypeConst(const Habitat& habitat, int hour, double forkLength);
 };
 
 #endif // __FISH_PREDATION_H
