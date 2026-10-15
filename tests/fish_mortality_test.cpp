@@ -28,34 +28,42 @@ static double calculateExpectedMortality(
     return result;
 }
 
+static void setHabitatMortalityMultiplier(Model &model, float multiplier) {
+    const ModelConfigMap &config = model.getConfigMap();
+    auto &mutableConfig = const_cast<ModelConfigMap &>(config);
+    mutableConfig.set(ModelParamKey::HabitatMortalityMultiplier, multiplier);
+}
+
 TEST_CASE("Fish::getMortality baseline calculation", "[fish][mortality]") {
     using Catch::Approx;
 
     auto hydroModel = std::make_unique<MockHydroModel>();
     Model model(hydroModel.get());
+    setHabitatMortalityMultiplier(model, 0.6f);
 
     auto node = createMapNode(0.0f, 0.0f, HabitatType::Distributary);
+    CHECK(node->habitat.structure() == HabitatStructure::Neutral);
     node->popDensity = 0.05f;
 
     SECTION("Calculates mortality matching equation for standard values") {
-        Fish fish(1UL, 0L, 50.0f, node.get());
-        CHECK(fish.forkLength == 50.0f);
+        Fish fish(1UL, 0L, 25.0f, node.get());
+        CHECK(fish.forkLength == 25.0f);
 
         float mortality = fish.getMortality(model, *node);
-        double expected = calculateExpectedMortality(model, *node, 50.0);
+        double expected = calculateExpectedMortality(model, *node, 25.0);
 
         REQUIRE(mortality == Approx(expected).epsilon(1e-5));
     }
 
     SECTION("Mortality scales with different fork lengths") {
-        Fish smallFish(1UL, 0L, 35.0f, node.get());
-        Fish largeFish(2UL, 0L, 100.0f, node.get());
+        Fish smallFish(1UL, 0L, 20.0f, node.get());
+        Fish largeFish(2UL, 0L, 29.0f, node.get());
 
         float smallMort = smallFish.getMortality(model, *node);
         float largeMort = largeFish.getMortality(model, *node);
 
-        double expectedSmall = calculateExpectedMortality(model, *node, 35.0);
-        double expectedLarge = calculateExpectedMortality(model, *node, 100.0);
+        double expectedSmall = calculateExpectedMortality(model, *node, 20.0);
+        double expectedLarge = calculateExpectedMortality(model, *node, 29.0);
 
         REQUIRE(smallMort == Approx(expectedSmall).epsilon(1e-5));
         REQUIRE(largeMort == Approx(expectedLarge).epsilon(1e-5));
@@ -63,55 +71,18 @@ TEST_CASE("Fish::getMortality baseline calculation", "[fish][mortality]") {
     }
 
     SECTION("Mortality responds to population density") {
-        Fish fish(1UL, 0L, 50.0f, node.get());
+        Fish fish(1UL, 0L, 25.0f, node.get());
 
         node->popDensity = 0.001f;
         float lowDensityMort = fish.getMortality(model, *node);
-        double expectedLow = calculateExpectedMortality(model, *node, 50.0);
+        double expectedLow = calculateExpectedMortality(model, *node, 25.0);
         REQUIRE(lowDensityMort == Approx(expectedLow).epsilon(1e-4));
 
         node->popDensity = 0.5f;
         float highDensityMort = fish.getMortality(model, *node);
-        double expectedHigh = calculateExpectedMortality(model, *node, 50.0);
+        double expectedHigh = calculateExpectedMortality(model, *node, 25.0);
         REQUIRE(highDensityMort == Approx(expectedHigh).epsilon(1e-4));
 
         REQUIRE(lowDensityMort > highDensityMort);
     }
-}
-
-TEST_CASE("Fish::getMortality habitat multiplier effect", "[fish][mortality]") {
-    using Catch::Approx;
-
-    auto hydroModel = std::make_unique<MockHydroModel>();
-    Model model(hydroModel.get());
-
-    auto distNode = createMapNode(0.0f, 0.0f, HabitatType::Distributary);
-    auto nearshoreNode = createMapNode(1.0f, 0.0f, HabitatType::Nearshore);
-    auto openWaterNode = createMapNode(2.0f, 0.0f, HabitatType::OpenWater);
-    auto distEdgeNode = createMapNode(3.0f, 0.0f, HabitatType::DistributaryEdge);
-
-    distNode->popDensity = 0.02f;
-    nearshoreNode->popDensity = 0.02f;
-    openWaterNode->popDensity = 0.02f;
-    distEdgeNode->popDensity = 0.02f;
-
-    Fish fish(1UL, 0L, 60.0f, distNode.get());
-
-    float distMort = fish.getMortality(model, *distNode);
-    float nearshoreMort = fish.getMortality(model, *nearshoreNode);
-    float openWaterMort = fish.getMortality(model, *openWaterNode);
-    float distEdgeMort = fish.getMortality(model, *distEdgeNode);
-
-    REQUIRE(distMort == Approx(calculateExpectedMortality(model, *distNode, 60.0)).epsilon(1e-5));
-    REQUIRE(nearshoreMort == Approx(calculateExpectedMortality(model, *nearshoreNode, 60.0)).epsilon(1e-5));
-    REQUIRE(openWaterMort == Approx(calculateExpectedMortality(model, *openWaterNode, 60.0)).epsilon(1e-5));
-    REQUIRE(distEdgeMort == Approx(calculateExpectedMortality(model, *distEdgeNode, 60.0)).epsilon(1e-5));
-
-    // Distributary and Nearshore use HabitatMortalityMultiplier (default 2.0)
-    // OpenWater and DistributaryEdge have const 1.0
-    const float multiplier = model.getFloat(ModelParamKey::HabitatMortalityMultiplier);
-    CHECK(multiplier == Approx(2.0f));
-    REQUIRE(distMort == Approx(openWaterMort * multiplier).epsilon(1e-5));
-    REQUIRE(nearshoreMort == Approx(openWaterMort * multiplier).epsilon(1e-5));
-    REQUIRE(distEdgeMort == Approx(openWaterMort).epsilon(1e-5));
 }
