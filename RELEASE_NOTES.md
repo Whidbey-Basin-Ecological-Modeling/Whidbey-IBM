@@ -4,6 +4,10 @@ This file records major feature changes. It goes back in time to 11.19.2024. "Re
 when the completed feature was merged to the main branch. Functional parts of a feature may have been merged earlier.
 Minor updates are not recorded.
 
+## 10.14.2026
+- predation mortality model implemented to dynamically scale fish mortality based on habitat structure (Complex, Neutral, Simplified), large habitat zone (Delta, Intertidal), time of season, and fish fork length / active predator size classes.
+- removed `habitatMortalityMultiplier` configuration parameter and legacy static habitat mortality multipliers.
+
 ## 09.15.2026
 - `SalinityResponse` model implemented to calculate salinity movement bias for fish.
 - added configuration parameters in JSON for salinity response: `salinityAttractionLength`, `salinitySigmoidSteepness`, and `salinityBiasWeight`.

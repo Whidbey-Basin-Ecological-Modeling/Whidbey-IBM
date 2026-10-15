@@ -178,15 +178,6 @@ TEST_CASE("Habitat helper methods", "[habitat]") {
         REQUIRE(Habitat(HabitatType::DistributaryEdge).isDistributaryWithoutEdgeOrIsNearshore() == false);
         REQUIRE(Habitat(HabitatType::Nearshore).isDistributaryWithoutEdgeOrIsNearshore() == true);
     }
-
-    SECTION("getMortalityConst") {
-        float multiplier = 2.5f;
-        REQUIRE(Habitat(HabitatType::Distributary).getMortalityConst(multiplier) == multiplier);
-        REQUIRE(Habitat(HabitatType::Nearshore).getMortalityConst(multiplier) == multiplier);
-        REQUIRE(Habitat(HabitatType::DistributaryEdge).getMortalityConst(multiplier) == 1.0f);
-        REQUIRE(Habitat(HabitatType::Harbor).getMortalityConst(multiplier) == 1.0f);
-        REQUIRE(Habitat(HabitatType::OpenWater).getMortalityConst(multiplier) == 1.0f);
-    }
 }
 
 TEST_CASE("Habitat::toString conversions", "[habitat]") {

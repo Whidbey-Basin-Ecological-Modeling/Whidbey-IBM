@@ -16,8 +16,7 @@ static double calculateExpectedMortalityLegacyEqn(
 ) {
     const double mort_min_c = model.getFloat(ModelParamKey::MortMin);
     const double mort_max_d = model.getFloat(ModelParamKey::MortMax);
-    const float habitat_mortality_multiplier = model.getFloat(ModelParamKey::HabitatMortalityMultiplier);
-    const double habTypeMortConst = 0.6; // Z in the new equation loc.habitat.getMortalityConst(habitat_mortality_multiplier);
+    const double habTypeMortConst = 0.6; // Z in the new equation
     const double a = 1.849;
     const double b_m = -0.8;
     const double b_s = -2.395;

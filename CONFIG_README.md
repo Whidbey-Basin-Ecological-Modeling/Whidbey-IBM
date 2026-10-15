@@ -10,7 +10,6 @@ Parameters:
   `threadCount` parameter.) Together this will create reproducible, deterministic outputs for testing or validation. 
   If negative or omitted, the RNG will use a pseudo-random seed.
 - `habitatTypeExitConditionHours`: float; optional, default 2.0; the number of consecutive hours a fish must reside in a Nearshore habitat (at the end of each hour) after which it will "exit" the simulation.
-- `habitatMortalityMultiplier`: float; optional; default 2.0; additional mortality multiplier applied in distributaries and nearshore habitats
 - `mortMin`: float; optional; default 0.0005; mort_min_c parameter used in fish mortality equation
 - `mortMax`: float; optional; default 0.002; mort_max_d parameter used in fish mortality equation
 - `mortalityInflectionPoint`: float; optional; default 500.0; mortalityInflectionPoint (e) used in fish mortality equation 

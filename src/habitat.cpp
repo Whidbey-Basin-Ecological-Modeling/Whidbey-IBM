@@ -100,14 +100,6 @@ bool Habitat::isDistributaryWithoutEdgeOrIsNearshore() const {
     return isDistributary(false) || isNearshore();
 }
 
-float Habitat::getMortalityConst(const float habitatMortalityMultiplier) const {
-    float defaultNoMultiplier = 1.0f;
-    if (isDistributaryWithoutEdgeOrIsNearshore()) {
-        return habitatMortalityMultiplier;
-    }
-    return defaultNoMultiplier;
-}
-
 std::string Habitat::toString() const {
     return toString(fine);
 }

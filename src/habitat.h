@@ -90,8 +90,6 @@ public:
     bool isDistributaryOrNearshore() const;
     bool isDistributaryWithoutEdgeOrIsNearshore() const;
 
-    float getMortalityConst(float habitatMortalityMultiplier) const;
-
     std::string toString() const;
     static std::string toString(HabitatType type);
     static std::string toString(LargeHabitatType type);

@@ -9,7 +9,6 @@ std::unordered_map<ModelParamKey, ConfigDefinition> ModelConfigMap::createDefaul
         {ModelParamKey::DirectionlessEdges, {"directionlessEdges", 1}},
         {ModelParamKey::VirtualNodes, {"virtualNodes", 0}},
         {ModelParamKey::rng_seed, {"rng_seed", static_cast<int>(GlobalRand::USE_RANDOM_SEED)}},
-        {ModelParamKey::HabitatMortalityMultiplier, {"habitatMortalityMultiplier", 2.0f}},
         {ModelParamKey::MortMin, {"mortMin", 0.0005f}},
         {ModelParamKey::MortMax, {"mortMax", 0.002f}},
         {ModelParamKey::GrowthSlope, {"growthSlope", 0.0007f}},

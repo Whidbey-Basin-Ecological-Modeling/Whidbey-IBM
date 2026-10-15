@@ -16,7 +16,6 @@ enum class ModelParamKey {
     DirectionlessEdges,
     rng_seed,
     VirtualNodes,
-    HabitatMortalityMultiplier,
     MortMin,
     MortMax,
     GrowthSlope,
