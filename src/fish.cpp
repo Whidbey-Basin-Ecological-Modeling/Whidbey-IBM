@@ -10,6 +10,7 @@
 #include "fish_movement_downstream.h"
 #include "fish_movement_factory.h"
 #include "fish_post_movement.h"
+#include "predation.h"
 #include "salinity_response.h"
 #include "util.h"
 
@@ -509,8 +510,7 @@ float Fish::getGrowth(Model &model, MapNode &loc, float cost, float Pmax) const 
 float Fish::getMortality(Model &model, MapNode &loc) const {
     const double mort_min_c = model.getFloat(ModelParamKey::MortMin);
     const double mort_max_d = model.getFloat(ModelParamKey::MortMax);
-    const float habitat_mortality_multiplier = model.getFloat(ModelParamKey::HabitatMortalityMultiplier);
-    const double habTypeMortConst = loc.habitat.getMortalityConst(habitat_mortality_multiplier);
+    const double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(loc.habitat, model.time, this->forkLength);
     const double a = 1.849; // slope
     const double b_m = -0.8; //slope at inflection
     const double b_s = -2.395; // intercept
@@ -518,7 +518,7 @@ float Fish::getMortality(Model &model, MapNode &loc) const {
     const double L = this->forkLength;
     const double X = loc.popDensity; // * 1000; // convert m^2 to ha
     const double S = 250; // scaling factor numerator
-    const double result = (((mort_min_c + (mort_max_d - mort_min_c) * exp(-exp(-b_m * (log(X) - log(e))))) * (S / (exp(b_s + a * log(L))) ))) * habTypeMortConst;
+    const double result = (((mort_min_c + (mort_max_d - mort_min_c) * exp(-exp(-b_m * (log(X) - log(e))))) * (S / (exp(b_s + a * log(L))) ))) * habitatTypeConst;
     return result;
 }
 
