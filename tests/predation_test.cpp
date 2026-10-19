@@ -91,15 +91,43 @@ TEST_CASE("PredationMortality size range active status", "[predation]") {
 }
 
 TEST_CASE("PredationMortality habitat baseline constants", "[predation]") {
-    SECTION("Structure baseline constants match Section 2.3") {
-        REQUIRE(PredationMortality::getHabitatBaselineConst(HabitatStructure::Complex) == 0.5);
-        REQUIRE(PredationMortality::getHabitatBaselineConst(HabitatStructure::Neutral) == 1.0);
-        REQUIRE(PredationMortality::getHabitatBaselineConst(HabitatStructure::Simplified) == 1.5);
+    SECTION("Structure baseline constants match default ModelConfigMap") {
+        ModelConfigMap config;
+        REQUIRE(PredationMortality::getHabitatBaselineConst(HabitatStructure::Complex, config) == 0.5);
+        REQUIRE(PredationMortality::getHabitatBaselineConst(HabitatStructure::Neutral, config) == 1.0);
+        REQUIRE(PredationMortality::getHabitatBaselineConst(HabitatStructure::Simplified, config) == 1.5);
+    }
+
+    SECTION("Structure baseline constants read custom values from ModelConfigMap") {
+        ModelConfigMap config;
+        config.set(ModelParamKey::HabitatMortConstComplex, 0.25f);
+        config.set(ModelParamKey::HabitatMortConstNeutral, 0.75f);
+        config.set(ModelParamKey::HabitatMortConstSimplified, 2.25f);
+
+        REQUIRE(PredationMortality::getHabitatBaselineConst(HabitatStructure::Complex, config) == 0.25);
+        REQUIRE(PredationMortality::getHabitatBaselineConst(HabitatStructure::Neutral, config) == 0.75);
+        REQUIRE(PredationMortality::getHabitatBaselineConst(HabitatStructure::Simplified, config) == 2.25);
+    }
+
+    SECTION("Structure baseline constants loaded from JSON Document") {
+        rapidjson::Document doc;
+        doc.Parse(R"({
+            "habitatMortConstComplex": 0.4,
+            "habitatMortConstNeutral": 0.8,
+            "habitatMortConstSimplified": 1.2
+        })");
+        ModelConfigMap config;
+        config.loadFromJson(doc);
+
+        REQUIRE(PredationMortality::getHabitatBaselineConst(HabitatStructure::Complex, config) == 0.4f);
+        REQUIRE(PredationMortality::getHabitatBaselineConst(HabitatStructure::Neutral, config) == 0.8f);
+        REQUIRE(PredationMortality::getHabitatBaselineConst(HabitatStructure::Simplified, config) == 1.2f);
     }
 
     SECTION("Invalid HabitatStructure throws exception") {
+        ModelConfigMap config;
         REQUIRE_THROWS_AS(
-            PredationMortality::getHabitatBaselineConst(HabitatStructure::HabitatStructureCountSentinel),
+            PredationMortality::getHabitatBaselineConst(HabitatStructure::HabitatStructureCountSentinel, config),
             std::invalid_argument
         );
     }
@@ -281,13 +309,14 @@ TEST_CASE("PredationMortality active predator relative density sum calculations"
 
 TEST_CASE("PredationMortality calculateHabitatTypeConst", "[predation]") {
     using Catch::Approx;
+    ModelConfigMap config;
 
     SECTION("Delta complex habitat, hour < 2500, fork length 50mm") {
         Habitat habitat(HabitatType::BlindChannel);
         CHECK(habitat.structure() == HabitatStructure::Complex);
         CHECK(habitat.largeType() == LargeHabitatType::Delta);
 
-        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 1000, 50.0);
+        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 1000, 50.0, config);
         // Z (0.6) * mort.const (0.5) * (1 + active_pred_sum (0.64)) = 0.3 * 1.64 = 0.492
         REQUIRE(habitatTypeConst == Approx(0.492));
     }
@@ -297,7 +326,7 @@ TEST_CASE("PredationMortality calculateHabitatTypeConst", "[predation]") {
         CHECK(habitat.structure() == HabitatStructure::Neutral);
         CHECK(habitat.largeType() == LargeHabitatType::Delta);
 
-        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 2500, 50.0);
+        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 2500, 50.0, config);
         // Z (0.6) * mort.const (1.0) * (1 + active_pred_sum (0.74)) = 0.6 * 1.74 = 1.044
         REQUIRE(habitatTypeConst == Approx(1.044));
     }
@@ -307,7 +336,7 @@ TEST_CASE("PredationMortality calculateHabitatTypeConst", "[predation]") {
         CHECK(habitat.structure() == HabitatStructure::Simplified);
         CHECK(habitat.largeType() == LargeHabitatType::Delta);
 
-        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 1000, 50.0);
+        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 1000, 50.0, config);
         // Z (0.6) * mort.const (1.5) * (1 + active_pred_sum (0.64)) = 0.9 * 1.64 = 1.476
         REQUIRE(habitatTypeConst == Approx(1.476));
     }
@@ -317,7 +346,7 @@ TEST_CASE("PredationMortality calculateHabitatTypeConst", "[predation]") {
         CHECK(habitat.structure() == HabitatStructure::Complex);
         CHECK(habitat.largeType() == LargeHabitatType::Freshwater);
 
-        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 1000, 65.0);
+        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 1000, 65.0, config);
         // Z (0.6) * mort.const (0.5) * (1 + active_pred_sum (0.20)) = 0.3 * 1.20 = 0.36
         REQUIRE(habitatTypeConst == Approx(0.36));
     }
@@ -327,7 +356,7 @@ TEST_CASE("PredationMortality calculateHabitatTypeConst", "[predation]") {
         CHECK(habitat.structure() == HabitatStructure::Neutral);
         CHECK(habitat.largeType() == LargeHabitatType::Offshore);
 
-        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 1000, 200.0);
+        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 1000, 200.0, config);
         // Z (0.6) * mort.const (1.0) * (1 + active_pred_sum (1.32)) = 0.6 * 2.32 = 1.392
         REQUIRE(habitatTypeConst == Approx(1.392));
     }
@@ -337,7 +366,7 @@ TEST_CASE("PredationMortality calculateHabitatTypeConst", "[predation]") {
         CHECK(habitat.structure() == HabitatStructure::Complex);
         CHECK(habitat.largeType() == LargeHabitatType::Intertidal);
 
-        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 3000, 150.0);
+        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 3000, 150.0, config);
         // Z (0.6) * mort.const (0.5) * (1 + active_pred_sum (1.30)) = 0.3 * 2.30 = 0.69
         REQUIRE(habitatTypeConst == Approx(0.69));
     }
@@ -347,9 +376,22 @@ TEST_CASE("PredationMortality calculateHabitatTypeConst", "[predation]") {
         CHECK(habitat.structure() == HabitatStructure::Simplified);
         CHECK(habitat.largeType() == LargeHabitatType::Intertidal);
 
-        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 1000, 50.0);
+        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 1000, 50.0, config);
         // Z (0.6) * mort.const (1.5) * (1 + active_pred_sum (1.25)) = 0.9 * 2.25 = 2.025
         REQUIRE(habitatTypeConst == Approx(2.025));
+    }
+
+    SECTION("Custom config changes calculateHabitatTypeConst output") {
+        Habitat habitat(HabitatType::BlindChannel);
+        CHECK(habitat.structure() == HabitatStructure::Complex);
+        CHECK(habitat.largeType() == LargeHabitatType::Delta);
+
+        ModelConfigMap customConfig;
+        customConfig.set(ModelParamKey::HabitatMortConstComplex, 1.0f);
+
+        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 1000, 50.0, customConfig);
+        // Z (0.6) * mort.const (1.0) * (1 + active_pred_sum (0.64)) = 0.6 * 1.64 = 0.984
+        REQUIRE(habitatTypeConst == Approx(0.984));
     }
 
     SECTION("No active predators outside fork length bounds") {
@@ -357,7 +399,7 @@ TEST_CASE("PredationMortality calculateHabitatTypeConst", "[predation]") {
         CHECK(habitat.structure() == HabitatStructure::Neutral);
         CHECK(habitat.largeType() == LargeHabitatType::Delta);
 
-        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 1000, 20.0);
+        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 1000, 20.0, config);
         // Z (0.6) * mort.const (1.0) * (1 + active_pred_sum (0.0)) = 0.6 * 1.0 = 0.6
         REQUIRE(habitatTypeConst == Approx(0.6));
     }

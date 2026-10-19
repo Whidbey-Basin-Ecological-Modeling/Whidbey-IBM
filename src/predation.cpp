@@ -108,14 +108,14 @@ constexpr double PREDATOR_RELATIVE_DENSITY[static_cast<size_t>(PredatorGroup::Pr
 
 } // namespace
 
-double PredationMortality::getHabitatBaselineConst(HabitatStructure structure) {
+double PredationMortality::getHabitatBaselineConst(HabitatStructure structure, const ModelConfigMap& config) {
     switch (structure) {
         case HabitatStructure::Complex:
-            return 0.5;
+            return config.getFloat(ModelParamKey::HabitatMortConstComplex);
         case HabitatStructure::Neutral:
-            return 1.0;
+            return config.getFloat(ModelParamKey::HabitatMortConstNeutral);
         case HabitatStructure::Simplified:
-            return 1.5;
+            return config.getFloat(ModelParamKey::HabitatMortConstSimplified);
         default:
             throw std::invalid_argument("Invalid HabitatStructure enum value");
     }
@@ -155,8 +155,8 @@ double PredationMortality::calculateActivePredatorRelativeDensitySum(LargeHabita
     return sum;
 }
 
-double PredationMortality::calculateHabitatTypeConst(const Habitat& habitat, int hour, double forkLength) {
-    double habitatConst = getHabitatBaselineConst(habitat.structure());
+double PredationMortality::calculateHabitatTypeConst(const Habitat& habitat, int hour, double forkLength, const ModelConfigMap& config) {
+    double habitatConst = getHabitatBaselineConst(habitat.structure(), config);
     double predatorSum = calculateActivePredatorRelativeDensitySum(habitat.largeType(), hour, forkLength);
     return PREDATION_Z_SCALING * habitatConst * (1.0 + predatorSum);
 }

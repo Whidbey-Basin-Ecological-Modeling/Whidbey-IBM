@@ -21,6 +21,9 @@ Parameters:
 - `salinityAttractionLength`: float; optional; default 65.0; fish length (in mm) at which neutral salinity preference is reached in the salinity response calculation
 - `salinitySigmoidSteepness`: float; optional; default 0.1; steepness parameter of the sigmoid in the salinity response calculation
 - `salinityBiasWeight`: float; optional; default 0.2; weight/scaling factor applied to the salinity preference match in movement bias calculation
+- `habitatMortConstComplex`: float; optional; default 0.5; baseline constant for complex habitat structure in predation mortality calculation
+- `habitatMortConstNeutral`: float; optional; default 1.0; baseline constant for neutral habitat structure in predation mortality calculation
+- `habitatMortConstSimplified`: float; optional; default 1.5; baseline constant for simplified habitat structure in predation mortality calculation
 - `agentAwareness`: string; optional; default "medium"; the agent awareness level (aka movement omniscience) to use in 
   the model. Options are "low", "medium", and "high".
 - `envDataType`: *DEPRECATED:* Only "string" is supported, and need not be specified in the config

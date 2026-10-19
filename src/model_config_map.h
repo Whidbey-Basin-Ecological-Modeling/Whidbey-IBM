@@ -27,7 +27,10 @@ enum class ModelParamKey {
     MortalityInflectionPoint,
     SalinityAttractionLength,
     SalinitySigmoidSteepness,
-    SalinityBiasWeight
+    SalinityBiasWeight,
+    HabitatMortConstComplex,
+    HabitatMortConstNeutral,
+    HabitatMortConstSimplified
 };
 
 class ModelConfigMap {

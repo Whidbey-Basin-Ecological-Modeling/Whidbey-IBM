@@ -21,6 +21,9 @@ std::unordered_map<ModelParamKey, ConfigDefinition> ModelConfigMap::createDefaul
         {ModelParamKey::SalinityAttractionLength, {"salinityAttractionLength", 65.0f}},
         {ModelParamKey::SalinitySigmoidSteepness, {"salinitySigmoidSteepness", 0.1f}},
         {ModelParamKey::SalinityBiasWeight, {"salinityBiasWeight", 0.2f}},
+        {ModelParamKey::HabitatMortConstComplex, {"habitatMortConstComplex", 0.5f}},
+        {ModelParamKey::HabitatMortConstNeutral, {"habitatMortConstNeutral", 1.0f}},
+        {ModelParamKey::HabitatMortConstSimplified, {"habitatMortConstSimplified", 1.5f}},
     };
 }
 

@@ -510,7 +510,7 @@ float Fish::getGrowth(Model &model, MapNode &loc, float cost, float Pmax) const 
 float Fish::getMortality(Model &model, MapNode &loc) const {
     const double mort_min_c = model.getFloat(ModelParamKey::MortMin);
     const double mort_max_d = model.getFloat(ModelParamKey::MortMax);
-    const double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(loc.habitat, model.time, this->forkLength);
+    const double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(loc.habitat, model.time, this->forkLength, model.getConfigMap());
     const double a = 1.849; // slope
     const double b_m = -0.8; //slope at inflection
     const double b_s = -2.395; // intercept

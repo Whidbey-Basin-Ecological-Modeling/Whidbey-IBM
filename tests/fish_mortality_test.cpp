@@ -89,7 +89,7 @@ TEST_CASE("Fish::getMortality with dynamic predation mortality", "[fish][mortali
     auto calcExpectedDynamicMortality = [](const Model &m, const MapNode &node, double forkLength) -> double {
         const double mort_min_c = m.getFloat(ModelParamKey::MortMin);
         const double mort_max_d = m.getFloat(ModelParamKey::MortMax);
-        const double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(node.habitat, m.time, forkLength);
+        const double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(node.habitat, m.time, forkLength, m.getConfigMap());
         const double a = 1.849;
         const double b_m = -0.8;
         const double b_s = -2.395;
