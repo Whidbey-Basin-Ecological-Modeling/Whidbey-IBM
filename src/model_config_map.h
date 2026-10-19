@@ -30,7 +30,8 @@ enum class ModelParamKey {
     SalinityBiasWeight,
     HabitatMortConstComplex,
     HabitatMortConstNeutral,
-    HabitatMortConstSimplified
+    HabitatMortConstSimplified,
+    PredationZScaling
 };
 
 class ModelConfigMap {

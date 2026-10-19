@@ -24,6 +24,7 @@ std::unordered_map<ModelParamKey, ConfigDefinition> ModelConfigMap::createDefaul
         {ModelParamKey::HabitatMortConstComplex, {"habitatMortConstComplex", 0.5f}},
         {ModelParamKey::HabitatMortConstNeutral, {"habitatMortConstNeutral", 1.0f}},
         {ModelParamKey::HabitatMortConstSimplified, {"habitatMortConstSimplified", 1.5f}},
+        {ModelParamKey::PredationZScaling, {"predationZScaling", 0.6f}},
     };
 }
 

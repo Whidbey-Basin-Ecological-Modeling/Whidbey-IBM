@@ -394,6 +394,38 @@ TEST_CASE("PredationMortality calculateHabitatTypeConst", "[predation]") {
         REQUIRE(habitatTypeConst == Approx(0.984));
     }
 
+    SECTION("Custom predationZScaling changes calculateHabitatTypeConst output") {
+        Habitat habitat(HabitatType::BlindChannel);
+        CHECK(habitat.structure() == HabitatStructure::Complex);
+        CHECK(habitat.largeType() == LargeHabitatType::Delta);
+
+        ModelConfigMap customConfig;
+        customConfig.set(ModelParamKey::PredationZScaling, 1.2f);
+
+        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 1000, 50.0, customConfig);
+        // Z (1.2) * mort.const (0.5) * (1 + active_pred_sum (0.64)) = 0.6 * 1.64 = 0.984
+        REQUIRE(habitatTypeConst == Approx(0.984));
+    }
+
+    SECTION("predationZScaling loaded from JSON document") {
+        rapidjson::Document doc;
+        doc.Parse(R"({
+            "predationZScaling": 0.3
+        })");
+        ModelConfigMap configJson;
+        configJson.loadFromJson(doc);
+
+        REQUIRE(configJson.getFloat(ModelParamKey::PredationZScaling) == 0.3f);
+
+        Habitat habitat(HabitatType::BlindChannel);
+        CHECK(habitat.structure() == HabitatStructure::Complex);
+        CHECK(habitat.largeType() == LargeHabitatType::Delta);
+
+        double habitatTypeConst = PredationMortality::calculateHabitatTypeConst(habitat, 1000, 50.0, configJson);
+        // Z (0.3) * mort.const (0.5) * (1 + active_pred_sum (0.64)) = 0.15 * 1.64 = 0.246
+        REQUIRE(habitatTypeConst == Approx(0.246));
+    }
+
     SECTION("No active predators outside fork length bounds") {
         Habitat habitat(HabitatType::Distributary);
         CHECK(habitat.structure() == HabitatStructure::Neutral);

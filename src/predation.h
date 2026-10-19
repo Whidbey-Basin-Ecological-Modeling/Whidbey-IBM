@@ -22,7 +22,6 @@ enum class PredatorGroup {
 
 class PredationMortality {
 public:
-    static constexpr double PREDATION_Z_SCALING = 0.6;
     static constexpr int PREDATION_TIME_WINDOW_CUTOFF_HOUR = 2500;
 
     static double getHabitatBaselineConst(HabitatStructure structure, const ModelConfigMap& config);

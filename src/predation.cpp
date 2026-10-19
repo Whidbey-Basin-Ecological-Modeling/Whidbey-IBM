@@ -158,5 +158,5 @@ double PredationMortality::calculateActivePredatorRelativeDensitySum(LargeHabita
 double PredationMortality::calculateHabitatTypeConst(const Habitat& habitat, int hour, double forkLength, const ModelConfigMap& config) {
     double habitatConst = getHabitatBaselineConst(habitat.structure(), config);
     double predatorSum = calculateActivePredatorRelativeDensitySum(habitat.largeType(), hour, forkLength);
-    return PREDATION_Z_SCALING * habitatConst * (1.0 + predatorSum);
+    return config.getFloat(ModelParamKey::PredationZScaling) * habitatConst * (1.0 + predatorSum);
 }
