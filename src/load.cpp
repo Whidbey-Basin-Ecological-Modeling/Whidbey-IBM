@@ -126,7 +126,7 @@ void initializeEachHydroNodeToNearestMapNode(const std::vector<MapNode *> & map,
             }
         }
         if (closestDistance < closestNode->hydroNodeDistance) {
-            assignHydroNodeToMapNodeWithDistance(hydroNodeIndex, closestNode, closestNode->hydroNodeDistance, const_cast<std::vector<DistribHydroNode> &>(hydroNodes));
+            assignHydroNodeToMapNodeWithDistance(hydroNodeIndex, closestNode, closestNode->hydroNodeDistance, const_cast<std::vector<DistribHydroNode> &>(hydroNodes)); // TODO: possible bug using wrong distance?
             assignedNodes.emplace(closestNode);
         }
     }
