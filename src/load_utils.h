@@ -54,6 +54,16 @@ public:
                 *fillValue = static_cast<float>(fileFillValue);
                 return;
             }
+            case netCDF::NcType::nc_BYTE: {
+                signed char fileFillValue = static_cast<signed char>(NC_FILL_BYTE);
+                if (variableFillActive) {
+                    ncVar_.getFillModeParameters(variableFillActive, static_cast<void *>(&fileFillValue));
+                } else {
+                    fileFillValue = getFillValueOrDefault(static_cast<signed char>(NC_FILL_BYTE));
+                }
+                *fillValue = static_cast<float>(fileFillValue);
+                return;
+            }
             default:
                 throw std::invalid_argument("Unsupported NetCDF type for float fill value: " + ncVar_.getType().getName());
         }

@@ -43,6 +43,13 @@ public:
         intCustom.setFill(true, customIntFill);
         auto intDefault = file.addVar("int_default", netCDF::NcType(netCDF::NcType::nc_INT), nodeDimension);
 
+        const signed char customByteFill = -1;
+        auto byteCustom = file.addVar("byte_custom", netCDF::NcType(netCDF::NcType::nc_BYTE), nodeDimension);
+        byteCustom.setFill(true, customByteFill);
+        const signed char byteValues[] = {0, customByteFill, 1};
+        byteCustom.putVar(byteValues);
+        auto byteDefault = file.addVar("byte_default", netCDF::NcType(netCDF::NcType::nc_BYTE), nodeDimension);
+
         file.addVar("short_unsupported", netCDF::NcType(netCDF::NcType::nc_SHORT), nodeDimension);
     }
 
@@ -440,4 +447,33 @@ TEST_CASE("NetCDF fill adapter supports fill consumers and rejects other types",
     float unusedFillValue = 0.0f;
     bool fillActive = false;
     REQUIRE_THROWS_AS(shortAdapter.getFillModeParameters(fillActive, &unusedFillValue), std::invalid_argument);
+}
+
+TEST_CASE("NetCDF fill adapter converts signed byte fills for wetness series", "[netcdf]") {
+    TemporaryFillNetCDFFile temporaryFile;
+    netCDF::NcFile file(temporaryFile.path(), netCDF::NcFile::read);
+
+    auto byteVariable = file.getVar("byte_custom");
+    NetCDFVarFillAdapter byteAdapter(byteVariable);
+    bool fillActive = false;
+    float fillValue = 0.0f;
+    byteAdapter.getFillModeParameters(fillActive, &fillValue);
+    REQUIRE(fillActive);
+    REQUIRE(fillValue == -1.0f);
+
+    std::vector<float> wetness = {0.0f, fillValue, 1.0f};
+    std::vector<std::string> diagnostics;
+    fix_all_missing_values(wetness.size(), byteAdapter, wetness, "wetness", &diagnostics);
+    REQUIRE(wetness == std::vector<float>{0.0f, 0.0f, 1.0f});
+    REQUIRE(diagnostics.size() == 1);
+
+    std::vector<float> allMissingWetness = {fillValue, fillValue, fillValue};
+    REQUIRE_THROWS_AS(fix_all_missing_values(allMissingWetness.size(), byteAdapter, allMissingWetness, "wetness"),
+                      AllMissingValuesException);
+
+    auto defaultByteVariable = file.getVar("byte_default");
+    NetCDFVarFillAdapter defaultByteAdapter(defaultByteVariable);
+    defaultByteAdapter.getFillModeParameters(fillActive, &fillValue);
+    REQUIRE(fillActive);
+    REQUIRE(fillValue == static_cast<float>(NC_FILL_BYTE));
 }

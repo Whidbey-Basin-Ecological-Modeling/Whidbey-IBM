@@ -43,19 +43,27 @@ void writeHydroFixture(const std::filesystem::path &path, const std::vector<int>
     netCDF::NcFile file(path.string(), netCDF::NcFile::FileMode::replace);
     const auto timeDimension = file.addDim("time", timeCount);
     const auto nodeDimension = file.addDim("node", ids.size());
-    const auto nodeVar = file.addVar("node", netCDF::ncInt, nodeDimension);
+    const auto nodeIndexVar = file.addVar("node_index", netCDF::ncInt, nodeDimension);
     const auto xVar = file.addVar("x", netCDF::ncFloat, nodeDimension);
     const auto yVar = file.addVar("y", netCDF::ncFloat, nodeDimension);
     const std::vector<netCDF::NcDim> dimensions{timeDimension, nodeDimension};
-    const std::array<std::string, 6> names{"u", "v", "zeta", "temperature", "salinity", "wet_n"};
+    const std::array<std::string, 5> names{"u", "v", "zeta", "temperature", "salinity"};
 
-    nodeVar.putVar(ids.data());
+    nodeIndexVar.putVar(ids.data());
     xVar.putVar(x.data());
     yVar.putVar(y.data());
     for (size_t variableIndex = 0; variableIndex < names.size(); ++variableIndex) {
         auto variable = file.addVar(names[variableIndex], netCDF::ncFloat, dimensions);
         variable.putVar(series[variableIndex].data());
     }
+
+    auto wetVar = file.addVar("is_wet", netCDF::NcType(netCDF::NcType::nc_BYTE), dimensions);
+    wetVar.setFill(true, static_cast<signed char>(-1));
+    std::vector<signed char> wetness(series[5].size());
+    for (size_t index = 0; index < series[5].size(); ++index) {
+        wetness[index] = static_cast<signed char>(series[5][index]);
+    }
+    wetVar.putVar(wetness.data());
 }
 
 class CoutRedirect {
@@ -776,7 +784,7 @@ TEST_CASE("loadDistribHydro reads time series by NetCDF position and skips inval
     const std::vector<float> y{11.0f, 21.0f, 31.0f, 41.0f, NC_FILL_FLOAT, 61.0f};
     std::array<std::vector<float>, 6> series;
 
-    for (size_t variableIndex = 0; variableIndex < series.size(); ++variableIndex) {
+    for (size_t variableIndex = 0; variableIndex < series.size() - 1; ++variableIndex) {
         series[variableIndex].resize(timeCount * nodeCount);
         for (size_t time = 0; time < timeCount; ++time) {
             for (size_t position = 0; position < nodeCount; ++position) {
@@ -787,7 +795,17 @@ TEST_CASE("loadDistribHydro reads time series by NetCDF position and skips inval
             }
         }
     }
+    series[5].resize(timeCount * nodeCount);
+    for (size_t time = 0; time < timeCount; ++time) {
+        for (size_t position = 0; position < nodeCount; ++position) {
+            const bool invalidNode = position == 1 || position == 2 || position == 4;
+            series[5][time * nodeCount + position] = invalidNode
+                ? -1.0f
+                : static_cast<float>((time + position) % 2);
+        }
+    }
     series[0][1 * nodeCount + 5] = NC_FILL_FLOAT;
+    series[5][1 * nodeCount + 5] = -1.0f;
 
     TemporaryHydroFile fixture;
     writeHydroFixture(fixture.path(), ids, x, y, series, timeCount);
@@ -824,8 +842,8 @@ TEST_CASE("loadDistribHydro reads time series by NetCDF position and skips inval
             const auto &values = nodes[nodeIndex].*members[variableIndex];
             REQUIRE(values.size() == timeCount);
             for (size_t time = 0; time < timeCount; ++time) {
-                const float expected = variableIndex == 0 && nodeIndex == 2 && time == 1
-                    ? static_cast<float>((variableIndex + 1) * 1000 + sourcePositions[nodeIndex])
+                const float expected = (variableIndex == 0 || variableIndex == 5) && nodeIndex == 2 && time == 1
+                    ? series[variableIndex][sourcePositions[nodeIndex]]
                     : series[variableIndex][time * nodeCount + sourcePositions[nodeIndex]];
                 REQUIRE(values[time] == Catch::Approx(expected));
             }
@@ -911,13 +929,19 @@ TEST_CASE("loadDistribHydro accepts zero-based and one-based IDs", "[load]") {
     const std::vector<float> x{1.0f, 2.0f, 3.0f};
     const std::vector<float> y{4.0f, 5.0f, 6.0f};
     std::array<std::vector<float>, 6> series;
-    for (size_t variableIndex = 0; variableIndex < series.size(); ++variableIndex) {
+    for (size_t variableIndex = 0; variableIndex < series.size() - 1; ++variableIndex) {
         series[variableIndex].resize(timeCount * nodeCount);
         for (size_t time = 0; time < timeCount; ++time) {
             for (size_t position = 0; position < nodeCount; ++position) {
                 series[variableIndex][time * nodeCount + position] =
                     static_cast<float>(variableIndex * 100 + time * 10 + position);
             }
+        }
+    }
+    series[5].resize(timeCount * nodeCount);
+    for (size_t time = 0; time < timeCount; ++time) {
+        for (size_t position = 0; position < nodeCount; ++position) {
+            series[5][time * nodeCount + position] = static_cast<float>((time + position) % 2);
         }
     }
 
@@ -933,6 +957,8 @@ TEST_CASE("loadDistribHydro accepts zero-based and one-based IDs", "[load]") {
             REQUIRE(nodes[position].id == static_cast<unsigned>(ids[position]));
             REQUIRE(nodes[position].us[0] == Catch::Approx(series[0][position]));
             REQUIRE(nodes[position].us[1] == Catch::Approx(series[0][nodeCount + position]));
+            REQUIRE(nodes[position].is_wet[0] == Catch::Approx(series[5][position]));
+            REQUIRE(nodes[position].is_wet[1] == Catch::Approx(series[5][nodeCount + position]));
         }
     }
 }

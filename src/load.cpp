@@ -55,7 +55,7 @@ void loadDistribHydro(std::string &flowPath, std::vector<DistribHydroNode> &node
     size_t timeCount = flowSourceFile.getDim("time").getSize();
     std::cout << "Loading " << nodeCount << " hydro nodes and " << timeCount << " timesteps..." << std::endl;
 
-    netCDF::NcVar nodeVar = flowSourceFile.getVar("node");
+    netCDF::NcVar nodeVar = flowSourceFile.getVar("node_index");
     netCDF::NcVar xVar = flowSourceFile.getVar("x");
     netCDF::NcVar yVar = flowSourceFile.getVar("y");
     netCDF::NcVar uVar = flowSourceFile.getVar("u");
@@ -63,7 +63,7 @@ void loadDistribHydro(std::string &flowPath, std::vector<DistribHydroNode> &node
     netCDF::NcVar wseVar = flowSourceFile.getVar("zeta");
     netCDF::NcVar tempVar = flowSourceFile.getVar("temperature");
     netCDF::NcVar salinityVar = flowSourceFile.getVar("salinity");
-    netCDF::NcVar wetVar = flowSourceFile.getVar("wet_n");
+    netCDF::NcVar wetVar = flowSourceFile.getVar("is_wet");
 
     std::vector<int> all_node(nodeCount);
     std::vector<float> all_x(nodeCount);
@@ -117,7 +117,7 @@ void loadDistribHydro(std::string &flowPath, std::vector<DistribHydroNode> &node
     processVar(wseVar, "wse (water surface elevation)", [](DistribHydroNode &n) -> std::vector<float>& { return n.wses; });
     processVar(tempVar, "temp (hydro temperature)", [](DistribHydroNode &n) -> std::vector<float>& { return n.temps; });
     processVar(salinityVar, "salinity", [](DistribHydroNode &n) -> std::vector<float>& { return n.salinity; });
-    processVar(wetVar, "wet_n", [](DistribHydroNode &n) -> std::vector<float>& { return n.is_wet; });
+    processVar(wetVar, "is_wet", [](DistribHydroNode &n) -> std::vector<float>& { return n.is_wet; });
 
     removeSkippedHydroNodes(nodesOut, skipNode);
 
