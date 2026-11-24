@@ -8,7 +8,7 @@
 // This struct represents a point for which
 // flow velocities, water surface elevations, and temperatures have been pre-calculated
 typedef struct DistribHydroNode {
-    unsigned id; // This node's index in HydroModel::distribHydro
+    unsigned id; // This node's ID from the hydro data file
     float x; // horizontal (latitudinal) UTM Zone 10N coordinate
     float y; // vertical (longitudinal) UTM Zone 10N coordinate
     std::vector<float> us; // horizontal component of the flow speed vector (m/s), in 1hr increments starting from midnight on Jan 1

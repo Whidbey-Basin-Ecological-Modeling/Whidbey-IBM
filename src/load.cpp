@@ -12,6 +12,7 @@
 #include <tuple>
 #include <algorithm>
 #include <chrono>
+#include <stdexcept>
 #include <netcdf>
 
 #include "load.h"
@@ -28,7 +29,27 @@ inline float distance(float x1, float y1, float x2, float y2) {
     return sqrt(dx*dx + dy*dy);
 }
 
+void removeSkippedHydroNodes(std::vector<DistribHydroNode> &nodes, const std::vector<bool> &skipNode) {
+    size_t retainedNodeCount = 0;
+    for (size_t sourcePosition = 0; sourcePosition < nodes.size(); ++sourcePosition) {
+        if (skipNode[sourcePosition]) {
+            continue;
+        }
+        if (retainedNodeCount != sourcePosition) {
+            nodes[retainedNodeCount] = std::move(nodes[sourcePosition]);
+        }
+        ++retainedNodeCount;
+    }
+    while (nodes.size() > retainedNodeCount) {
+        nodes.pop_back();
+    }
+}
+
 void loadDistribHydro(std::string &flowPath, std::vector<DistribHydroNode> &nodesOut) {
+    if (!nodesOut.empty()) {
+        throw std::invalid_argument("nodesOut must be empty when loading hydro nodes");
+    }
+
     netCDF::NcFile flowSourceFile(flowPath, netCDF::NcFile::FileMode::read);
     size_t nodeCount = flowSourceFile.getDim("node").getSize();
     size_t timeCount = flowSourceFile.getDim("time").getSize();
@@ -52,6 +73,7 @@ void loadDistribHydro(std::string &flowPath, std::vector<DistribHydroNode> &node
     yVar.getVar(all_y.data());
 
     std::vector<std::string> error_log;
+    std::vector<bool> skipNode(nodeCount, false);
 
     for (size_t i = 0; i < nodeCount; ++i) {
         nodesOut.emplace_back(all_node[i]);
@@ -59,14 +81,14 @@ void loadDistribHydro(std::string &flowPath, std::vector<DistribHydroNode> &node
             DistribHydroNode &node = nodesOut.back();
             node.x = all_x[i];
             node.y = all_y[i];
-            validate_required_value(NetCDFVarFillAdapter(nodeVar), (int)node.id, "Unrecoverable error: missing 'node' for hydro node: " + std::to_string(i+1));
-            validate_required_value(NetCDFVarFillAdapter(xVar), node.x, "Unrecoverable error: missing geo 'x' for hydro node: " + std::to_string(i+1));
-            validate_required_value(NetCDFVarFillAdapter(yVar), node.y, "Unrecoverable error: missing geo 'y' for hydro node: " + std::to_string(i+1));
+            validate_required_value(NetCDFVarFillAdapter(nodeVar), all_node[i], "Unrecoverable error: missing hydro ID at NetCDF position " + std::to_string(i));
+            validate_required_value(NetCDFVarFillAdapter(xVar), node.x, "Unrecoverable error: missing geo 'x' for hydro ID " + std::to_string(node.id) + " at NetCDF position " + std::to_string(i));
+            validate_required_value(NetCDFVarFillAdapter(yVar), node.y, "Unrecoverable error: missing geo 'y' for hydro ID " + std::to_string(node.id) + " at NetCDF position " + std::to_string(i));
         } catch (CustomExceptionWithMessage &e) {
             std::cout << std::endl;
-            std::cout << "ERROR! " << e.what() << "; skipping hydro node " << i+1 << "..." << std::endl;
+            std::cout << "ERROR! " << e.what() << "; skipping hydro node at NetCDF position " << i << "..." << std::endl;
             std::cout << "Please fix this error in " << flowPath << std::endl << std::endl;
-            nodesOut.pop_back();
+            skipNode[i] = true;
         }
     }
 
@@ -74,15 +96,19 @@ void loadDistribHydro(std::string &flowPath, std::vector<DistribHydroNode> &node
         std::cout << "Loading bulk " << name << " data..." << std::endl;
         std::vector<float> buffer(timeCount * nodeCount);
         var.getVar(buffer.data());
-        for (size_t j = 0; j < nodesOut.size(); ++j) {
-            auto &node = nodesOut[j];
-            size_t i = node.id;
+        for (size_t sourcePosition = 0; sourcePosition < nodeCount; ++sourcePosition) {
+            if (skipNode[sourcePosition]) {
+                continue;
+            }
+            auto &node = nodesOut[sourcePosition];
             auto &vec = accessor(node);
             vec.resize(timeCount);
             for (size_t t = 0; t < timeCount; ++t) {
-                vec[t] = buffer[t * nodeCount + i];
+                vec[t] = buffer[t * nodeCount + sourcePosition];
             }
-            fix_all_missing_values(timeCount, NetCDFVarFillAdapter(var), vec, name + ", node: " + std::to_string(i+1), &error_log);
+            const std::string nodeDescription = name + ", hydro ID: " + std::to_string(node.id) +
+                                                ", NetCDF position: " + std::to_string(sourcePosition);
+            fix_all_missing_values(timeCount, NetCDFVarFillAdapter(var), vec, nodeDescription, &error_log);
         }
     };
 
@@ -92,6 +118,8 @@ void loadDistribHydro(std::string &flowPath, std::vector<DistribHydroNode> &node
     processVar(tempVar, "temp (hydro temperature)", [](DistribHydroNode &n) -> std::vector<float>& { return n.temps; });
     processVar(salinityVar, "salinity", [](DistribHydroNode &n) -> std::vector<float>& { return n.salinity; });
     processVar(wetVar, "wet_n", [](DistribHydroNode &n) -> std::vector<float>& { return n.is_wet; });
+
+    removeSkippedHydroNodes(nodesOut, skipNode);
 
     std::cout << "done loading hydro" << std::endl;
     if (error_log.size() > 0) {

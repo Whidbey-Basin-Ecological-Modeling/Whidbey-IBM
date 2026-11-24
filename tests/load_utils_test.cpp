@@ -7,7 +7,57 @@
 #include "custom_exceptions.h"
 #include "load_utils.h"
 
+#include <chrono>
 #include <cmath>
+#include <filesystem>
+
+class TemporaryFillNetCDFFile {
+public:
+    TemporaryFillNetCDFFile() {
+        const auto timestamp = std::chrono::steady_clock::now().time_since_epoch().count();
+        path_ = (std::filesystem::temp_directory_path() /
+                 ("whidbey_fill_adapter_" + std::to_string(timestamp) + ".nc")).string();
+
+        netCDF::NcFile file(path_, netCDF::NcFile::replace, netCDF::NcFile::nc4);
+        const auto nodeDimension = file.addDim("node", 3);
+
+        const double customDoubleFill = -777.125;
+        auto doubleCustom = file.addVar("double_custom", netCDF::NcType(netCDF::NcType::nc_DOUBLE), nodeDimension);
+        doubleCustom.setFill(true, customDoubleFill);
+        auto doubleDefault = file.addVar("double_default", netCDF::NcType(netCDF::NcType::nc_DOUBLE), nodeDimension);
+        auto doubleNoFill = file.addVar("double_nofill", netCDF::NcType(netCDF::NcType::nc_DOUBLE), nodeDimension);
+        doubleNoFill.setFill(false, static_cast<void *>(nullptr));
+        doubleNoFill.putAtt("_FillValue", netCDF::NcType(netCDF::NcType::nc_DOUBLE), customDoubleFill);
+
+        const float customFloatFill = 42.75f;
+        auto floatCustom = file.addVar("float_custom", netCDF::NcType(netCDF::NcType::nc_FLOAT), nodeDimension);
+        floatCustom.setFill(true, customFloatFill);
+        const float floatValues[] = {1.0f, customFloatFill, 3.0f};
+        floatCustom.putVar(floatValues);
+        auto floatDefault = file.addVar("float_default", netCDF::NcType(netCDF::NcType::nc_FLOAT), nodeDimension);
+        auto floatNoFill = file.addVar("float_nofill", netCDF::NcType(netCDF::NcType::nc_FLOAT), nodeDimension);
+        floatNoFill.setFill(false, static_cast<void *>(nullptr));
+
+        const int customIntFill = -12345;
+        auto intCustom = file.addVar("int_custom", netCDF::NcType(netCDF::NcType::nc_INT), nodeDimension);
+        intCustom.setFill(true, customIntFill);
+        auto intDefault = file.addVar("int_default", netCDF::NcType(netCDF::NcType::nc_INT), nodeDimension);
+
+        file.addVar("short_unsupported", netCDF::NcType(netCDF::NcType::nc_SHORT), nodeDimension);
+    }
+
+    ~TemporaryFillNetCDFFile() {
+        std::error_code error;
+        std::filesystem::remove(path_, error);
+    }
+
+    const std::string &path() const {
+        return path_;
+    }
+
+private:
+    std::string path_;
+};
 
 SCENARIO("Correct missing netcdf values", "[load]") {
     GIVEN("a reference to one cell from a loaded netcdf vector") {
@@ -291,4 +341,103 @@ SCENARIO("checking a required netcdf value", "[netcdf]") {
             }
         }
     }
+}
+
+TEST_CASE("NetCDF fill adapter converts supported file types", "[netcdf]") {
+    TemporaryFillNetCDFFile temporaryFile;
+    netCDF::NcFile file(temporaryFile.path(), netCDF::NcFile::read);
+
+    SECTION("custom and default double fills convert to float") {
+        auto customVariable = file.getVar("double_custom");
+        NetCDFVarFillAdapter customAdapter(customVariable);
+        bool fillActive = false;
+        float fillValue = 0.0f;
+        customAdapter.getFillModeParameters(fillActive, &fillValue);
+        REQUIRE(fillActive);
+        REQUIRE(fillValue == static_cast<float>(-777.125));
+
+        auto defaultVariable = file.getVar("double_default");
+        NetCDFVarFillAdapter defaultAdapter(defaultVariable);
+        defaultAdapter.getFillModeParameters(fillActive, &fillValue);
+        REQUIRE(fillActive);
+        REQUIRE(fillValue == static_cast<float>(NC_FILL_DOUBLE));
+    }
+
+    SECTION("custom and default float fills are returned") {
+        auto customVariable = file.getVar("float_custom");
+        NetCDFVarFillAdapter customAdapter(customVariable);
+        bool fillActive = false;
+        float fillValue = 0.0f;
+        customAdapter.getFillModeParameters(fillActive, &fillValue);
+        REQUIRE(fillActive);
+        REQUIRE(fillValue == 42.75f);
+
+        auto defaultVariable = file.getVar("float_default");
+        NetCDFVarFillAdapter defaultAdapter(defaultVariable);
+        defaultAdapter.getFillModeParameters(fillActive, &fillValue);
+        REQUIRE(fillActive);
+        REQUIRE(fillValue == NC_FILL_FLOAT);
+    }
+
+    SECTION("custom and default integer fills are returned") {
+        auto customVariable = file.getVar("int_custom");
+        NetCDFVarFillAdapter customAdapter(customVariable);
+        bool fillActive = false;
+        int fillValue = 0;
+        customAdapter.getFillModeParameters(fillActive, &fillValue);
+        REQUIRE(fillActive);
+        REQUIRE(fillValue == -12345);
+
+        auto defaultVariable = file.getVar("int_default");
+        NetCDFVarFillAdapter defaultAdapter(defaultVariable);
+        defaultAdapter.getFillModeParameters(fillActive, &fillValue);
+        REQUIRE(fillActive);
+        REQUIRE(fillValue == NC_FILL_INT);
+    }
+}
+
+TEST_CASE("NetCDF fill adapter recognizes missing values with fill mode disabled", "[netcdf]") {
+    TemporaryFillNetCDFFile temporaryFile;
+    netCDF::NcFile file(temporaryFile.path(), netCDF::NcFile::read);
+
+    auto doubleVariable = file.getVar("double_nofill");
+    NetCDFVarFillAdapter doubleAdapter(doubleVariable);
+    bool fillActive = true;
+    float doubleFillValue = 0.0f;
+    doubleAdapter.getFillModeParameters(fillActive, &doubleFillValue);
+    REQUIRE_FALSE(fillActive);
+    REQUIRE(doubleFillValue == static_cast<float>(-777.125));
+    REQUIRE_THROWS_AS(validate_required_value(doubleAdapter, static_cast<float>(-777.125), "missing double"),
+                      MissingRequiredValueException);
+
+    auto floatVariable = file.getVar("float_nofill");
+    NetCDFVarFillAdapter floatAdapter(floatVariable);
+    float floatFillValue = 0.0f;
+    floatAdapter.getFillModeParameters(fillActive, &floatFillValue);
+    REQUIRE_FALSE(fillActive);
+    REQUIRE(floatFillValue == NC_FILL_FLOAT);
+}
+
+TEST_CASE("NetCDF fill adapter supports fill consumers and rejects other types", "[netcdf]") {
+    TemporaryFillNetCDFFile temporaryFile;
+    netCDF::NcFile file(temporaryFile.path(), netCDF::NcFile::read);
+
+    auto floatVariable = file.getVar("float_custom");
+    NetCDFVarFillAdapter floatAdapter(floatVariable);
+    std::vector<float> values = {1.0f, 42.75f, 3.0f};
+    std::vector<std::string> diagnostics;
+    fix_all_missing_values(values.size(), floatAdapter, values, "test series", &diagnostics);
+    REQUIRE(values == std::vector<float>{1.0f, 1.0f, 3.0f});
+    REQUIRE(diagnostics.size() == 1);
+
+    auto intVariable = file.getVar("int_custom");
+    NetCDFVarFillAdapter intAdapter(intVariable);
+    REQUIRE_THROWS_AS(validate_required_value(intAdapter, -12345, "missing ID"), MissingRequiredValueException);
+    REQUIRE_NOTHROW(validate_required_value(intAdapter, 42, "valid ID"));
+
+    auto shortVariable = file.getVar("short_unsupported");
+    NetCDFVarFillAdapter shortAdapter(shortVariable);
+    float unusedFillValue = 0.0f;
+    bool fillActive = false;
+    REQUIRE_THROWS_AS(shortAdapter.getFillModeParameters(fillActive, &unusedFillValue), std::invalid_argument);
 }

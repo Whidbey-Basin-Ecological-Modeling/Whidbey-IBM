@@ -3,11 +3,69 @@
 //
 
 #include <catch2/catch_test_macros.hpp>
+#include <array>
+#include <chrono>
+#include <filesystem>
+#include <iostream>
 #include <memory>
 #include <sstream>
+#include <stdexcept>
+#include <system_error>
+#include <vector>
+#include <netcdf>
 #include "load.h"
 #include "map.h"
 #include "catch2/catch_approx.hpp"
+
+void removeSkippedHydroNodes(std::vector<DistribHydroNode> &nodes, const std::vector<bool> &skipNode);
+
+class TemporaryHydroFile {
+public:
+    TemporaryHydroFile() {
+        const auto timestamp = std::chrono::steady_clock::now().time_since_epoch().count();
+        path_ = std::filesystem::temp_directory_path() / ("hydro_loader_test_" + std::to_string(timestamp) + ".nc");
+    }
+
+    ~TemporaryHydroFile() {
+        std::error_code error;
+        std::filesystem::remove(path_, error);
+    }
+
+    const std::filesystem::path &path() const { return path_; }
+
+private:
+    std::filesystem::path path_;
+};
+
+void writeHydroFixture(const std::filesystem::path &path, const std::vector<int> &ids,
+                       const std::vector<float> &x, const std::vector<float> &y,
+                       const std::array<std::vector<float>, 6> &series, size_t timeCount) {
+    netCDF::NcFile file(path.string(), netCDF::NcFile::FileMode::replace);
+    const auto timeDimension = file.addDim("time", timeCount);
+    const auto nodeDimension = file.addDim("node", ids.size());
+    const auto nodeVar = file.addVar("node", netCDF::ncInt, nodeDimension);
+    const auto xVar = file.addVar("x", netCDF::ncFloat, nodeDimension);
+    const auto yVar = file.addVar("y", netCDF::ncFloat, nodeDimension);
+    const std::vector<netCDF::NcDim> dimensions{timeDimension, nodeDimension};
+    const std::array<std::string, 6> names{"u", "v", "zeta", "temperature", "salinity", "wet_n"};
+
+    nodeVar.putVar(ids.data());
+    xVar.putVar(x.data());
+    yVar.putVar(y.data());
+    for (size_t variableIndex = 0; variableIndex < names.size(); ++variableIndex) {
+        auto variable = file.addVar(names[variableIndex], netCDF::ncFloat, dimensions);
+        variable.putVar(series[variableIndex].data());
+    }
+}
+
+class CoutRedirect {
+public:
+    explicit CoutRedirect(std::ostream &destination) : original_(std::cout.rdbuf(destination.rdbuf())) {}
+    ~CoutRedirect() { std::cout.rdbuf(original_); }
+
+private:
+    std::streambuf *original_;
+};
 
 // Helper function to create a MapNode for testing
 auto createTestNode(int id = 0, HabitatType type = HabitatType::Distributary) {
@@ -708,4 +766,184 @@ TEST_CASE("readNodeHabitatTypes functionality", "[load]") {
     for (auto node : nodes) {
         delete node;
     }
+}
+
+TEST_CASE("loadDistribHydro reads time series by NetCDF position and skips invalid nodes", "[load]") {
+    constexpr size_t timeCount = 3;
+    constexpr size_t nodeCount = 6;
+    const std::vector<int> ids{42, NC_FILL_INT, 7, 100, 8, 200};
+    const std::vector<float> x{10.0f, 20.0f, NC_FILL_FLOAT, 40.0f, 50.0f, 60.0f};
+    const std::vector<float> y{11.0f, 21.0f, 31.0f, 41.0f, NC_FILL_FLOAT, 61.0f};
+    std::array<std::vector<float>, 6> series;
+
+    for (size_t variableIndex = 0; variableIndex < series.size(); ++variableIndex) {
+        series[variableIndex].resize(timeCount * nodeCount);
+        for (size_t time = 0; time < timeCount; ++time) {
+            for (size_t position = 0; position < nodeCount; ++position) {
+                const bool invalidNode = position == 1 || position == 2 || position == 4;
+                series[variableIndex][time * nodeCount + position] = invalidNode
+                    ? NC_FILL_FLOAT
+                    : static_cast<float>((variableIndex + 1) * 1000 + time * 100 + position);
+            }
+        }
+    }
+    series[0][1 * nodeCount + 5] = NC_FILL_FLOAT;
+
+    TemporaryHydroFile fixture;
+    writeHydroFixture(fixture.path(), ids, x, y, series, timeCount);
+    std::string flowPath = fixture.path().string();
+    std::vector<DistribHydroNode> nodes;
+    std::ostringstream output;
+    {
+        CoutRedirect redirect(output);
+        loadDistribHydro(flowPath, nodes);
+    }
+
+    REQUIRE(nodes.size() == 3);
+    REQUIRE(nodes[0].id == 42);
+    REQUIRE(nodes[1].id == 100);
+    REQUIRE(nodes[2].id == 200);
+    REQUIRE(nodes[0].x == Catch::Approx(10.0f));
+    REQUIRE(nodes[1].x == Catch::Approx(40.0f));
+    REQUIRE(nodes[2].x == Catch::Approx(60.0f));
+    REQUIRE(nodes[0].y == Catch::Approx(11.0f));
+    REQUIRE(nodes[1].y == Catch::Approx(41.0f));
+    REQUIRE(nodes[2].y == Catch::Approx(61.0f));
+
+    const std::array<std::vector<float> DistribHydroNode::*, 6> members{
+        &DistribHydroNode::us,
+        &DistribHydroNode::vs,
+        &DistribHydroNode::wses,
+        &DistribHydroNode::temps,
+        &DistribHydroNode::salinity,
+        &DistribHydroNode::is_wet
+    };
+    const std::array<size_t, 3> sourcePositions{0, 3, 5};
+    for (size_t nodeIndex = 0; nodeIndex < nodes.size(); ++nodeIndex) {
+        for (size_t variableIndex = 0; variableIndex < members.size(); ++variableIndex) {
+            const auto &values = nodes[nodeIndex].*members[variableIndex];
+            REQUIRE(values.size() == timeCount);
+            for (size_t time = 0; time < timeCount; ++time) {
+                const float expected = variableIndex == 0 && nodeIndex == 2 && time == 1
+                    ? static_cast<float>((variableIndex + 1) * 1000 + sourcePositions[nodeIndex])
+                    : series[variableIndex][time * nodeCount + sourcePositions[nodeIndex]];
+                REQUIRE(values[time] == Catch::Approx(expected));
+            }
+        }
+    }
+
+    const std::string diagnostics = output.str();
+    REQUIRE(diagnostics.find("missing hydro ID at NetCDF position 1") != std::string::npos);
+    REQUIRE(diagnostics.find("missing geo 'x' for hydro ID 7 at NetCDF position 2") != std::string::npos);
+    REQUIRE(diagnostics.find("missing geo 'y' for hydro ID 8 at NetCDF position 4") != std::string::npos);
+    REQUIRE(diagnostics.find("hydro ID: 200, NetCDF position: 5") != std::string::npos);
+    REQUIRE(diagnostics.find("hydro ID: 200, NetCDF position: 5 at step 1") != std::string::npos);
+    REQUIRE(diagnostics.find("internal node index") == std::string::npos);
+}
+
+TEST_CASE("removeSkippedHydroNodes compacts nodes directly", "[load]") {
+    const auto createNodes = [](size_t count) {
+        std::vector<DistribHydroNode> nodes;
+        for (size_t position = 0; position < count; ++position) {
+            const unsigned id = static_cast<unsigned>(100 + position);
+            nodes.emplace_back(id);
+            auto &node = nodes.back();
+            node.x = static_cast<float>(id);
+            node.y = static_cast<float>(id + 1);
+            node.us = {static_cast<float>(id + 2), static_cast<float>(id + 3)};
+            node.vs = {static_cast<float>(id + 4), static_cast<float>(id + 5)};
+            node.wses = {static_cast<float>(id + 6), static_cast<float>(id + 7)};
+            node.temps = {static_cast<float>(id + 8), static_cast<float>(id + 9)};
+            node.salinity = {static_cast<float>(id + 10), static_cast<float>(id + 11)};
+            node.is_wet = {static_cast<float>(id + 12), static_cast<float>(id + 13)};
+        }
+        return nodes;
+    };
+
+    SECTION("empty input") {
+        std::vector<DistribHydroNode> nodes;
+        removeSkippedHydroNodes(nodes, {});
+        REQUIRE(nodes.empty());
+    }
+
+    SECTION("no nodes skipped") {
+        auto nodes = createNodes(3);
+        removeSkippedHydroNodes(nodes, {false, false, false});
+
+        REQUIRE(nodes.size() == 3);
+        REQUIRE(nodes[0].id == 100);
+        REQUIRE(nodes[1].id == 101);
+        REQUIRE(nodes[2].id == 102);
+        REQUIRE(nodes[1].x == Catch::Approx(101.0f));
+        REQUIRE(nodes[1].y == Catch::Approx(102.0f));
+        REQUIRE(nodes[1].us == std::vector<float>{103.0f, 104.0f});
+        REQUIRE(nodes[1].vs == std::vector<float>{105.0f, 106.0f});
+        REQUIRE(nodes[1].wses == std::vector<float>{107.0f, 108.0f});
+        REQUIRE(nodes[1].temps == std::vector<float>{109.0f, 110.0f});
+        REQUIRE(nodes[1].salinity == std::vector<float>{111.0f, 112.0f});
+        REQUIRE(nodes[1].is_wet == std::vector<float>{113.0f, 114.0f});
+    }
+
+    SECTION("all nodes skipped") {
+        auto nodes = createNodes(3);
+        removeSkippedHydroNodes(nodes, {true, true, true});
+        REQUIRE(nodes.empty());
+    }
+
+    SECTION("leading, consecutive middle, and trailing nodes skipped") {
+        auto nodes = createNodes(7);
+        removeSkippedHydroNodes(nodes, {true, false, true, true, false, false, true});
+
+        REQUIRE(nodes.size() == 3);
+        REQUIRE(nodes[0].id == 101);
+        REQUIRE(nodes[1].id == 104);
+        REQUIRE(nodes[2].id == 105);
+        REQUIRE(nodes[0].x == Catch::Approx(101.0f));
+        REQUIRE(nodes[0].us == std::vector<float>{103.0f, 104.0f});
+        REQUIRE(nodes[1].salinity == std::vector<float>{114.0f, 115.0f});
+        REQUIRE(nodes[2].is_wet == std::vector<float>{117.0f, 118.0f});
+    }
+}
+
+TEST_CASE("loadDistribHydro accepts zero-based and one-based IDs", "[load]") {
+    constexpr size_t timeCount = 2;
+    constexpr size_t nodeCount = 3;
+    const std::vector<float> x{1.0f, 2.0f, 3.0f};
+    const std::vector<float> y{4.0f, 5.0f, 6.0f};
+    std::array<std::vector<float>, 6> series;
+    for (size_t variableIndex = 0; variableIndex < series.size(); ++variableIndex) {
+        series[variableIndex].resize(timeCount * nodeCount);
+        for (size_t time = 0; time < timeCount; ++time) {
+            for (size_t position = 0; position < nodeCount; ++position) {
+                series[variableIndex][time * nodeCount + position] =
+                    static_cast<float>(variableIndex * 100 + time * 10 + position);
+            }
+        }
+    }
+
+    for (const std::vector<int> &ids : {std::vector<int>{0, 1, 2}, std::vector<int>{1, 2, 3}}) {
+        TemporaryHydroFile fixture;
+        writeHydroFixture(fixture.path(), ids, x, y, series, timeCount);
+        std::string flowPath = fixture.path().string();
+        std::vector<DistribHydroNode> nodes;
+        loadDistribHydro(flowPath, nodes);
+
+        REQUIRE(nodes.size() == nodeCount);
+        for (size_t position = 0; position < nodeCount; ++position) {
+            REQUIRE(nodes[position].id == static_cast<unsigned>(ids[position]));
+            REQUIRE(nodes[position].us[0] == Catch::Approx(series[0][position]));
+            REQUIRE(nodes[position].us[1] == Catch::Approx(series[0][nodeCount + position]));
+        }
+    }
+}
+
+TEST_CASE("loadDistribHydro requires an empty output vector", "[load]") {
+    std::string flowPath = "file-does-not-need-to-exist.nc";
+    std::vector<DistribHydroNode> nodes;
+    nodes.emplace_back(77);
+
+    REQUIRE_THROWS_AS(loadDistribHydro(flowPath, nodes), std::invalid_argument);
+    REQUIRE(nodes.size() == 1);
+    REQUIRE(nodes[0].id == 77);
+    REQUIRE(nodes[0].us.empty());
 }

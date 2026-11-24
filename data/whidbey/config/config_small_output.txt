@@ -1,18 +1,249 @@
-## temp
-Step 330: 156192 living fish; 5 exited; 269662 (196098,1379,72185) dead (mort,strand,starve)
-Step 660: 310310 living fish; 2959 exited; 905924 (661649,18122,226153) dead (mort,strand,starve)
-Step 990: 486213 living fish; 4528 exited; 1747824 (1318190,38420,391214) dead (mort,strand,starve)
-Step 1320: 227154 living fish; 11424 exited; 2383407 (1873905,68449,441053) dead (mort,strand,starve)
-Step 1650: 155515 living fish; 16928 exited; 2723053 (2168367,84466,470220) dead (mort,strand,starve)
-Step 1980: 143420 living fish; 18865 exited; 2980754 (2375646,99318,505790) dead (mort,strand,starve)
-Step 2310: 125184 living fish; 32197 exited; 3155666 (2525372,107942,522352) dead (mort,strand,starve)
-Step 2640: 116388 living fish; 66709 exited; 3274967 (2627055,118338,529574) dead (mort,strand,starve)
-Step 2970: 69742 living fish; 95623 exited; 3360045 (2701575,128061,530409) dead (mort,strand,starve)
-Step 3300: 28200 living fish; 113738 exited; 3401262 (2729733,140506,531023) dead (mort,strand,starve)
-Step 3630: 20633 living fish; 121656 exited; 3415811 (2740663,143984,531164) dead (mort,strand,starve)
-Step 3960: 12112 living fish; 126365 exited; 3425580 (2748093,146155,531332) dead (mort,strand,starve)
-## end temp
+Mon Nov 23 16:04:29 PST 2026
+Configuring model...
+8 hardware threads available
+6 thread(s) enabled
+Loading 17655 hydro nodes and 8760 timesteps...
+Loading bulk u (hydro u velocity) data...
+Loading bulk v (hydro v velocity) data...
+Loading bulk wse (water surface elevation) data...
+Loading bulk temp (hydro temperature) data...
+Loading bulk salinity data...
+Loading bulk wet_n data...
+done loading hydro
+directionless edges!
+Error: Duplicate edge 6525->6445 discarded.
+Error: Self-loop edge discarded for node 6445
+Error: Duplicate edge 6525->6445 discarded.
+Error: Self-loop edge discarded for node 6525
+Error: Self-loop edge discarded for node 6606
+Error: Effective duplicate edge 6525->6606 (matches 6606->6525) discarded.
+Error: Duplicate edge 6606->6525 discarded.
+Error: Effective duplicate edge 6303->6374 (matches 6374->6303) discarded.
+Error: Duplicate edge 6303->6237 discarded.
+Error: Self-loop edge discarded for node 6303
+Error: Effective duplicate edge 6303->6374 (matches 6374->6303) discarded.
+Error: Self-loop edge discarded for node 6374
+Error: Self-loop edge discarded for node 6374
+Error: Self-loop edge discarded for node 6374
+Error: Effective duplicate edge 6445->6374 (matches 6374->6445) discarded.
+Error: Effective duplicate edge 6445->6374 (matches 6374->6445) discarded.
+Error: Duplicate edge 6106->6030 discarded.
+Error: Self-loop edge discarded for node 6170
+Error: Self-loop edge discarded for node 6170
+Error: Self-loop edge discarded for node 6170
+Error: Effective duplicate edge 6170->6106 (matches 6106->6170) discarded.
+Error: Effective duplicate edge 6170->6237 (matches 6237->6170) discarded.
+Error: Self-loop edge discarded for node 7461
+Error: Effective duplicate edge 7461->7528 (matches 7528->7461) discarded.
+Error: Self-loop edge discarded for node 7399
+Error: Duplicate edge 7399->7345 discarded.
+Error: Duplicate edge 7461->7399 discarded.
+Error: Duplicate edge 7461->7399 discarded.
+Error: Duplicate edge 10366->10194 discarded.
+Error: Self-loop edge discarded for node 10366
+Error: Effective duplicate edge 10527->10366 (matches 10366->10527) discarded.
+Error: Effective duplicate edge 10522->10527 (matches 10527->10522) discarded.
+Error: Self-loop edge discarded for node 10527
+Error: Effective duplicate edge 1965->1875 (matches 1875->1965) discarded.
+Error: Self-loop edge discarded for node 1965
+Error: Self-loop edge discarded for node 1965
+Error: Self-loop edge discarded for node 1965
+Error: Effective duplicate edge 1792->1875 (matches 1875->1792) discarded.
+Error: Duplicate edge 1875->1965 discarded.
+Error: Self-loop edge discarded for node 1875
+Error: Self-loop edge discarded for node 1564
+Error: Effective duplicate edge 1564->1634 (matches 1634->1564) discarded.
+Error: Self-loop edge discarded for node 1634
+Error: Self-loop edge discarded for node 1634
+Error: Self-loop edge discarded for node 1634
+Error: Duplicate edge 1634->1564 discarded.
+Error: Effective duplicate edge 1634->1710 (matches 1710->1634) discarded.
+Error: Self-loop edge discarded for node 1634
+Error: Self-loop edge discarded for node 1634
+Error: Self-loop edge discarded for node 6
+Error: Effective duplicate edge 7->6 (matches 6->7) discarded.
+Error: Self-loop edge discarded for node 7
+Error: Duplicate edge 6->7 discarded.
+Error: Effective duplicate edge 6->4 (matches 4->6) discarded.
+Error: Self-loop edge discarded for node 2
+Error: Duplicate edge 1->6 discarded.
+Error: Self-loop edge discarded for node 1
+Error: Self-loop edge discarded for node 1
+Error: Self-loop edge discarded for node 1
+Error: Self-loop edge discarded for node 3
+Error: Effective duplicate edge 3->2 (matches 2->3) discarded.
+Error: Effective duplicate edge 3->2 (matches 2->3) discarded.
+Error: Effective duplicate edge 2->8 (matches 8->2) discarded.
+Error: Duplicate edge 3->12 discarded.
+Error: Self-loop edge discarded for node 12
+Error: Effective duplicate edge 26->12 (matches 12->26) discarded.
+Error: Duplicate edge 3->12 discarded.
+Error: Self-loop edge discarded for node 8
+Error: Effective duplicate edge 8->9 (matches 9->8) discarded.
+Error: Effective duplicate edge 7->8 (matches 8->7) discarded.
+Error: Duplicate edge 8->7 discarded.
+Error: Self-loop edge discarded for node 13
+Error: Self-loop edge discarded for node 13
+Error: Self-loop edge discarded for node 13
+Error: Effective duplicate edge 13->28 (matches 28->13) discarded.
+Error: Effective duplicate edge 26->27 (matches 27->26) discarded.
+Error: Self-loop edge discarded for node 26
+Error: Effective duplicate edge 26->12 (matches 12->26) discarded.
+Error: Self-loop edge discarded for node 27
+Error: Effective duplicate edge 28->27 (matches 27->28) discarded.
+Error: Duplicate edge 27->26 discarded.
+Error: Effective duplicate edge 1340->1388 (matches 1388->1340) discarded.
+Error: Self-loop edge discarded for node 1389
+Error: Effective duplicate edge 1389->1340 (matches 1340->1389) discarded.
+Error: Self-loop edge discarded for node 1340
+Error: Self-loop edge discarded for node 1390
+Error: Duplicate edge 1389->1390 discarded.
+Error: Effective duplicate edge 1390->1389 (matches 1389->1390) discarded.
+Error: Self-loop edge discarded for node 1441
+Error: Effective duplicate edge 1442->1441 (matches 1441->1442) discarded.
+Error: Effective duplicate edge 1441->1390 (matches 1390->1441) discarded.
+Error: Duplicate edge 1390->1441 discarded.
+Error: Self-loop edge discarded for node 1442
+Error: Self-loop edge discarded for node 1442
+Error: Self-loop edge discarded for node 1442
+Error: Duplicate edge 1441->1442 discarded.
+Error: Duplicate edge 1564->1499 discarded.
+Error: Effective duplicate edge 1498->1442 (matches 1442->1498) discarded.
+Error: Self-loop edge discarded for node 1210
+Error: Effective duplicate edge 1209->1172 (matches 1172->1209) discarded.
+Error: Duplicate edge 1172->1210 discarded.
+Error: Self-loop edge discarded for node 1172
+Error: Effective duplicate edge 1210->1247 (matches 1247->1210) discarded.
+Error: Duplicate edge 1247->1210 discarded.
+Error: Self-loop edge discarded for node 1247
+Error: Self-loop edge discarded for node 1290
+Error: Effective duplicate edge 1338->1290 (matches 1290->1338) discarded.
+Error: Effective duplicate edge 1290->1335 (matches 1335->1290) discarded.
+Error: Self-loop edge discarded for node 1289
+Error: Effective duplicate edge 1289->1247 (matches 1247->1289) discarded.
+Error: Effective duplicate edge 1288->1247 (matches 1247->1288) discarded.
+Error: Self-loop edge discarded for node 1338
+Error: Duplicate edge 1290->1338 discarded.
+Error: Effective duplicate edge 1339->1338 (matches 1338->1339) discarded.
+Error: Self-loop edge discarded for node 1339
+Error: Duplicate edge 1338->1339 discarded.
+Error: Self-loop edge discarded for node 1335
+Error: Self-loop edge discarded for node 1335
+Error: Duplicate edge 1289->1335 discarded.
+Error: Effective duplicate edge 1335->1289 (matches 1289->1335) discarded.
+Error: Duplicate edge 1335->1290 discarded.
+Error: Self-loop edge discarded for node 1335
+Error: Self-loop edge discarded for node 1340
+Error: Self-loop edge discarded for node 1340
+Error: Duplicate edge 1339->1340 discarded.
+Error: Effective duplicate edge 1340->1339 (matches 1339->1340) discarded.
+Error: Effective duplicate edge 1004->1034 (matches 1034->1004) discarded.
+Error: Self-loop edge discarded for node 1004
+Error: Self-loop edge discarded for node 1034
+Error: Self-loop edge discarded for node 1034
+Error: Self-loop edge discarded for node 1034
+Error: Effective duplicate edge 1034->1033 (matches 1033->1034) discarded.
+Error: Effective duplicate edge 1065->1034 (matches 1034->1065) discarded.
+Error: Self-loop edge discarded for node 1065
+Error: Self-loop edge discarded for node 1065
+Error: Duplicate edge 1065->1063 discarded.
+Error: Self-loop edge discarded for node 1065
+Error: Self-loop edge discarded for node 1065
+Error: Self-loop edge discarded for node 1065
+Error: Duplicate edge 1097->1065 discarded.
+Error: Self-loop edge discarded for node 1134
+Error: Duplicate edge 1134->1097 discarded.
+Error: Effective duplicate edge 1172->1134 (matches 1134->1172) discarded.
+Error: Duplicate edge 1134->1172 discarded.
+Error: Self-loop edge discarded for node 1172
+Error: Self-loop edge discarded for node 1172
+Error: Self-loop edge discarded for node 17655
+Error: Duplicate edge 17654->17655 discarded.
+Error: Self-loop edge discarded for node 17654
+Error: Effective duplicate edge 17655->17654 (matches 17654->17655) discarded.
+Error: Duplicate edge 5953->5861 discarded.
+Error: Self-loop edge discarded for node 5953
+Error: Effective duplicate edge 5953->5952 (matches 5952->5953) discarded.
+Error: Self-loop edge discarded for node 5952
+Error: Duplicate edge 5952->5953 discarded.
+Error: Self-loop edge discarded for node 6030
+Error: Effective duplicate edge 6030->5952 (matches 5952->6030) discarded.
+Error: Effective duplicate edge 6030->5952 (matches 5952->6030) discarded.
+Error: Effective duplicate edge 5702->5779 (matches 5779->5702) discarded.
+Error: Self-loop edge discarded for node 5702
+Error: Self-loop edge discarded for node 5702
+Error: Self-loop edge discarded for node 5702
+Error: Effective duplicate edge 5776->5861 (matches 5861->5776) discarded.
+Error: Self-loop edge discarded for node 5776
+Error: Self-loop edge discarded for node 5777
+Error: Effective duplicate edge 5778->5777 (matches 5777->5778) discarded.
+Error: Effective duplicate edge 5777->5865 (matches 5865->5777) discarded.
+Error: Effective duplicate edge 5776->5865 (matches 5865->5776) discarded.
+Error: Self-loop edge discarded for node 5779
+Error: Duplicate edge 5778->5779 discarded.
+Error: Self-loop edge discarded for node 5778
+Error: Effective duplicate edge 5779->5778 (matches 5778->5779) discarded.
+Error: Duplicate edge 5777->5778 discarded.
+Error: Effective duplicate edge 5702->5779 (matches 5779->5702) discarded.
+Error: Duplicate edge 5953->5861 discarded.
+Error: Self-loop edge discarded for node 5861
+Error: Effective duplicate edge 5777->5865 (matches 5865->5777) discarded.
+Error: Self-loop edge discarded for node 5865
+Error: Self-loop edge discarded for node 5865
+Error: Self-loop edge discarded for node 5865
+Error: Duplicate edge 5864->5865 discarded.
+Error: Duplicate edge 5861->5776 discarded.
+Error: Effective duplicate edge 15691->15636 (matches 15636->15691) discarded.
+Error: Self-loop edge discarded for node 15691
+Error: Self-loop edge discarded for node 15691
+Error: Self-loop edge discarded for node 15691
+Error: Self-loop edge discarded for node 15691
+Error: Self-loop edge discarded for node 15691
+Error: Self-loop edge discarded for node 16223
+Error: Effective duplicate edge 16222->16223 (matches 16223->16222) discarded.
+Error: Self-loop edge discarded for node 16223
+Error: Self-loop edge discarded for node 16223
+Edge validation passed
+Found 0 duplicate edges
+Made  0 disconnected 'distributary' nodes into blind channels
+Found 0 disconnected nodes
+Found 0 orphaned nodes
+Found 0 orphaned protected nodes
+Map nodes: 248 Boat harbor
+Map nodes: 3240 Distributary
+Map nodes: 1605 Mudflat
+Map nodes: 451 Sub-tidal flat
+Map nodes: 1221 Rock
+Map nodes: 1503 Blind channel
+Map nodes: 9280 Open water
+Map nodes: 107 Exit
+Finished loading map
+Selected run ID: 0
+Sample data will be saved to /Users/troy.frever/code/Whidbey-IBM/data/whidbey/output/output_0.nc
+Step 330: 158348 living fish; 88 exited; 267208 (199246,8783,59179) dead (mort,strand,starve)
+Step 660: 324462 living fish; 6169 exited; 888422 (684248,55019,149155) dead (mort,strand,starve)
+Step 990: 525914 living fish; 9060 exited; 1703782 (1364556,101443,237783) dead (mort,strand,starve)
+Step 1320: 224331 living fish; 20188 exited; 2377466 (1908693,203851,264922) dead (mort,strand,starve)
+Step 1650: 153388 living fish; 29445 exited; 2712504 (2189189,235673,287642) dead (mort,strand,starve)
+Step 1980: 147558 living fish; 31599 exited; 2963795 (2393418,263408,306969) dead (mort,strand,starve)
+Step 2310: 128541 living fish; 47926 exited; 3136542 (2538179,281233,317130) dead (mort,strand,starve)
+Step 2640: 110495 living fish; 90548 exited; 3257021 (2633442,305792,317787) dead (mort,strand,starve)
+Step 2970: 56856 living fish; 125587 exited; 3342936 (2700112,325037,317787) dead (mort,strand,starve)
+Step 3300: 19873 living fish; 142260 exited; 3381070 (2722503,340780,317787) dead (mort,strand,starve)
+Step 3630: 16279 living fish; 147427 exited; 3394375 (2731985,344603,317787) dead (mort,strand,starve)
+Step 3960: 9163 living fish; 150178 exited; 3404716 (2738420,348509,317787) dead (mort,strand,starve)
 
+Finished at step 3984
+In saveTaggedHistories
+
+Values for N: 1427, and T: 3985
+
+N: 1427,   T: 3985
+
+Finished loading all tracks
+Mon Nov 23 16:16:38 PST 2026
+
+------------
 [100%] Built target headless
 Tue Aug 18 14:27:53 PDT 2026
 Configuring model...
