@@ -3,7 +3,7 @@
   "threadCount": 6,
   "rng_seed" : 0,
   "recStartTimestep": 744,
-  "hydroStartTimestep": 0,
+  "hydroStartTimestep": 1,
 
   "initialPopulations": [
     {
