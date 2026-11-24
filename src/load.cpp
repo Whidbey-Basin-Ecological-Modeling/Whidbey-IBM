@@ -112,12 +112,47 @@ void loadDistribHydro(std::string &flowPath, std::vector<DistribHydroNode> &node
         }
     };
 
+    auto processWetVar = [&] {
+        std::cout << "Loading bulk is_wet data..." << std::endl;
+        std::vector<float> buffer(timeCount * nodeCount);
+        wetVar.getVar(buffer.data());
+        const NetCDFVarFillAdapter fillAdapter(wetVar);
+        bool fillActive;
+        float missingIndicator;
+        fillAdapter.getFillModeParameters(fillActive, &missingIndicator);
+
+        for (size_t sourcePosition = 0; sourcePosition < nodeCount; ++sourcePosition) {
+            if (skipNode[sourcePosition]) {
+                continue;
+            }
+            auto &node = nodesOut[sourcePosition];
+            std::vector<float> values(timeCount);
+            for (size_t t = 0; t < timeCount; ++t) {
+                const float value = buffer[t * nodeCount + sourcePosition];
+                values[t] = value;
+                if (!is_missing_indicator(value, missingIndicator) && value != 0.0f && value != 1.0f) {
+                    std::cout << "ERROR! Non-binary is_wet value " << value << " at timestep " << t
+                              << ", hydro ID " << node.id << ", NetCDF position " << sourcePosition
+                              << "; treating as wet." << std::endl;
+                }
+            }
+
+            const std::string nodeDescription = "is_wet, hydro ID: " + std::to_string(node.id) +
+                                                ", NetCDF position: " + std::to_string(sourcePosition);
+            fix_all_missing_values(timeCount, fillAdapter, values, nodeDescription, &error_log);
+            node.is_wet.resize(timeCount);
+            for (size_t t = 0; t < timeCount; ++t) {
+                node.is_wet[t] = values[t] != 0.0f;
+            }
+        }
+    };
+
     processVar(uVar, "u (hydro u velocity)", [](DistribHydroNode &n) -> std::vector<float>& { return n.us; });
     processVar(vVar, "v (hydro v velocity)", [](DistribHydroNode &n) -> std::vector<float>& { return n.vs; });
     processVar(wseVar, "wse (water surface elevation)", [](DistribHydroNode &n) -> std::vector<float>& { return n.wses; });
     processVar(tempVar, "temp (hydro temperature)", [](DistribHydroNode &n) -> std::vector<float>& { return n.temps; });
     processVar(salinityVar, "salinity", [](DistribHydroNode &n) -> std::vector<float>& { return n.salinity; });
-    processVar(wetVar, "is_wet", [](DistribHydroNode &n) -> std::vector<float>& { return n.is_wet; });
+    processWetVar();
 
     removeSkippedHydroNodes(nodesOut, skipNode);
 

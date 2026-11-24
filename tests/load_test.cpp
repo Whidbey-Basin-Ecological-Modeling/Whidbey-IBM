@@ -15,6 +15,7 @@
 #include <netcdf>
 #include "load.h"
 #include "map.h"
+#include "custom_exceptions.h"
 #include "catch2/catch_approx.hpp"
 
 void removeSkippedHydroNodes(std::vector<DistribHydroNode> &nodes, const std::vector<bool> &skipNode);
@@ -828,13 +829,12 @@ TEST_CASE("loadDistribHydro reads time series by NetCDF position and skips inval
     REQUIRE(nodes[1].y == Catch::Approx(41.0f));
     REQUIRE(nodes[2].y == Catch::Approx(61.0f));
 
-    const std::array<std::vector<float> DistribHydroNode::*, 6> members{
+    const std::array<std::vector<float> DistribHydroNode::*, 5> members{
         &DistribHydroNode::us,
         &DistribHydroNode::vs,
         &DistribHydroNode::wses,
         &DistribHydroNode::temps,
-        &DistribHydroNode::salinity,
-        &DistribHydroNode::is_wet
+        &DistribHydroNode::salinity
     };
     const std::array<size_t, 3> sourcePositions{0, 3, 5};
     for (size_t nodeIndex = 0; nodeIndex < nodes.size(); ++nodeIndex) {
@@ -842,11 +842,17 @@ TEST_CASE("loadDistribHydro reads time series by NetCDF position and skips inval
             const auto &values = nodes[nodeIndex].*members[variableIndex];
             REQUIRE(values.size() == timeCount);
             for (size_t time = 0; time < timeCount; ++time) {
-                const float expected = (variableIndex == 0 || variableIndex == 5) && nodeIndex == 2 && time == 1
+                const float expected = variableIndex == 0 && nodeIndex == 2 && time == 1
                     ? series[variableIndex][sourcePositions[nodeIndex]]
                     : series[variableIndex][time * nodeCount + sourcePositions[nodeIndex]];
                 REQUIRE(values[time] == Catch::Approx(expected));
             }
+        }
+        for (size_t time = 0; time < timeCount; ++time) {
+            const float expectedWetness = nodeIndex == 2 && time == 1
+                ? series[5][sourcePositions[nodeIndex]]
+                : series[5][time * nodeCount + sourcePositions[nodeIndex]];
+            REQUIRE(nodes[nodeIndex].is_wet[time] == (expectedWetness != 0.0f));
         }
     }
 
@@ -873,7 +879,7 @@ TEST_CASE("removeSkippedHydroNodes compacts nodes directly", "[load]") {
             node.wses = {static_cast<float>(id + 6), static_cast<float>(id + 7)};
             node.temps = {static_cast<float>(id + 8), static_cast<float>(id + 9)};
             node.salinity = {static_cast<float>(id + 10), static_cast<float>(id + 11)};
-            node.is_wet = {static_cast<float>(id + 12), static_cast<float>(id + 13)};
+            node.is_wet = {position % 2 == 0, position % 2 != 0};
         }
         return nodes;
     };
@@ -899,7 +905,7 @@ TEST_CASE("removeSkippedHydroNodes compacts nodes directly", "[load]") {
         REQUIRE(nodes[1].wses == std::vector<float>{107.0f, 108.0f});
         REQUIRE(nodes[1].temps == std::vector<float>{109.0f, 110.0f});
         REQUIRE(nodes[1].salinity == std::vector<float>{111.0f, 112.0f});
-        REQUIRE(nodes[1].is_wet == std::vector<float>{113.0f, 114.0f});
+        REQUIRE(nodes[1].is_wet == std::vector<bool>{false, true});
     }
 
     SECTION("all nodes skipped") {
@@ -919,7 +925,7 @@ TEST_CASE("removeSkippedHydroNodes compacts nodes directly", "[load]") {
         REQUIRE(nodes[0].x == Catch::Approx(101.0f));
         REQUIRE(nodes[0].us == std::vector<float>{103.0f, 104.0f});
         REQUIRE(nodes[1].salinity == std::vector<float>{114.0f, 115.0f});
-        REQUIRE(nodes[2].is_wet == std::vector<float>{117.0f, 118.0f});
+        REQUIRE(nodes[2].is_wet == std::vector<bool>{false, true});
     }
 }
 
@@ -957,10 +963,62 @@ TEST_CASE("loadDistribHydro accepts zero-based and one-based IDs", "[load]") {
             REQUIRE(nodes[position].id == static_cast<unsigned>(ids[position]));
             REQUIRE(nodes[position].us[0] == Catch::Approx(series[0][position]));
             REQUIRE(nodes[position].us[1] == Catch::Approx(series[0][nodeCount + position]));
-            REQUIRE(nodes[position].is_wet[0] == Catch::Approx(series[5][position]));
-            REQUIRE(nodes[position].is_wet[1] == Catch::Approx(series[5][nodeCount + position]));
+            REQUIRE(nodes[position].is_wet[0] == (series[5][position] != 0.0f));
+            REQUIRE(nodes[position].is_wet[1] == (series[5][nodeCount + position] != 0.0f));
         }
     }
+}
+
+TEST_CASE("loadDistribHydro converts nonbinary wetness to wet and reports it", "[load]") {
+    constexpr size_t timeCount = 3;
+    constexpr size_t nodeCount = 2;
+    const std::vector<int> ids{10, 20};
+    const std::vector<float> x{1.0f, 2.0f};
+    const std::vector<float> y{3.0f, 4.0f};
+    std::array<std::vector<float>, 6> series;
+    for (size_t variableIndex = 0; variableIndex < series.size() - 1; ++variableIndex) {
+        series[variableIndex].assign(timeCount * nodeCount, static_cast<float>(variableIndex + 1));
+    }
+    series[5] = {0.0f, 1.0f, 2.0f, -2.0f, -1.0f, -1.0f};
+
+    TemporaryHydroFile fixture;
+    writeHydroFixture(fixture.path(), ids, x, y, series, timeCount);
+    std::string flowPath = fixture.path().string();
+    std::vector<DistribHydroNode> nodes;
+    std::ostringstream output;
+    {
+        CoutRedirect redirect(output);
+        loadDistribHydro(flowPath, nodes);
+    }
+
+    REQUIRE(nodes.size() == nodeCount);
+    REQUIRE(nodes[0].is_wet == std::vector<bool>{false, true, true});
+    REQUIRE(nodes[1].is_wet == std::vector<bool>{true, true, true});
+
+    const std::string diagnostics = output.str();
+    REQUIRE(diagnostics.find("Non-binary is_wet value 2 at timestep 1, hydro ID 10, NetCDF position 0; treating as wet.") != std::string::npos);
+    REQUIRE(diagnostics.find("Non-binary is_wet value -2 at timestep 1, hydro ID 20, NetCDF position 1; treating as wet.") != std::string::npos);
+    REQUIRE(diagnostics.find("Non-binary is_wet value -1") == std::string::npos);
+    REQUIRE(diagnostics.find("Non-binary is_wet value 2 at timestep 2") == std::string::npos);
+}
+
+TEST_CASE("loadDistribHydro rejects an all-missing wetness series", "[load]") {
+    constexpr size_t timeCount = 2;
+    const std::vector<int> ids{10};
+    const std::vector<float> x{1.0f};
+    const std::vector<float> y{3.0f};
+    std::array<std::vector<float>, 6> series;
+    for (size_t variableIndex = 0; variableIndex < series.size() - 1; ++variableIndex) {
+        series[variableIndex].assign(timeCount, static_cast<float>(variableIndex + 1));
+    }
+    series[5] = {-1.0f, -1.0f};
+
+    TemporaryHydroFile fixture;
+    writeHydroFixture(fixture.path(), ids, x, y, series, timeCount);
+    std::string flowPath = fixture.path().string();
+    std::vector<DistribHydroNode> nodes;
+
+    REQUIRE_THROWS_AS(loadDistribHydro(flowPath, nodes), AllMissingValuesException);
 }
 
 TEST_CASE("loadDistribHydro requires an empty output vector", "[load]") {

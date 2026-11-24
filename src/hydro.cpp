@@ -127,7 +127,7 @@ bool HydroModel::isDry(MapNode &node) {
     if (node.habitat.isDistributaryOrHarbor())
         return false;
 
-    return node.nearestHydroNode->is_wet[this->getTime()] == 0.0f;
+    return !node.nearestHydroNode->is_wet[this->getTime()];
 }
 
 float limitDepth(const float depth, const Habitat nodeHabitat) {
