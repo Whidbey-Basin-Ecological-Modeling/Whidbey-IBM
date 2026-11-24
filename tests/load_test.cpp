@@ -15,6 +15,7 @@
 #include <netcdf>
 #include "load.h"
 #include "map.h"
+#include "hydro.h"
 #include "custom_exceptions.h"
 #include "catch2/catch_approx.hpp"
 
@@ -1030,4 +1031,25 @@ TEST_CASE("loadDistribHydro requires an empty output vector", "[load]") {
     REQUIRE(nodes.size() == 1);
     REQUIRE(nodes[0].id == 77);
     REQUIRE(nodes[0].us.empty());
+}
+
+TEST_CASE("HydroModel validates initial offset and available records", "[load][hydro]") {
+    constexpr size_t timeCount = 2;
+    const std::vector<int> ids{10};
+    const std::vector<float> x{1.0f};
+    const std::vector<float> y{3.0f};
+    std::array<std::vector<float>, 6> series;
+    for (size_t variableIndex = 0; variableIndex < series.size(); ++variableIndex) {
+        series[variableIndex] = {static_cast<float>(variableIndex), static_cast<float>(variableIndex + 1)};
+    }
+
+    TemporaryHydroFile fixture;
+    writeHydroFixture(fixture.path(), ids, x, y, series, timeCount);
+    const std::string flowPath = fixture.path().string();
+
+    HydroModel hydroModel(flowPath, 1);
+    REQUIRE(hydroModel.getTime() == 1);
+    REQUIRE_THROWS_AS(hydroModel.updateTime(1), std::runtime_error);
+    REQUIRE(hydroModel.getTime() == 2);
+    REQUIRE_THROWS_AS(([&] { HydroModel invalidModel(flowPath, 2); }()), std::runtime_error);
 }

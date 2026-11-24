@@ -21,6 +21,7 @@
 #include <string>
 #include <sstream>
 #include <cmath>
+#include <exception>
 
 #include "model.h"
 #include "fish.h"
@@ -243,6 +244,8 @@ void getTextExtentMultiline(wxDC &dc, std::vector<std::string> &lines, int &w, i
 class FishGui : public wxApp {
 public:
     virtual bool OnInit();
+    bool OnExceptionInMainLoop() override;
+    void OnUnhandledException() override;
 };
 
 class MapView : public wxPanel {
@@ -713,14 +716,7 @@ FishFrame::FishFrame(const wxString &title, const wxPoint &pos, const wxSize& si
         configFile = std::string(argv[1]);
     }
 
-    try {
-        this->model = modelFromConfig(configFile);
-    }
-    catch (std::runtime_error e) {
-        std::cerr << e.what();
-        this->Destroy();
-        return;
-    }
+    this->model = modelFromConfig(configFile);
 
     wxButton *tagButton = new wxButton(this, -1, "Tag Fish");
     tagButton->Enable(false);
@@ -843,4 +839,26 @@ bool FishGui::OnInit() {
     FishFrame *frame = new FishFrame("Skagit River Delta IBM", wxDefaultPosition, wxDefaultSize, this->argc, this->argv);
     frame->Show();
     return true;
+}
+
+bool FishGui::OnExceptionInMainLoop() {
+    throw;
+}
+
+void FishGui::OnUnhandledException() {
+    std::string errorMessage;
+    try {
+        throw;
+    } catch (const std::exception &error) {
+        errorMessage = error.what();
+    } catch (...) {
+        errorMessage = "Unknown exception.";
+    }
+
+    std::cerr << "ERROR: " << errorMessage << std::endl;
+    wxWindow *window = this->GetTopWindow();
+    if (window) {
+        window->Hide();
+    }
+    wxMessageBox(errorMessage, "Model stopped", wxOK | wxICON_ERROR, window);
 }

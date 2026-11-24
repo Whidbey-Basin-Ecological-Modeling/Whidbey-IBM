@@ -3,6 +3,9 @@
 
 #include <cmath>
 #include <iostream>
+#include <limits>
+#include <sstream>
+#include <stdexcept>
 
 #define MIN_WATER_TEMP 0.01f
 #define MIN_WATER_TEMP_DISTRIBUTARY 4.0f
@@ -25,9 +28,17 @@ HydroModel::HydroModel(
     int hydroTimeIntercept
 ) :
     hydroNodes(),
-    hydroTimeIntercept(hydroTimeIntercept)
+    hydroTimeIntercept(hydroTimeIntercept),
+    currTimestep(0)
 {
     loadDistribHydro(flowSpeedFilename, this->hydroNodes);
+    if (this->hydroNodes.empty()) {
+        std::ostringstream errorMessage;
+        errorMessage << "Hydro data contains no nodes or records for model timestep 0 with hydro offset "
+                     << hydroTimeIntercept << ".";
+        std::cerr << "ERROR: " << errorMessage.str() << std::endl;
+        throw std::runtime_error(errorMessage.str());
+    }
     this->updateTime(0L);
 }
 
@@ -37,6 +48,30 @@ long HydroModel::getTime() const {
 
 void HydroModel::updateTime(long newTime) {
     this->currTimestep = newTime;
+    if (this->hydroNodes.empty()) {
+        return;
+    }
+
+    const long hydroOffset = this->hydroTimeIntercept;
+    const bool negativeModelTime = newTime < 0;
+    const bool indexOverflow = !negativeModelTime && hydroOffset > 0 &&
+                               newTime > std::numeric_limits<long>::max() - hydroOffset;
+    const long hydroRecordIndex = negativeModelTime || indexOverflow ? -1 : newTime + hydroOffset;
+    const size_t recordCount = this->hydroNodes.front().us.size();
+    if (negativeModelTime || indexOverflow || hydroRecordIndex < 0 ||
+        static_cast<size_t>(hydroRecordIndex) >= recordCount) {
+        std::ostringstream errorMessage;
+        if (indexOverflow) {
+            errorMessage << "Hydro record index overflows for model timestep " << newTime
+                         << " with hydro offset " << hydroOffset;
+        } else {
+            errorMessage << "Hydro record index " << hydroRecordIndex << " for model timestep " << newTime
+                         << " with hydro offset " << hydroOffset;
+        }
+        errorMessage << " is outside available records: " << recordCount << ".";
+        std::cerr << "ERROR: " << errorMessage.str() << std::endl;
+        throw std::runtime_error(errorMessage.str());
+    }
 }
 
 

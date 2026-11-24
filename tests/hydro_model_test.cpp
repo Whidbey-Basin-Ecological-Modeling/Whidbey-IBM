@@ -1,4 +1,5 @@
 #include <complex>
+#include <stdexcept>
 #include <catch2/catch_test_macros.hpp>
 #include "hydro.h"
 #include "catch2/matchers/catch_matchers.hpp"
@@ -10,6 +11,28 @@ TEST_CASE("hydro updates timestep", "") {
     REQUIRE(hydroModel.getTime() == 4);
     hydroModel.updateTime(7);
     REQUIRE(hydroModel.getTime() == 7);
+}
+
+TEST_CASE("HydroModel rejects unavailable record indices", "[hydro]") {
+    HydroModel hydroModel;
+    hydroModel.hydroNodes.emplace_back(0);
+    hydroModel.hydroNodes[0].us = {1.0f, 2.0f};
+
+    hydroModel.updateTime(0);
+    hydroModel.updateTime(1);
+    REQUIRE(hydroModel.getTime() == 1);
+
+    REQUIRE_THROWS_AS(hydroModel.updateTime(2), std::runtime_error);
+    REQUIRE(hydroModel.getTime() == 2);
+    REQUIRE_THROWS_AS(hydroModel.updateTime(-1), std::runtime_error);
+    REQUIRE(hydroModel.getTime() == -1);
+}
+
+TEST_CASE("HydroModel rejects nodes with no hydro records", "[hydro]") {
+    HydroModel hydroModel;
+    hydroModel.hydroNodes.emplace_back(0);
+
+    REQUIRE_THROWS_AS(hydroModel.updateTime(0), std::runtime_error);
 }
 
 TEST_CASE("HydroModel::getScaledFlowVelocityAt tests", "[hydro]") {
@@ -112,6 +135,7 @@ TEST_CASE("HydroModel::calculateFlowSpeedScalar tests", "[hydro]") {
 TEST_CASE("HydroModel::isDry tests", "[hydro]") {
     HydroModel hydro_model;
     hydro_model.hydroNodes.emplace_back(0);
+    hydro_model.hydroNodes[0].us = {0.0f, 0.0f};
     // At timestep 0: dry; at timestep 1: wet
     hydro_model.hydroNodes[0].is_wet = {false, true};
 
