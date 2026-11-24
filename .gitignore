@@ -62,7 +62,7 @@ Catch2
 
 /.idea/editor.xml
 /.junie/*
-/data/whidbey/hydro/WhidbeyBasin_Compiled_Full.nc
+/data/whidbey/hydro/WhidbeyBasin_Compiled_Full*.nc
 /.idea/inspectionProfiles/profiles_settings.xml
 /.idea/Whidbey-IBM.iml
 /netcdf-c/
