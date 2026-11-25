@@ -68,4 +68,6 @@ Catch2
 /netcdf-c/
 /netcdf-cxx4/
 /data/whidbey/output/
+/data/whidbey/nodes/old/
+/data/whidbey/nodes/new/
 /temp/*
