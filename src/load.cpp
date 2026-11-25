@@ -1544,7 +1544,11 @@ void loadMap(
     std::unordered_map<MapNode *, SamplingSite *> samplingSitesByNode;
     auto zeroBasedDest = std::vector<MapNode *>(dest.begin() + 1, dest.end());
     std::unordered_set<MapNode *> disconnectedNodes = identifyDisconnectedNodes(zeroBasedDest, recruitPoints);
-    removeDisconnectedNodes(disconnectedNodes, zeroBasedDest, recruitPoints, monitoringPoints, samplingSites, samplingSitesByNode);
+    if (!disconnectedNodes.empty()) {
+        std::cerr << "Error: Found " << disconnectedNodes.size()
+                  << " map nodes disconnected from all recruit points." << std::endl;
+        exit(1);
+    }
 
     std::unordered_set<MapNode *> protectedNodes;
     checkDisjointDistributariesAndOtherMapErrors(zeroBasedDest, recruitPoints, protectedNodes);

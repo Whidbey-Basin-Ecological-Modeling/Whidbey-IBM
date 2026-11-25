@@ -5,17 +5,24 @@
 #include <catch2/catch_test_macros.hpp>
 #include <array>
 #include <chrono>
+#include <cstdlib>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <system_error>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #include <vector>
 #include <netcdf>
 #include "load.h"
 #include "map.h"
 #include "hydro.h"
+#include "initial_population.h"
+#include "model_config_map.h"
 #include "custom_exceptions.h"
 #include "catch2/catch_approx.hpp"
 
@@ -38,6 +45,126 @@ public:
 private:
     std::filesystem::path path_;
 };
+
+class TemporaryMapFiles {
+public:
+    explicit TemporaryMapFiles(bool disconnected) {
+        const auto timestamp = std::chrono::steady_clock::now().time_since_epoch().count();
+        directory_ = std::filesystem::temp_directory_path() / ("map_loader_test_" + std::to_string(timestamp));
+        std::filesystem::create_directories(directory_);
+
+        locationFilePath_ = directory_ / "locations.csv";
+        geometryFilePath_ = directory_ / "geometry.csv";
+        edgeFilePath_ = directory_ / "edges.csv";
+        habitatFilePath_ = directory_ / "habitats.csv";
+
+        const int nodeCount = disconnected ? 4 : 2;
+        std::ofstream locations(locationFilePath_);
+        std::ofstream geometry(geometryFilePath_);
+        std::ofstream habitats(habitatFilePath_);
+        locations << "node,x,y\n";
+        geometry << "node,x,y,area\n";
+        habitats << "node,habitat\n";
+        for (int nodeId = 1; nodeId <= nodeCount; ++nodeId) {
+            locations << nodeId << ',' << nodeId << ",0\n";
+            geometry << nodeId << ',' << nodeId << ",0,1\n";
+            habitats << nodeId << ",open water\n";
+        }
+
+        std::ofstream edges(edgeFilePath_);
+        edges << "source,target,length\n1,2,1\n";
+        if (disconnected) {
+            edges << "3,4,1\n";
+        }
+    }
+
+    ~TemporaryMapFiles() {
+        std::error_code error;
+        std::filesystem::remove_all(directory_, error);
+    }
+
+    std::string locationFilePath() const { return locationFilePath_.string(); }
+    std::string edgeFilePath() const { return edgeFilePath_.string(); }
+    std::string geometryFilePath() const { return geometryFilePath_.string(); }
+    std::string habitatFilePath() const { return habitatFilePath_.string(); }
+
+private:
+    std::filesystem::path directory_;
+    std::filesystem::path locationFilePath_;
+    std::filesystem::path edgeFilePath_;
+    std::filesystem::path geometryFilePath_;
+    std::filesystem::path habitatFilePath_;
+};
+
+void loadMapFromTestFiles(const TemporaryMapFiles &files, std::vector<MapNode *> &nodes,
+                          std::vector<DistribHydroNode> &hydroNodes) {
+    hydroNodes.emplace_back(101);
+    hydroNodes.back().x = 1.0f;
+    hydroNodes.back().y = 0.0f;
+    std::vector<InitialPopulation> initialPopulations(1);
+    initialPopulations[0].entryNodeIds = {1};
+    std::vector<MapNode *> monitoringPoints;
+    std::vector<SamplingSite *> samplingSites;
+    ModelConfigMap configMap;
+    std::string locationFilePath = files.locationFilePath();
+    std::string edgeFilePath = files.edgeFilePath();
+    std::string geometryFilePath = files.geometryFilePath();
+    std::string habitatFilePath = files.habitatFilePath();
+    loadMap(nodes, locationFilePath, edgeFilePath, geometryFilePath, habitatFilePath,
+            hydroNodes, initialPopulations, monitoringPoints, samplingSites, 0.0f, configMap);
+    for (SamplingSite *samplingSite : samplingSites) {
+        delete samplingSite;
+    }
+}
+
+struct MapNodesOwner {
+    std::vector<MapNode *> nodes;
+
+    ~MapNodesOwner() {
+        for (MapNode *node : nodes) {
+            delete node;
+        }
+    }
+};
+
+struct ChildProcessResult {
+    int exitCode;
+    std::string output;
+};
+
+ChildProcessResult loadMapInChildProcess(const TemporaryMapFiles &files) {
+    int outputPipe[2];
+    REQUIRE(pipe(outputPipe) == 0);
+    std::cout.flush();
+    std::cerr.flush();
+    const pid_t child = fork();
+    REQUIRE(child >= 0);
+    if (child == 0) {
+        close(outputPipe[0]);
+        if (dup2(outputPipe[1], STDOUT_FILENO) == -1 || dup2(outputPipe[1], STDERR_FILENO) == -1) {
+            std::_Exit(125);
+        }
+        close(outputPipe[1]);
+        std::vector<MapNode *> nodes;
+        std::vector<DistribHydroNode> hydroNodes;
+        loadMapFromTestFiles(files, nodes, hydroNodes);
+        std::_Exit(0);
+    }
+
+    close(outputPipe[1]);
+    std::string output;
+    char buffer[256];
+    ssize_t bytesRead;
+    while ((bytesRead = read(outputPipe[0], buffer, sizeof(buffer))) > 0) {
+        output.append(buffer, static_cast<size_t>(bytesRead));
+    }
+    close(outputPipe[0]);
+
+    int status = 0;
+    REQUIRE(waitpid(child, &status, 0) == child);
+    REQUIRE(WIFEXITED(status));
+    return {WEXITSTATUS(status), output};
+}
 
 void writeHydroFixture(const std::filesystem::path &path, const std::vector<int> &ids,
                        const std::vector<float> &x, const std::vector<float> &y,
@@ -1052,4 +1179,27 @@ TEST_CASE("HydroModel validates initial offset and available records", "[load][h
     REQUIRE_THROWS_AS(hydroModel.updateTime(1), std::runtime_error);
     REQUIRE(hydroModel.getTime() == 2);
     REQUIRE_THROWS_AS(([&] { HydroModel invalidModel(flowPath, 2); }()), std::runtime_error);
+}
+
+TEST_CASE("loadMap rejects disconnected nodes before hydro assignment", "[load]") {
+    TemporaryMapFiles files(true);
+    const ChildProcessResult result = loadMapInChildProcess(files);
+
+    REQUIRE(result.exitCode != 0);
+    REQUIRE(result.output.find("Found 2 map nodes disconnected from all recruit points") != std::string::npos);
+    REQUIRE(result.output.find("Finished loading map") == std::string::npos);
+}
+
+TEST_CASE("loadMap continues hydro assignment for connected nodes", "[load]") {
+    TemporaryMapFiles files(false);
+    MapNodesOwner map;
+    std::vector<DistribHydroNode> hydroNodes;
+
+    loadMapFromTestFiles(files, map.nodes, hydroNodes);
+
+    REQUIRE(map.nodes.size() == 3);
+    REQUIRE(hydroNodes.size() == 1);
+    REQUIRE(map.nodes[1]->nearestHydroNode == &hydroNodes[0]);
+    REQUIRE(map.nodes[1]->hydroNodeDistance == 0.0f);
+    REQUIRE(map.nodes[2]->nearestHydroNode == &hydroNodes[0]);
 }
